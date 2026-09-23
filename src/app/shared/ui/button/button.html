@@ -1,0 +1,17 @@
+<button
+  class="button"
+  [class.button--primary]="variant() === 'primary'"
+  [class.button--secondary]="variant() === 'secondary'"
+  [class.button--ghost]="variant() === 'ghost'"
+  [class.button--danger]="variant() === 'danger'"
+  [class.button--small]="size() === 'small'"
+  [class.button--medium]="size() === 'medium'"
+  [class.button--large]="size() === 'large'"
+  [class.button--full]="fullWidth()"
+  [disabled]="disabled()"
+  [type]="type()"
+>
+  <span class="button__icon" aria-hidden="true"><ng-content select="[button-leading]" /></span>
+  <span class="button__label"><ng-content /></span>
+  <span class="button__icon" aria-hidden="true"><ng-content select="[button-trailing]" /></span>
+</button>

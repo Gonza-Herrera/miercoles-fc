@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.card {
+  height: 100%;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.card--elevated {
+  border-color: transparent;
+  box-shadow: var(--shadow-md);
+}
+
+.card--interactive {
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: var(--color-purple-100);
+    box-shadow: var(--shadow-sm);
+  }
+}

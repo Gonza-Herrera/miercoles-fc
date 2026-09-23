@@ -1,0 +1,10 @@
+<button
+  class="chip"
+  type="button"
+  [class.chip--selected]="selected()"
+  [attr.aria-pressed]="selected()"
+  [disabled]="disabled()"
+  (click)="toggle()"
+>
+  <ng-content />
+</button>
