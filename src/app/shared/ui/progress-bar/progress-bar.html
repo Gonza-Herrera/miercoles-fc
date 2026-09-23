@@ -1,0 +1,15 @@
+<div class="progress__meta">
+  <span>{{ label() }}</span>
+  <span class="progress__value">{{ accessibleValueText() }}</span>
+</div>
+<div
+  class="progress__track"
+  role="progressbar"
+  [attr.aria-label]="label()"
+  [attr.aria-valuemax]="safeMax()"
+  [attr.aria-valuemin]="0"
+  [attr.aria-valuenow]="safeValue()"
+  [attr.aria-valuetext]="accessibleValueText()"
+>
+  <span class="progress__fill" [style.width.%]="percentage()"></span>
+</div>

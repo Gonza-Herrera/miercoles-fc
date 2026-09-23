@@ -17,7 +17,7 @@ describe('application routes', () => {
 
     await harness.navigateByUrl('/', Home);
 
-    expect(harness.routeNativeElement?.textContent).toContain('Foundation ready.');
+    expect(harness.routeNativeElement?.textContent).toContain('Design system · PR02');
   });
 
   it('redirects unknown routes to Home', async () => {
@@ -25,6 +25,8 @@ describe('application routes', () => {
 
     await harness.navigateByUrl('/not-found', Home);
 
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Miércoles FC');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      'Una base cálida',
+    );
   });
 });

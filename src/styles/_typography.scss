@@ -1,0 +1,60 @@
+.ds-display,
+.ds-page-title,
+.ds-section-title,
+.ds-card-title {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.ds-display {
+  font-size: var(--font-size-display);
+  line-height: var(--line-height-tight);
+}
+
+.ds-page-title {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-heading);
+}
+
+.ds-section-title {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-heading);
+}
+
+.ds-card-title {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-heading);
+}
+
+.ds-body,
+.ds-body-small,
+.ds-caption {
+  color: var(--color-text-secondary);
+}
+
+.ds-body {
+  font-size: var(--font-size-md);
+}
+
+.ds-body-small {
+  font-size: var(--font-size-sm);
+}
+
+.ds-caption {
+  font-size: var(--font-size-xs);
+}
+
+.ds-button-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
+}
+
+.ds-amount {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-tight);
+}

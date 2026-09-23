@@ -1,4 +1,194 @@
-<main>
-  <h1>Miércoles FC</h1>
-  <p>Foundation ready.</p>
+<main class="showcase ds-page">
+  <header class="showcase__hero">
+    <app-badge variant="primary">Design system · PR02</app-badge>
+    <div class="showcase__intro">
+      <p class="showcase__eyebrow">Miércoles FC</p>
+      <h1 class="ds-page-title">Una base cálida para jugar y compartir</h1>
+      <p class="ds-body">
+        Primitivas simples, accesibles y pensadas primero para pantallas móviles.
+      </p>
+    </div>
+  </header>
+
+  <section class="showcase__section" aria-labelledby="colors-title">
+    <div class="showcase__section-heading">
+      <p class="showcase__eyebrow">Fundamentos</p>
+      <h2 id="colors-title" class="ds-section-title">Color</h2>
+    </div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--primary"><span>Acción</span></div>
+      <div class="color-swatch color-swatch--football"><span>Fútbol</span></div>
+      <div class="color-swatch color-swatch--social"><span>Social</span></div>
+      <div class="color-swatch color-swatch--success"><span>Éxito</span></div>
+      <div class="color-swatch color-swatch--warning"><span>Alerta</span></div>
+      <div class="color-swatch color-swatch--danger"><span>Error</span></div>
+    </div>
+  </section>
+
+  <app-divider />
+
+  <section class="showcase__section" aria-labelledby="type-title">
+    <div class="showcase__section-heading">
+      <p class="showcase__eyebrow">Jerarquía</p>
+      <h2 id="type-title" class="ds-section-title">Tipografía y números</h2>
+    </div>
+    <app-card>
+      <div class="type-sample">
+        <p class="ds-display">10</p>
+        <p class="ds-page-title">Título de página</p>
+        <p class="ds-card-title">Título de tarjeta</p>
+        <p class="ds-body">Texto cómodo para leer rápidamente junto a la cancha.</p>
+        <p class="ds-body-small">Información secundaria y ayuda contextual.</p>
+        <p class="ds-caption">ETIQUETA · 20:30</p>
+        <p class="ds-amount">$50.000 · $5.000 c/u</p>
+      </div>
+    </app-card>
+    <div class="spacing-scale" aria-label="Escala visual de espaciado">
+      <span class="spacing-scale__item spacing-scale__item--1"></span>
+      <span class="spacing-scale__item spacing-scale__item--2"></span>
+      <span class="spacing-scale__item spacing-scale__item--3"></span>
+      <span class="spacing-scale__item spacing-scale__item--4"></span>
+      <span class="spacing-scale__item spacing-scale__item--5"></span>
+    </div>
+  </section>
+
+  <app-divider />
+
+  <section id="components" class="showcase__section" aria-labelledby="actions-title">
+    <div class="showcase__section-heading">
+      <p class="showcase__eyebrow">Primitivas</p>
+      <h2 id="actions-title" class="ds-section-title">Acciones</h2>
+    </div>
+    <div class="button-grid">
+      <app-button fullWidth>
+        <svg
+          button-leading
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Principal
+      </app-button>
+      <app-button variant="secondary" fullWidth>Secundario</app-button>
+      <app-button variant="ghost" fullWidth>Fantasma</app-button>
+      <app-button variant="danger" fullWidth>Peligro</app-button>
+      <app-button size="small">Pequeño</app-button>
+      <app-button size="large">Grande</app-button>
+      <app-button disabled>Deshabilitado</app-button>
+      <div class="icon-actions">
+        <app-icon-button ariaLabel="Agregar" variant="primary">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </app-icon-button>
+        <app-icon-button ariaLabel="Más opciones" variant="neutral">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <circle cx="5" cy="12" r="1.8" />
+            <circle cx="12" cy="12" r="1.8" />
+            <circle cx="19" cy="12" r="1.8" />
+          </svg>
+        </app-icon-button>
+        <app-icon-button ariaLabel="Cerrar" variant="ghost" disabled>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <path
+              d="m6 6 12 12M18 6 6 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </app-icon-button>
+      </div>
+    </div>
+  </section>
+
+  <section class="showcase__section" aria-labelledby="surfaces-title">
+    <h2 id="surfaces-title" class="ds-section-title">Superficies y estados</h2>
+    <div class="card-grid">
+      <app-card>
+        <div class="profile-row">
+          <app-avatar name="Gonzalo Herrera" />
+          <div class="profile-row__copy">
+            <h3 class="ds-card-title">Tarjeta base</h3>
+            <p class="ds-body-small">Borde suave y contenido flexible.</p>
+          </div>
+          <app-badge variant="success">Confirmado</app-badge>
+        </div>
+      </app-card>
+      <app-card variant="elevated">
+        <div class="profile-row">
+          <app-avatar name="Gazpar" size="large" />
+          <div class="profile-row__copy">
+            <h3 class="ds-card-title">Superficie elevada</h3>
+            <p class="ds-body-small">Una sombra sutil para jerarquía puntual.</p>
+          </div>
+        </div>
+      </app-card>
+      <app-card variant="interactive">
+        <h3 class="ds-card-title">Superficie interactiva</h3>
+        <p class="ds-body-small">El foco vive en el control real dentro de la tarjeta.</p>
+        <a class="showcase__link" href="#progress-title">Ver progreso</a>
+      </app-card>
+    </div>
+    <div class="badge-row" aria-label="Variantes de insignias">
+      <app-badge>Neutral</app-badge>
+      <app-badge variant="primary">Principal</app-badge>
+      <app-badge variant="success">Pagado</app-badge>
+      <app-badge variant="warning">Pendiente</app-badge>
+      <app-badge variant="danger">Error</app-badge>
+    </div>
+    <div class="chip-row" aria-label="Ejemplo de selección">
+      <app-chip selected>Seleccionado</app-chip>
+      <app-chip>Disponible</app-chip>
+      <app-chip disabled>Deshabilitado</app-chip>
+    </div>
+  </section>
+
+  <app-divider />
+
+  <section class="showcase__section" aria-labelledby="progress-title">
+    <h2 id="progress-title" class="ds-section-title">Progreso</h2>
+    <app-card>
+      <div class="progress-stack">
+        <app-progress-bar label="Sin comenzar" [value]="0" [max]="10" valueText="0 de 10" />
+        <app-progress-bar label="En curso" [value]="7" [max]="10" valueText="7 de 10" />
+        <app-progress-bar label="Completo" [value]="10" [max]="10" valueText="10 de 10" />
+      </div>
+    </app-card>
+  </section>
+
+  <section class="showcase__section" aria-labelledby="empty-title">
+    <h2 id="empty-title" class="ds-section-title">Estado vacío</h2>
+    <app-card>
+      <app-empty-state
+        title="Todavía no hay elementos"
+        description="Usá una acción clara para ayudar a continuar."
+      >
+        <svg empty-state-icon viewBox="0 0 24 24" width="28" height="28" fill="none">
+          <path
+            d="M7 3h10v18H7zM10 8h4M10 12h4"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <app-button empty-state-action size="small">Crear elemento</app-button>
+      </app-empty-state>
+    </app-card>
+  </section>
 </main>

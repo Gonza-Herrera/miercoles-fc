@@ -1,0 +1,106 @@
+:root {
+  color-scheme: light;
+
+  // Primitive palette
+  --color-white: #ffffff;
+  --color-ivory-50: #faf9f5;
+  --color-ivory-100: #f5f2eb;
+  --color-ink-900: #182033;
+  --color-purple-50: #f3effc;
+  --color-purple-100: #e7def8;
+  --color-purple-500: #6d45c6;
+  --color-purple-700: #50309b;
+  --color-blue-50: #edf5fb;
+  --color-blue-500: #3976b8;
+  --color-coral-50: #fdf0ec;
+  --color-coral-500: #b45143;
+  --color-green-50: #edf7f1;
+  --color-green-600: #2f7651;
+  --color-amber-50: #fff6df;
+  --color-amber-700: #80550c;
+  --color-red-50: #fcedef;
+  --color-red-600: #ad3949;
+  --color-red-700: #8f2e3c;
+  --color-neutral-50: #f7f7f8;
+  --color-neutral-100: #ededf0;
+  --color-neutral-200: #dbdce3;
+  --color-neutral-500: #686d7c;
+  --color-neutral-700: #454a59;
+
+  // Semantic color roles
+  --color-brand: var(--color-purple-500);
+  --color-primary: var(--color-purple-500);
+  --color-primary-hover: var(--color-purple-700);
+  --color-secondary: var(--color-blue-500);
+  --color-social: var(--color-coral-500);
+  --color-background: var(--color-ivory-50);
+  --color-surface: var(--color-white);
+  --color-surface-subtle: var(--color-ivory-100);
+  --color-text-primary: var(--color-ink-900);
+  --color-text-secondary: var(--color-neutral-500);
+  --color-border: var(--color-neutral-200);
+  --color-success: var(--color-green-600);
+  --color-success-surface: var(--color-green-50);
+  --color-warning: var(--color-amber-700);
+  --color-warning-surface: var(--color-amber-50);
+  --color-danger: var(--color-red-600);
+  --color-danger-hover: var(--color-red-700);
+  --color-danger-surface: var(--color-red-50);
+  --color-disabled: var(--color-neutral-100);
+  --color-disabled-text: var(--color-neutral-500);
+  --color-focus-ring: var(--color-blue-500);
+
+  // Typography
+  --font-family-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-numeric: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.375rem;
+  --font-size-2xl: 1.75rem;
+  --font-size-display: clamp(2.25rem, 9vw, 3.5rem);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.15;
+  --line-height-heading: 1.25;
+  --line-height-body: 1.5;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-label: 0.01em;
+  --letter-spacing-eyebrow: 0.08em;
+
+  // Spacing
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  // Shape and elevation
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 999px;
+  --shadow-sm: 0 1px 3px rgb(24 32 51 / 8%);
+  --shadow-md: 0 8px 24px rgb(24 32 51 / 10%);
+
+  // Layout
+  --content-max-width: 68rem;
+  --page-inline-padding: 1rem;
+  --bottom-navigation-height: 4.5rem;
+  --touch-target-min: 2.75rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --page-inline-padding: 1.5rem;
+  }
+}

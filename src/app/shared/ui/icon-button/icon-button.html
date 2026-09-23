@@ -1,0 +1,14 @@
+<button
+  class="icon-button"
+  [class.icon-button--primary]="variant() === 'primary'"
+  [class.icon-button--neutral]="variant() === 'neutral'"
+  [class.icon-button--ghost]="variant() === 'ghost'"
+  [class.icon-button--small]="size() === 'small'"
+  [class.icon-button--medium]="size() === 'medium'"
+  [class.icon-button--large]="size() === 'large'"
+  [attr.aria-label]="ariaLabel()"
+  [disabled]="disabled()"
+  [type]="type()"
+>
+  <span class="icon-button__icon" aria-hidden="true"><ng-content /></span>
+</button>

@@ -1,0 +1,12 @@
+<span
+  class="avatar"
+  [class.avatar--small]="size() === 'small'"
+  [class.avatar--medium]="size() === 'medium'"
+  [class.avatar--large]="size() === 'large'"
+>
+  @if (src(); as imageSource) {
+    <img class="avatar__image" [src]="imageSource" [alt]="imageAlt()" />
+  } @else {
+    <span class="avatar__fallback" role="img" [attr.aria-label]="name()">{{ initials() }}</span>
+  }
+</span>
