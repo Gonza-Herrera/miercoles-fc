@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Local Supabase browser configuration (publishable values only; never secret/service-role keys)
+/public/config/supabase-config.json
+
 # System files
 .DS_Store
 Thumbs.db
