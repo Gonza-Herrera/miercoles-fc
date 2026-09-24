@@ -1,13 +1,27 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { vi } from 'vitest';
 
 import { routes } from './app.routes';
+import { AuthService } from './core/auth/auth.service';
 
 describe('application routes', () => {
+  const authenticated = signal(true);
+  const authStub = {
+    displayName: signal('Gonzalo'),
+    initialize: vi.fn().mockResolvedValue(undefined),
+    isAuthenticated: authenticated,
+    profile: signal(null),
+    signOut: vi.fn().mockResolvedValue(undefined),
+    user: signal({ email: 'gonzalo@example.com' }),
+  };
+
   beforeEach(() => {
+    authenticated.set(true);
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes)],
+      providers: [provideRouter(routes), { provide: AuthService, useValue: authStub }],
     });
   });
 
@@ -42,5 +56,15 @@ describe('application routes', () => {
 
     expect(TestBed.inject(Router).url).toBe('/');
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Inicio');
+  });
+
+  it('redirects unauthenticated application routes to auth with a safe return URL', async () => {
+    authenticated.set(false);
+    const harness = await RouterTestingHarness.create();
+
+    await harness.navigateByUrl('/payments');
+
+    expect(TestBed.inject(Router).url).toBe('/auth?returnUrl=%2Fpayments');
+    expect(harness.routeNativeElement?.textContent).toContain('Enviarme un enlace');
   });
 });

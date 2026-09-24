@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './core/auth/auth.guard';
+
 export const routes: Routes = [
   {
     path: 'design-system',
@@ -9,7 +11,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'auth',
+    loadChildren: () =>
+      import('./features/auth/auth.routes').then(({ AUTH_ROUTES }) => AUTH_ROUTES),
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./shared/layout/app-shell/app-shell').then(({ AppShell }) => AppShell),
     children: [

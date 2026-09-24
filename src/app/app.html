@@ -1,1 +1,5 @@
-<router-outlet />
+@if (auth.isInitializing()) {
+  <app-auth-loading />
+} @else {
+  <router-outlet />
+}

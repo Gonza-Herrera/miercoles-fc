@@ -33,7 +33,14 @@ export function createSupabaseClient(
 ): SupabaseClient<Database> {
   const validatedConfig = validateSupabaseConfig(config);
 
-  return createClient<Database>(validatedConfig.url, validatedConfig.publishableKey);
+  return createClient<Database>(validatedConfig.url, validatedConfig.publishableKey, {
+    auth: {
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'implicit',
+      persistSession: true,
+    },
+  });
 }
 
 export async function loadSupabaseConfig(
