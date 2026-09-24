@@ -6,7 +6,7 @@ import { Card, EmptyState } from '../../shared/ui';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Card, EmptyState, PageContainer],
-  selector: 'app-home',
-  templateUrl: './home.html',
+  selector: 'app-dinner',
+  templateUrl: './dinner.html',
 })
-export class Home {}
+export class Dinner {}

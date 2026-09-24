@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application and design-system foundations. It does not yet implement those business workflows.
+This repository currently contains the application foundation, Design System, and mobile application shell. It does not yet implement those business workflows.
 
 ## Current status
 
-**PR02 — Design System Foundations**
+**PR03 — Mobile App Shell**
 
-PR01 established the standalone Angular application, strict TypeScript, lazy-loaded routing, Vitest, ESLint, and Prettier. PR02 adds centralized visual tokens, accessible reusable UI primitives, and a temporary mobile-first showcase. Supabase integration and PWA capabilities are planned but are not implemented.
+PR01 established the Angular foundation and PR02 added centralized visual tokens and reusable UI primitives. PR03 introduces the responsive application shell, header, route-driven bottom navigation, and placeholder feature pages. Supabase integration and PWA capabilities are planned but are not implemented.
 
 ## Tech stack
 
@@ -32,10 +32,11 @@ Application code follows a feature-oriented structure:
 
 ```text
 src/app/
-├── core/       # Future application-wide singleton infrastructure
-├── shared/ui/  # Reusable, domain-agnostic visual primitives
-├── features/   # Independently evolvable application features
-│   └── home/
+├── core/          # Future application-wide singleton infrastructure
+├── shared/
+│   ├── layout/    # Shell, header, navigation, and page composition
+│   └── ui/        # Reusable, domain-agnostic visual primitives
+├── features/      # Independently evolvable, lazy-loaded features
 ├── app.config.ts
 ├── app.routes.ts
 └── app.ts
@@ -43,11 +44,23 @@ src/app/
 
 Only directories with useful code are committed. `core/` will be introduced when an application-wide concern belongs there.
 
-The root component is an application host. The root route lazy-loads the Home feature, while each future feature can own its pages, components, models, data access, state, and routes. Feature-specific code should remain inside its feature rather than moving into `shared/`.
+The root component remains a minimal router host. Primary feature routes render inside a lazy-loaded mobile shell, while each feature owns its page and routes. Feature-specific code should remain inside its feature rather than moving into `shared/`.
 
 Local and feature state will follow a Signals-first approach using `signal()`, `computed()`, and `effect()` when they solve a real state need. PR01 intentionally introduces no artificial state or state-management library.
 
 Design tokens and global foundations live in `src/styles/`. See [Design System documentation](docs/design-system.md) for principles, token semantics, component APIs, and accessibility guidance.
+
+## Application routes
+
+| Route            | Purpose                                         |
+| ---------------- | ----------------------------------------------- |
+| `/`              | Home placeholder inside the application shell   |
+| `/match`         | Match placeholder                               |
+| `/dinner`        | Dinner placeholder                              |
+| `/payments`      | Payments placeholder                            |
+| `/design-system` | Development showcase outside primary navigation |
+
+Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
 
 ## Getting started
 
@@ -84,7 +97,8 @@ The test suite covers the application host, routing, the showcase, and reusable 
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
-- Current: **PR02 — Design System Foundations**
-- Next: **PR03 — Mobile App Shell**
+- Completed: **PR02 — Design System Foundations**
+- Current: **PR03 — Mobile App Shell**
+- Next: **PR04 — PWA Foundation**
 
 Product features, Supabase, authentication, realtime behavior, and PWA installation will be implemented only in later roadmap stages.
