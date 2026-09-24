@@ -1,282 +1,641 @@
-/**
- * Bootstrap database contract derived from the PR05 migration.
- * Replace this file with `npm run supabase:types` whenever the schema changes.
- * The CLI-generated output remains the source of truth once a local database is available.
- */
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-export type GroupMemberRole = 'ADMIN' | 'MEMBER';
-export type EventStatus = 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'SETTLEMENT' | 'CLOSED';
-export type AttendanceResponse = 'UNKNOWN' | 'YES' | 'NO';
-export type ActualAttendanceStatus = 'UNSET' | 'YES' | 'NO';
-export type PaymentCategory = 'COURT' | 'DINNER';
-export type PaymentStatus = 'PENDING' | 'PAID';
-
-interface TableDefinition<Row, Insert> {
-  Row: Row;
-  Insert: Insert;
-  Update: Partial<Insert>;
-  Relationships: [];
-}
-
-export interface ProfileRow {
-  id: string;
-  display_name: string;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ProfileInsert {
-  id: string;
-  display_name: string;
-  avatar_url?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface GroupRow {
-  id: string;
-  name: string;
-  description: string | null;
-  avatar_url: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface GroupInsert {
-  id?: string;
-  name: string;
-  description?: string | null;
-  avatar_url?: string | null;
-  created_by: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface GroupMemberRow {
-  id: string;
-  group_id: string;
-  profile_id: string | null;
-  display_name: string;
-  nickname: string | null;
-  avatar_url: string | null;
-  role: GroupMemberRole;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface GroupMemberInsert {
-  id?: string;
-  group_id: string;
-  profile_id?: string | null;
-  display_name: string;
-  nickname?: string | null;
-  avatar_url?: string | null;
-  role?: GroupMemberRole;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface GroupInvitationRow {
-  id: string;
-  group_id: string;
-  group_member_id: string;
-  token_hash: string;
-  created_by: string;
-  expires_at: string | null;
-  accepted_at: string | null;
-  revoked_at: string | null;
-  created_at: string;
-}
-
-export interface GroupInvitationInsert {
-  id?: string;
-  group_id: string;
-  group_member_id: string;
-  token_hash: string;
-  created_by: string;
-  expires_at?: string | null;
-  accepted_at?: string | null;
-  revoked_at?: string | null;
-  created_at?: string;
-}
-
-export interface EventRow {
-  id: string;
-  group_id: string;
-  created_by: string;
-  title: string | null;
-  starts_at: string;
-  location: string | null;
-  court_price_minor: number | null;
-  currency_code: string;
-  status: EventStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface EventInsert {
-  id?: string;
-  group_id: string;
-  created_by: string;
-  title?: string | null;
-  starts_at: string;
-  location?: string | null;
-  court_price_minor?: number | null;
-  currency_code?: string;
-  status?: EventStatus;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface EventParticipantRow {
-  id: string;
-  event_id: string;
-  group_member_id: string | null;
-  guest_display_name: string | null;
-  football_response: AttendanceResponse;
-  dinner_response: AttendanceResponse;
-  actual_football: ActualAttendanceStatus;
-  actual_dinner: ActualAttendanceStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface EventParticipantInsert {
-  id?: string;
-  event_id: string;
-  group_member_id?: string | null;
-  guest_display_name?: string | null;
-  football_response?: AttendanceResponse;
-  dinner_response?: AttendanceResponse;
-  actual_football?: ActualAttendanceStatus;
-  actual_dinner?: ActualAttendanceStatus;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface TeamRow {
-  id: string;
-  event_id: string;
-  name: string;
-  position: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TeamInsert {
-  id?: string;
-  event_id: string;
-  name: string;
-  position: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface TeamMemberRow {
-  id: string;
-  event_id: string;
-  team_id: string;
-  event_participant_id: string;
-  created_at: string;
-}
-
-export interface TeamMemberInsert {
-  id?: string;
-  event_id: string;
-  team_id: string;
-  event_participant_id: string;
-  created_at?: string;
-}
-
-export interface EventManagerRow {
-  id: string;
-  event_id: string;
-  team_id: string;
-  group_member_id: string;
-  created_at: string;
-}
-
-export interface EventManagerInsert {
-  id?: string;
-  event_id: string;
-  team_id: string;
-  group_member_id: string;
-  created_at?: string;
-}
-
-export interface DinnerExpenseRow {
-  id: string;
-  event_id: string;
-  description: string;
-  amount_minor: number;
-  paid_by_group_member_id: string | null;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DinnerExpenseInsert {
-  id?: string;
-  event_id: string;
-  description: string;
-  amount_minor: number;
-  paid_by_group_member_id?: string | null;
-  created_by: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface PaymentRow {
-  id: string;
-  event_id: string;
-  event_participant_id: string;
-  category: PaymentCategory;
-  amount_minor: number;
-  status: PaymentStatus;
-  paid_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PaymentInsert {
-  id?: string;
-  event_id: string;
-  event_participant_id: string;
-  category: PaymentCategory;
-  amount_minor: number;
-  status?: PaymentStatus;
-  paid_at?: string | null;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: '14.5';
+  };
   public: {
     Tables: {
-      profiles: TableDefinition<ProfileRow, ProfileInsert>;
-      groups: TableDefinition<GroupRow, GroupInsert>;
-      group_members: TableDefinition<GroupMemberRow, GroupMemberInsert>;
-      group_invitations: TableDefinition<GroupInvitationRow, GroupInvitationInsert>;
-      events: TableDefinition<EventRow, EventInsert>;
-      event_participants: TableDefinition<EventParticipantRow, EventParticipantInsert>;
-      teams: TableDefinition<TeamRow, TeamInsert>;
-      team_members: TableDefinition<TeamMemberRow, TeamMemberInsert>;
-      event_managers: TableDefinition<EventManagerRow, EventManagerInsert>;
-      dinner_expenses: TableDefinition<DinnerExpenseRow, DinnerExpenseInsert>;
-      payments: TableDefinition<PaymentRow, PaymentInsert>;
+      dinner_expenses: {
+        Row: {
+          amount_minor: number;
+          created_at: string;
+          created_by: string;
+          description: string;
+          event_id: string;
+          id: string;
+          paid_by_group_member_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          amount_minor: number;
+          created_at?: string;
+          created_by: string;
+          description: string;
+          event_id: string;
+          id?: string;
+          paid_by_group_member_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          amount_minor?: number;
+          created_at?: string;
+          created_by?: string;
+          description?: string;
+          event_id?: string;
+          id?: string;
+          paid_by_group_member_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dinner_expenses_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dinner_expenses_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'dinner_expenses_paid_by_group_member_id_fkey';
+            columns: ['paid_by_group_member_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_members';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      event_managers: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          group_member_id: string;
+          id: string;
+          team_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          group_member_id: string;
+          id?: string;
+          team_id: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          group_member_id?: string;
+          id?: string;
+          team_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_managers_group_member_id_fkey';
+            columns: ['group_member_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_members';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_managers_team_event_fk';
+            columns: ['team_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id', 'event_id'];
+          },
+        ];
+      };
+      event_participants: {
+        Row: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          created_at: string;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string | null;
+          guest_display_name: string | null;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
+          actual_football?: Database['public']['Enums']['actual_attendance_status'];
+          created_at?: string;
+          dinner_response?: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response?: Database['public']['Enums']['attendance_response'];
+          group_member_id?: string | null;
+          guest_display_name?: string | null;
+          id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
+          actual_football?: Database['public']['Enums']['actual_attendance_status'];
+          created_at?: string;
+          dinner_response?: Database['public']['Enums']['attendance_response'];
+          event_id?: string;
+          football_response?: Database['public']['Enums']['attendance_response'];
+          group_member_id?: string | null;
+          guest_display_name?: string | null;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_participants_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_participants_group_member_id_fkey';
+            columns: ['group_member_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_members';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      events: {
+        Row: {
+          court_price_minor: number | null;
+          created_at: string;
+          created_by: string;
+          currency_code: string;
+          group_id: string;
+          id: string;
+          location: string | null;
+          starts_at: string;
+          status: Database['public']['Enums']['event_status'];
+          title: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          court_price_minor?: number | null;
+          created_at?: string;
+          created_by: string;
+          currency_code?: string;
+          group_id: string;
+          id?: string;
+          location?: string | null;
+          starts_at: string;
+          status?: Database['public']['Enums']['event_status'];
+          title?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          court_price_minor?: number | null;
+          created_at?: string;
+          created_by?: string;
+          currency_code?: string;
+          group_id?: string;
+          id?: string;
+          location?: string | null;
+          starts_at?: string;
+          status?: Database['public']['Enums']['event_status'];
+          title?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'events_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'events_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'groups';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      group_invitations: {
+        Row: {
+          accepted_at: string | null;
+          created_at: string;
+          created_by: string;
+          expires_at: string | null;
+          group_id: string;
+          group_member_id: string;
+          id: string;
+          revoked_at: string | null;
+          token_hash: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          created_at?: string;
+          created_by: string;
+          expires_at?: string | null;
+          group_id: string;
+          group_member_id: string;
+          id?: string;
+          revoked_at?: string | null;
+          token_hash: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          created_at?: string;
+          created_by?: string;
+          expires_at?: string | null;
+          group_id?: string;
+          group_member_id?: string;
+          id?: string;
+          revoked_at?: string | null;
+          token_hash?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'group_invitations_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_invitations_member_group_fk';
+            columns: ['group_member_id', 'group_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_members';
+            referencedColumns: ['id', 'group_id'];
+          },
+        ];
+      };
+      group_members: {
+        Row: {
+          avatar_url: string | null;
+          created_at: string;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          created_at?: string;
+          display_name: string;
+          group_id: string;
+          id?: string;
+          nickname?: string | null;
+          profile_id?: string | null;
+          role?: Database['public']['Enums']['group_member_role'];
+          updated_at?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          display_name?: string;
+          group_id?: string;
+          id?: string;
+          nickname?: string | null;
+          profile_id?: string | null;
+          role?: Database['public']['Enums']['group_member_role'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'group_members_group_id_fkey';
+            columns: ['group_id'];
+            isOneToOne: false;
+            referencedRelation: 'groups';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'group_members_profile_id_fkey';
+            columns: ['profile_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      groups: {
+        Row: {
+          avatar_url: string | null;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'groups_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      payments: {
+        Row: {
+          amount_minor: number;
+          category: Database['public']['Enums']['payment_category'];
+          created_at: string;
+          event_id: string;
+          event_participant_id: string;
+          id: string;
+          paid_at: string | null;
+          status: Database['public']['Enums']['payment_status'];
+          updated_at: string;
+        };
+        Insert: {
+          amount_minor: number;
+          category: Database['public']['Enums']['payment_category'];
+          created_at?: string;
+          event_id: string;
+          event_participant_id: string;
+          id?: string;
+          paid_at?: string | null;
+          status?: Database['public']['Enums']['payment_status'];
+          updated_at?: string;
+        };
+        Update: {
+          amount_minor?: number;
+          category?: Database['public']['Enums']['payment_category'];
+          created_at?: string;
+          event_id?: string;
+          event_participant_id?: string;
+          id?: string;
+          paid_at?: string | null;
+          status?: Database['public']['Enums']['payment_status'];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'payments_participant_event_fk';
+            columns: ['event_participant_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_participants';
+            referencedColumns: ['id', 'event_id'];
+          },
+        ];
+      };
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          created_at: string;
+          display_name: string;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          avatar_url?: string | null;
+          created_at?: string;
+          display_name: string;
+          id: string;
+          updated_at?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          display_name?: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      team_members: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          event_participant_id: string;
+          id: string;
+          team_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          event_participant_id: string;
+          id?: string;
+          team_id: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          event_participant_id?: string;
+          id?: string;
+          team_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'team_members_participant_event_fk';
+            columns: ['event_participant_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_participants';
+            referencedColumns: ['id', 'event_id'];
+          },
+          {
+            foreignKeyName: 'team_members_team_event_fk';
+            columns: ['team_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id', 'event_id'];
+          },
+        ];
+      };
+      teams: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          id: string;
+          name: string;
+          position: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          id?: string;
+          name: string;
+          position: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          id?: string;
+          name?: string;
+          position?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'teams_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: false;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
-    Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
     Enums: {
-      group_member_role: GroupMemberRole;
-      event_status: EventStatus;
-      attendance_response: AttendanceResponse;
-      actual_attendance_status: ActualAttendanceStatus;
-      payment_category: PaymentCategory;
-      payment_status: PaymentStatus;
+      actual_attendance_status: 'UNSET' | 'YES' | 'NO';
+      attendance_response: 'UNKNOWN' | 'YES' | 'NO';
+      event_status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'SETTLEMENT' | 'CLOSED';
+      group_member_role: 'ADMIN' | 'MEMBER';
+      payment_category: 'COURT' | 'DINNER';
+      payment_status: 'PENDING' | 'PAID';
     };
-    CompositeTypes: Record<never, never>;
+    CompositeTypes: {
+      [_ in never]: never;
+    };
   };
+};
+
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>];
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
 }
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+      Row: infer R;
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
+      }
+      ? R
+      : never
+    : never;
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Insert: infer I;
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
+      }
+      ? I
+      : never
+    : never;
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Update: infer U;
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
+      }
+      ? U
+      : never
+    : never;
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+    : never;
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    keyof DefaultSchema['CompositeTypes'] | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals;
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never;
+
+export const Constants = {
+  public: {
+    Enums: {
+      actual_attendance_status: ['UNSET', 'YES', 'NO'],
+      attendance_response: ['UNKNOWN', 'YES', 'NO'],
+      event_status: ['DRAFT', 'OPEN', 'IN_PROGRESS', 'SETTLEMENT', 'CLOSED'],
+      group_member_role: ['ADMIN', 'MEMBER'],
+      payment_category: ['COURT', 'DINNER'],
+      payment_status: ['PENDING', 'PAID'],
+    },
+  },
+} as const;

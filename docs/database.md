@@ -1,6 +1,6 @@
 # Miércoles FC database foundation
 
-PR05 establishes the Supabase/PostgreSQL contract for later identity and product features. The committed migration is the schema source of truth; Dashboard-only schema changes are not part of the workflow.
+PR05 establishes the Supabase/PostgreSQL contract for later identity and product features. The committed migrations are the schema source of truth; Dashboard-only schema changes are not part of the workflow.
 
 ## Architecture and identity
 
@@ -106,6 +106,8 @@ Unique constraints provide indexes for most invariants and common event lookups.
 - `dinner_expenses(event_id)` and its optional payer;
 - `payments(event_participant_id)`.
 
+Composite indexes follow the exact column order of the foreign keys that connect invitations, managers, payments, and team assignments to their parent records. This keeps referential checks and parent updates efficient and satisfies the hosted Supabase database advisor.
+
 No speculative indexes or Realtime publications are enabled.
 
 ## RLS and API grants
@@ -138,6 +140,18 @@ Required values:
 
 The real file is Git-ignored and fetched with `cache: no-store`. Missing configuration does not block the placeholder App Shell, but injecting `SUPABASE_CLIENT` fails with a clear error. Secret/service-role keys are rejected defensively and must never be placed in public files.
 
+For a clean development or production build, provide the same public values as environment variables and generate the runtime file before Angular builds:
+
+```bash
+SUPABASE_URL=https://project-ref.supabase.co \
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_replace_me \
+npm run build:configured
+```
+
+Configure those variables in the deployment platform rather than in a committed `.env` file. The generated JSON is a browser asset, so it must contain only the publishable key; authorization still depends on RLS. `SUPABASE_CONFIG_OUTPUT` may point the generator at a temporary path for validation.
+
+Local Auth uses `http://localhost:4200` as its Site URL and allows callback paths below both `localhost:4200` and `127.0.0.1:4200`. Before the first production authentication release, add the exact deployed callback URL to the hosted Supabase Auth redirect allow list and use the deployed origin as its Site URL. Avoid broad production wildcards.
+
 ## Local migration workflow
 
 A Docker-compatible runtime is required by Supabase local development.
@@ -161,4 +175,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides schema and access foundations only. It does not create cloud resources, credentials, users, sessions, groups, seed business data, Realtime subscriptions, settlement calculations, or business UI. Because the current development host has no Docker-compatible runtime, the migration still requires an actual local reset before deployment; see the PR05 validation report for the exact unexecuted checks.
+PR05 provides schema and access foundations only. The foundation migration is deployed to the linked Supabase project and the committed database types are generated from that hosted schema. It does not create users, sessions, groups, seed business data, Realtime subscriptions, settlement calculations, or business UI. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

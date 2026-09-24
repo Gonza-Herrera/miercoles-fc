@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:configured": "npm run config:supabase && npm run build",
+    "config:supabase": "node scripts/write-supabase-config.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "serve:pwa": "ng serve --configuration production",

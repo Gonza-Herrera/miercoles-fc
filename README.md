@@ -80,6 +80,7 @@ The development server is available at `http://localhost:4200/` by default.
 ```bash
 npm start             # Start the development server
 npm run build         # Create a production build
+npm run build:configured # Generate Supabase runtime config from env vars, then build
 npm run serve:pwa     # Serve a production configuration with Service Worker support
 npm run supabase:start # Start the local Supabase stack (requires Docker-compatible runtime)
 npm run supabase:reset # Rebuild the local database from committed migrations
@@ -110,9 +111,9 @@ For local verification, run `npm run build` followed by `npm run serve:pwa`, ope
 
 The application exposes one typed Supabase client through Angular dependency injection. Runtime browser configuration accepts only the project URL and public publishable key; no database password, secret key, or service-role key belongs in the application.
 
-The committed SQL migration defines profiles, groups, members, invitations, events, participants and guests, teams, event managers, dinner expenses, and independent court/dinner payments. Every application table has RLS enabled, while browser writes remain closed until their feature PR defines precise authorization.
+The committed SQL migrations define profiles, groups, members, invitations, events, participants and guests, teams, event managers, dinner expenses, and independent court/dinner payments. Every application table has RLS enabled, while browser writes remain closed until their feature PR defines precise authorization.
 
-Copy `public/config/supabase-config.example.json` to the Git-ignored `public/config/supabase-config.json` and provide the public project values when a Supabase project is available. See [database documentation](docs/database.md) for schema decisions, local migration workflow, RLS, and type generation.
+Copy `public/config/supabase-config.example.json` to the Git-ignored `public/config/supabase-config.json` and provide the public project values for local development. Deployments should set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`, then run `npm run build:configured` so the same runtime file is generated without committing credentials. See [database documentation](docs/database.md) for schema decisions, environment setup, local migration workflow, RLS, and type generation.
 
 ## Roadmap
 
