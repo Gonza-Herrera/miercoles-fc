@@ -6,25 +6,26 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, and installable PWA infrastructure. It does not yet implement those business workflows.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, and Supabase/PostgreSQL backend contract. It does not yet implement those business workflows.
 
 ## Current status
 
-**PR04 — PWA Foundation**
+**PR05 — Supabase Foundation**
 
-PR01 established the Angular foundation, PR02 added the Design System, and PR03 introduced the responsive mobile shell. PR04 adds a standards-based Web App Manifest, Angular Service Worker, app-shell caching, and approved Miércoles FC icon assets. Supabase and business features are not implemented.
+PR01–PR04 established the Angular application, Design System, responsive mobile shell, and PWA foundation. PR05 adds the official Supabase browser client, reproducible PostgreSQL migrations, initial relational schema, RLS foundations, and shared database types. Authentication and business features are not implemented.
 
 ## Tech stack
 
 - Angular 22 with standalone components
 - TypeScript in strict mode
 - Angular Router with lazy-loaded feature routes
+- Supabase JS and PostgreSQL migrations
 - SCSS
 - Vitest
 - ESLint and Prettier
 - Node.js 24
 
-Supabase is planned for a later roadmap stage; Angular PWA support is now configured.
+Angular PWA and Supabase infrastructure are configured. Identity UI and feature-specific data access arrive in later roadmap stages.
 
 ## Architecture
 
@@ -80,6 +81,10 @@ The development server is available at `http://localhost:4200/` by default.
 npm start             # Start the development server
 npm run build         # Create a production build
 npm run serve:pwa     # Serve a production configuration with Service Worker support
+npm run supabase:start # Start the local Supabase stack (requires Docker-compatible runtime)
+npm run supabase:reset # Rebuild the local database from committed migrations
+npm run supabase:lint  # Validate the local PostgreSQL schema
+npm run supabase:types # Regenerate the shared TypeScript database contract
 npm run lint          # Run Angular and TypeScript linting
 npm run format        # Format supported project files
 npm run format:check  # Check formatting without changing files
@@ -101,12 +106,21 @@ Miércoles FC is installable from supported browsers as a standalone PWA. Produc
 
 For local verification, run `npm run build` followed by `npm run serve:pwa`, open `http://localhost:4200` in a private browser window, and inspect the Manifest, Service Worker, and Cache Storage panels. See [PWA documentation](docs/pwa.md) for the complete installability and offline-shell checklist.
 
+## Supabase and database
+
+The application exposes one typed Supabase client through Angular dependency injection. Runtime browser configuration accepts only the project URL and public publishable key; no database password, secret key, or service-role key belongs in the application.
+
+The committed SQL migration defines profiles, groups, members, invitations, events, participants and guests, teams, event managers, dinner expenses, and independent court/dinner payments. Every application table has RLS enabled, while browser writes remain closed until their feature PR defines precise authorization.
+
+Copy `public/config/supabase-config.example.json` to the Git-ignored `public/config/supabase-config.json` and provide the public project values when a Supabase project is available. See [database documentation](docs/database.md) for schema decisions, local migration workflow, RLS, and type generation.
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
 - Completed: **PR02 — Design System Foundations**
 - Completed: **PR03 — Mobile App Shell**
-- Current: **PR04 — PWA Foundation**
-- Next: **PR05 — Supabase Foundation**
+- Completed: **PR04 — PWA Foundation**
+- Current: **PR05 — Supabase Foundation**
+- Next: **PR06 — Identity & Authentication**
 
-Product features, Supabase, authentication, realtime behavior, and offline business data will be implemented only in later roadmap stages.
+Authentication, product features, realtime behavior, and offline business data will be implemented only in later roadmap stages.
