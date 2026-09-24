@@ -14,8 +14,45 @@
       <span>Miércoles FC</span>
     </a>
 
-    <button class="app-header__profile" type="button" aria-label="Perfil de demostración" disabled>
-      <app-avatar name="Miércoles FC" size="small" />
-    </button>
+    <div class="app-header__account">
+      <button
+        class="app-header__profile"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="account-panel"
+        [attr.aria-expanded]="accountOpen()"
+        [attr.aria-label]="'Cuenta de ' + auth.displayName()"
+        (click)="toggleAccount()"
+      >
+        <app-avatar
+          [name]="auth.displayName()"
+          [src]="auth.profile()?.avatar_url ?? null"
+          size="small"
+        />
+      </button>
+
+      @if (accountOpen()) {
+        <section id="account-panel" class="account-panel" role="dialog" aria-label="Tu cuenta">
+          <div class="account-panel__identity">
+            <strong>{{ auth.displayName() }}</strong>
+            @if (auth.user()?.email; as email) {
+              <span>{{ email }}</span>
+            }
+          </div>
+          <app-button
+            variant="ghost"
+            size="small"
+            [fullWidth]="true"
+            [disabled]="isSigningOut()"
+            (click)="signOut()"
+          >
+            {{ isSigningOut() ? 'Saliendo…' : 'Salir' }}
+          </app-button>
+          @if (logoutError(); as error) {
+            <p class="account-panel__error" role="alert">{{ error }}</p>
+          }
+        </section>
+      }
+    </div>
   </div>
 </header>

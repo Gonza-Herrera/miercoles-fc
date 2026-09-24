@@ -1,0 +1,10 @@
+@if (errorMessage(); as error) {
+  <main class="callback-error">
+    <img src="/icons/icon-96x96.png" alt="" width="64" height="64" />
+    <h1>No pudimos iniciar sesión</h1>
+    <p>{{ error }}</p>
+    <a routerLink="/auth">Volver a intentar</a>
+  </main>
+} @else {
+  <app-auth-loading message="Completando el ingreso…" />
+}

@@ -12,13 +12,14 @@ This repository currently contains the application foundation, Design System, mo
 
 **PR05 — Supabase Foundation**
 
-PR01–PR04 established the Angular application, Design System, responsive mobile shell, and PWA foundation. PR05 adds the official Supabase browser client, reproducible PostgreSQL migrations, initial relational schema, RLS foundations, and shared database types. Authentication and business features are not implemented.
+PR01–PR05 established the Angular application, Design System, responsive mobile shell, installable PWA, and Supabase/PostgreSQL foundation. PR06 adds passwordless identity with Magic Links and Google OAuth, persistent session restoration, protected routes, logout, and automatic profile bootstrap. Group membership and business features are not implemented yet.
 
 ## Tech stack
 
 - Angular 22 with standalone components
 - TypeScript in strict mode
 - Angular Router with lazy-loaded feature routes
+- Supabase Auth with passwordless email and Google OAuth
 - Supabase JS and PostgreSQL migrations
 - SCSS
 - Vitest
@@ -53,13 +54,15 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 
 ## Application routes
 
-| Route            | Purpose                                         |
-| ---------------- | ----------------------------------------------- |
-| `/`              | Home placeholder inside the application shell   |
-| `/match`         | Match placeholder                               |
-| `/dinner`        | Dinner placeholder                              |
-| `/payments`      | Payments placeholder                            |
-| `/design-system` | Development showcase outside primary navigation |
+| Route            | Purpose                                                 |
+| ---------------- | ------------------------------------------------------- |
+| `/auth`          | Passwordless sign-in                                    |
+| `/auth/callback` | Magic Link and OAuth callback                           |
+| `/`              | Protected Home placeholder inside the application shell |
+| `/match`         | Protected Match placeholder                             |
+| `/dinner`        | Protected Dinner placeholder                            |
+| `/payments`      | Protected Payments placeholder                          |
+| `/design-system` | Development showcase outside primary navigation         |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
 
@@ -109,11 +112,13 @@ For local verification, run `npm run build` followed by `npm run serve:pwa`, ope
 
 ## Supabase and database
 
-The application exposes one typed Supabase client through Angular dependency injection. Runtime browser configuration accepts only the project URL and public publishable key; no database password, secret key, or service-role key belongs in the application.
+The application exposes one typed Supabase client through Angular dependency injection. Runtime browser configuration accepts only the project URL and public publishable key; no database password, secret key, Google secret, or service-role key belongs in the application.
 
 The committed SQL migrations define profiles, groups, members, invitations, events, participants and guests, teams, event managers, dinner expenses, and independent court/dinner payments. Every application table has RLS enabled, while browser writes remain closed until their feature PR defines precise authorization.
 
 Copy `public/config/supabase-config.example.json` to the Git-ignored `public/config/supabase-config.json` and provide the public project values for local development. Deployments should set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`, then run `npm run build:configured` so the same runtime file is generated without committing credentials. See [database documentation](docs/database.md) for schema decisions, environment setup, local migration workflow, RLS, and type generation.
+
+Supabase owns browser session persistence and callback processing. Angular waits for `INITIAL_SESSION` before guards decide whether to show the protected shell or `/auth`, avoiding a login flash when the PWA restores an existing session. New Auth users receive a profile through a database trigger; group membership remains separate. See [authentication documentation](docs/authentication.md) for architecture, provider setup, redirects, PWA limitations, and manual validation.
 
 ## Roadmap
 
@@ -121,7 +126,8 @@ Copy `public/config/supabase-config.example.json` to the Git-ignored `public/con
 - Completed: **PR02 — Design System Foundations**
 - Completed: **PR03 — Mobile App Shell**
 - Completed: **PR04 — PWA Foundation**
-- Current: **PR05 — Supabase Foundation**
-- Next: **PR06 — Identity & Authentication**
+- Completed: **PR05 — Supabase Foundation**
+- Current: **PR06 — Identity & Authentication**
+- Next: **PR07 — Invitations & Member Linking**
 
-Authentication, product features, realtime behavior, and offline business data will be implemented only in later roadmap stages.
+Invitation linking, group authorization workflows, realtime behavior, and offline business data will be implemented only in later roadmap stages.

@@ -123,7 +123,7 @@ Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid
 
 The local configuration disables automatic Data API exposure. The migration uses explicit grants because grants and RLS are separate security layers. The `service_role` keeps administrative access but must never be shipped to the browser.
 
-Feature-specific writes are deliberately deferred: profile creation to PR06, invitation mutations/linking to PR07, and group/business mutations to their owning PRs. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
+Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. Invitation mutations/linking remain deferred to PR07, and group/business mutations to their owning PRs. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
 
 ## Browser configuration
 

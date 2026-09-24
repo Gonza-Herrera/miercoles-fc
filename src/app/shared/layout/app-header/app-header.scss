@@ -47,9 +47,58 @@
   border: 0;
   border-radius: var(--radius-full);
   background: transparent;
+  cursor: pointer;
 
-  &:disabled {
-    cursor: default;
-    opacity: 1;
+  &:hover,
+  &:focus-visible {
+    outline: 0.1875rem solid color-mix(in srgb, var(--color-focus-ring) 24%, transparent);
+    outline-offset: 0.125rem;
   }
+}
+
+.app-header__account {
+  position: relative;
+}
+
+.account-panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  display: flex;
+  width: min(18rem, calc(100vw - 2 * var(--page-inline-padding)));
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.account-panel__identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  strong,
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--color-text-primary);
+  }
+
+  span {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+}
+
+.account-panel__error {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
 }
