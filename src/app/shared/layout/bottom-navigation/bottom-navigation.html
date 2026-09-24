@@ -1,0 +1,43 @@
+<nav class="bottom-navigation" aria-label="Navegación principal">
+  @for (item of navigationItems; track item.route) {
+    <a
+      class="bottom-navigation__item"
+      [routerLink]="item.route"
+      routerLinkActive="bottom-navigation__item--active"
+      [routerLinkActiveOptions]="{ exact: item.exact }"
+      ariaCurrentWhenActive="page"
+    >
+      <span class="bottom-navigation__icon" aria-hidden="true">
+        @switch (item.icon) {
+          @case ('home') {
+            <svg viewBox="0 0 24 24">
+              <path d="m4 10 8-6 8 6v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-9Z" />
+            </svg>
+          }
+          @case ('match') {
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" />
+              <path
+                d="m12 7 3 2.2-1.1 3.5h-3.8L9 9.2 12 7ZM12 3v4M20.6 9.2H15M17.3 19.3l-3.4-6.6M6.7 19.3l3.4-6.6M3.4 9.2H9"
+              />
+            </svg>
+          }
+          @case ('dinner') {
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M7 3v7M4.5 3v4.5A2.5 2.5 0 0 0 7 10a2.5 2.5 0 0 0 2.5-2.5V3M7 10v11M16 3v18M16 3c2.3 1.4 3.5 3.5 3.5 6.5H16"
+              />
+            </svg>
+          }
+          @case ('payments') {
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M3 9h18M7 15h4" />
+            </svg>
+          }
+        }
+      </span>
+      <span class="bottom-navigation__label">{{ item.label }}</span>
+    </a>
+  }
+</nav>

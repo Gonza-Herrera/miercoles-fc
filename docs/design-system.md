@@ -37,7 +37,7 @@ The system uses a dependency-free system font stack. Global classes cover displa
 
 ## Spacing, shape, and layout
 
-Spacing follows the `--space-1` through `--space-16` scale. Rounded surfaces use `--radius-sm` through `--radius-full`; only two subtle shadow levels are provided. `--content-max-width` and `--page-inline-padding` create a fluid mobile container that expands naturally on larger screens.
+Spacing follows the `--space-1` through `--space-16` scale. Rounded surfaces use `--radius-sm` through `--radius-full`; only two subtle shadow levels are provided. `--content-max-width` and `--page-inline-padding` create fluid page content, while `--app-shell-max-width`, `--app-header-height`, and `--bottom-navigation-height` support the mobile shell introduced in PR03.
 
 ## Component inventory
 
@@ -53,7 +53,7 @@ Reusable standalone components live in `src/app/shared/ui/` and are exported fro
 - Progress Bar: clamped values and complete ARIA progress semantics.
 - Empty State: configurable copy plus projected icon and action areas.
 
-The temporary Home route is the visual showcase. It is development scaffolding and will be replaced by the real product experience in a later PR.
+The temporary showcase remains available at `/design-system`. It is development scaffolding and is intentionally excluded from primary navigation.
 
 ### API conventions
 

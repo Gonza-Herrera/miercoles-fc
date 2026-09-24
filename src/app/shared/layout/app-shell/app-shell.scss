@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-shell {
+  width: min(100%, var(--app-shell-max-width));
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin-inline: auto;
+  background: var(--color-background);
+}
+
+.app-shell__content {
+  min-height: calc(100dvh - var(--app-header-height));
+  padding-block-end: calc(
+    var(--bottom-navigation-height) + env(safe-area-inset-bottom) + var(--space-6)
+  );
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  transform: translateY(-200%);
+  border-radius: var(--radius-sm);
+  background: var(--color-text-primary);
+  color: var(--color-white);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (min-width: 48rem) {
+  .app-shell {
+    border-inline: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+}
