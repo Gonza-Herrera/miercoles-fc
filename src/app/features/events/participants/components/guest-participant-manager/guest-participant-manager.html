@@ -1,0 +1,65 @@
+<section class="guest-manager" aria-labelledby="guest-manager-title">
+  <div class="guest-manager__header">
+    <div>
+      <h2 id="guest-manager-title" class="ds-section-title">Invitados</h2>
+      <p class="ds-body-small">Personas que participan solamente de este miércoles.</p>
+    </div>
+    @if (isAdmin() && !formOpen()) {
+      <app-button size="small" (click)="startAdd()">Agregar invitado</app-button>
+    }
+  </div>
+
+  @if (errorMessage(); as error) {
+    <p class="guest-manager__feedback guest-manager__feedback--error" role="alert">{{ error }}</p>
+  }
+  @if (feedback(); as message) {
+    <p class="guest-manager__feedback" role="status">{{ message }}</p>
+  }
+
+  @if (isAdmin() && formOpen()) {
+    <app-card variant="elevated">
+      <h3 class="ds-card-title">{{ editing() ? 'Editar invitado' : 'Agregar invitado' }}</h3>
+      <app-guest-participant-form
+        [participant]="editing()"
+        [saving]="saving()"
+        (cancelled)="closeForm()"
+        (submitted)="save($event)"
+      />
+    </app-card>
+  }
+
+  @if (loading()) {
+    <p class="ds-body" role="status">Cargando invitados…</p>
+  } @else if (!activeGuests().length) {
+    <app-card>
+      <app-empty-state
+        title="Todavía no hay invitados"
+        description="Los invitados se agregan solamente a este evento."
+      />
+    </app-card>
+  } @else {
+    <ul class="guest-manager__list" aria-label="Invitados activos">
+      @for (guest of activeGuests(); track guest.id) {
+        <li>
+          <app-card>
+            <app-participant-row
+              [participant]="presentation(guest)"
+              [canManage]="isAdmin()"
+              (editRequested)="startEdit(guest)"
+              (removeRequested)="pendingRemoval.set(guest)"
+            />
+          </app-card>
+        </li>
+      }
+    </ul>
+  }
+
+  <app-confirm-dialog
+    [open]="pendingRemoval() !== null"
+    [title]="'¿Quitar a ' + (pendingRemoval()?.displayName ?? '') + ' del evento?'"
+    description="Dejará de participar de este miércoles, pero conservaremos su historial."
+    confirmLabel="Quitar invitado"
+    (cancelled)="pendingRemoval.set(null)"
+    (confirmed)="remove()"
+  />
+</section>

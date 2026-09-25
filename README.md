@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, and group/member administration. Match, dinner, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, and event-scoped guest participants. Full event, match, dinner, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR08 — Groups & Members**
+**PR09 — Guest Members**
 
-PR01–PR07 established the Angular application, Design System, responsive mobile shell, installable PWA, Supabase/PostgreSQL foundation, passwordless identity, and secure invitations. PR08 adds multiple-group administration, durable member lifecycle, role management, private avatar storage, and invitation integration.
+PR01–PR08 established the Angular application, Design System, responsive mobile shell, installable PWA, Supabase/PostgreSQL foundation, passwordless identity, secure invitations, and group/member administration. PR09 adds temporary event guests through the common `EventParticipant` identity without creating accounts or persistent memberships.
 
 ## Tech stack
 
@@ -129,6 +129,8 @@ Invitations use 256-bit bearer tokens while PostgreSQL stores only SHA-256 hashe
 
 Groups support multiple active memberships per Profile, atomic creator-as-ADMIN setup, safe role changes, durable member deactivation/reactivation, and private avatar storage. See [groups and members documentation](docs/groups-and-members.md).
 
+Guests are event-scoped `EventParticipant` identities with independent football/dinner intent, ADMIN-only mutations and safe cancellation. PR10 will place the reusable flow in the complete Events experience. See [guest participant documentation](docs/guest-participants.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -138,7 +140,8 @@ Groups support multiple active memberships per Profile, atomic creator-as-ADMIN 
 - Completed: **PR05 — Supabase Foundation**
 - Completed: **PR06 — Identity & Authentication**
 - Completed: **PR07 — Invitations & Member Linking**
-- Current: **PR08 — Groups & Members**
-- Next: **PR09 — Guest Members**
+- Completed: **PR08 — Groups & Members**
+- Current: **PR09 — Guest Members**
+- Next: **PR10 — Events**
 
-Guest event members, event workflows, realtime behavior, and offline business data will be implemented only in later roadmap stages.
+Full event workflows, realtime behavior, and offline business data will be implemented only in later roadmap stages.

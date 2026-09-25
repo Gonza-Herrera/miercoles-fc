@@ -1,0 +1,28 @@
+<article class="participant" [class.participant--cancelled]="participant().cancelled">
+  <app-avatar [name]="participant().displayName" [src]="participant().avatarUrl" />
+  <div class="participant__content">
+    <div class="participant__identity">
+      <h3 class="ds-card-title">{{ participant().displayName }}</h3>
+      @if (participant().isGuest) {
+        <app-badge variant="primary">Invitado</app-badge>
+      } @else {
+        <app-badge>Asistente</app-badge>
+      }
+    </div>
+    <p class="ds-body-small">
+      {{ participant().plays ? 'Juega' : 'No juega' }} ·
+      {{ participant().dines ? 'Cena' : 'No cena' }}
+      @if (participant().cancelled) {
+        · Quitado
+      }
+    </p>
+  </div>
+  @if (canManage() && participant().isGuest && !participant().cancelled) {
+    <div class="participant__actions">
+      <app-button size="small" variant="secondary" (click)="editRequested.emit()"
+        >Editar</app-button
+      >
+      <app-button size="small" variant="ghost" (click)="removeRequested.emit()">Quitar</app-button>
+    </div>
+  }
+</article>

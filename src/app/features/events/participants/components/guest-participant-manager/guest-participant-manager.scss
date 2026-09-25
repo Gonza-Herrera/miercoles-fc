@@ -1,0 +1,47 @@
+:host {
+  display: block;
+}
+
+.guest-manager {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.guest-manager__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  h2,
+  p {
+    margin: 0;
+  }
+}
+
+.guest-manager__list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guest-manager__feedback {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  color: var(--color-success);
+  background: var(--color-success-surface);
+}
+
+.guest-manager__feedback--error {
+  color: var(--color-danger);
+  background: var(--color-danger-surface);
+}
+
+@media (max-width: 23rem) {
+  .guest-manager__header {
+    flex-direction: column;
+  }
+}

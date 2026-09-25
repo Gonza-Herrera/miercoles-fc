@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.guest-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.guest-form__field {
+  display: grid;
+  gap: var(--space-2);
+
+  label {
+    font-weight: 700;
+  }
+
+  input {
+    min-height: 3rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    font: inherit;
+  }
+}
+
+.guest-form__activities {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: var(--space-2);
+    font-weight: 700;
+  }
+
+  label {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+  }
+
+  input {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--color-primary);
+  }
+}
+
+.guest-form__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.guest-form__actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 30rem) {
+  .guest-form__actions:has(app-button + app-button) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
