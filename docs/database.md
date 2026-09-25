@@ -69,6 +69,14 @@ Persistent membership roles are the PostgreSQL enum `ADMIN | MEMBER`. “Manager
 
 `group_invitations` targets a specific `(group_member_id, group_id)` pair. It stores only a 32-byte SHA-256 token hash, never a raw bearer token. A partial unique index allows only one unconsumed/unrevoked invitation per member. PR07 adds private database implementations for secure generation, seven-day expiration, safe preview, revocation and atomic member linking, exposed through narrow public RPC wrappers.
 
+## Groups and member lifecycle
+
+PR08 adds `group_members.deactivated_at`. Active membership is represented by `deactivated_at is null`; inactive rows retain their stable UUID, optional Profile link, display data and historical foreign-key references. RLS helpers now require an active membership, so deactivation removes normal group access without destroying identity.
+
+Group creation is an atomic RPC that inserts both the group and its creator's ADMIN membership. Administrative mutations remain narrow RPCs. Role demotion and deactivation share an advisory transaction lock per group and reject any result with no active ADMIN. Direct table writes remain unavailable to browser roles.
+
+The private `group-assets` Storage bucket limits objects to JPEG, PNG or WebP and 2 MiB. Deterministic group/member paths are stored in the existing `avatar_url` fields; authenticated clients receive short-lived signed URLs after Storage RLS confirms active membership.
+
 ## Money and payments
 
 Money uses signed PostgreSQL `bigint` minor units, never floating point. For ARS, `5000000` represents ARS 50,000.00. Each event carries a three-letter `currency_code` (default `ARS`), and all of its court price, expenses, and payments use that currency.
@@ -175,4 +183,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity, and PR07 adds the narrow invitation RPC boundary plus the atomic Profile-to-GroupMember link. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Full group management, seed business data, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; and PR08 adds production group/member administration and private avatar storage. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Guest event members, event workflows, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

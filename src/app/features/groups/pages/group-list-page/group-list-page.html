@@ -1,0 +1,53 @@
+<app-page-container>
+  <div class="groups-page">
+    <header class="groups-page__header">
+      <div class="ds-stack">
+        <h1 class="ds-page-title">Mis grupos</h1>
+        <p class="ds-body">Elegí el grupo que querés organizar.</p>
+      </div>
+      <a routerLink="/groups/new"><app-button size="small">Crear grupo</app-button></a>
+    </header>
+
+    @if (errorMessage(); as error) {
+      <div class="feedback feedback--error" role="alert">
+        <p>{{ error }}</p>
+        <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+      </div>
+    }
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando grupos…</p>
+    } @else if (!groups().length && !errorMessage()) {
+      <app-card>
+        <app-empty-state
+          title="Todavía no tenés grupos"
+          description="Creá el primero para empezar a sumar a tus amigos."
+        />
+        <div class="group-form">
+          <a routerLink="/groups/new"
+            ><app-button [fullWidth]="true">Crear mi primer grupo</app-button></a
+          >
+        </div>
+      </app-card>
+    } @else {
+      <ul class="groups-list" aria-label="Tus grupos">
+        @for (group of groups(); track group.id) {
+          <li>
+            <app-card variant="interactive">
+              <a class="group-card" [routerLink]="['/groups', group.id]">
+                <app-avatar [name]="group.name" [src]="group.avatarUrl" />
+                <div class="group-card__content">
+                  <h2 class="ds-card-title group-card__name">{{ group.name }}</h2>
+                  <p class="ds-body-small">
+                    {{ group.memberCount }} {{ group.memberCount === 1 ? 'miembro' : 'miembros' }} ·
+                    {{ group.role === 'ADMIN' ? 'Admin' : 'Asistente' }}
+                  </p>
+                </div>
+              </a>
+            </app-card>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-page-container>

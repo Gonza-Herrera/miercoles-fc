@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { GroupService } from './features/groups/group.service';
 import { InvitationService } from './features/invitations/invitation.service';
 
 describe('application routes', () => {
@@ -27,6 +28,7 @@ describe('application routes', () => {
       status: 'ACTIVE',
     }),
   };
+  const groupStub = { list: vi.fn().mockResolvedValue([]) };
 
   beforeEach(() => {
     authenticated.set(true);
@@ -34,6 +36,7 @@ describe('application routes', () => {
       providers: [
         provideRouter(routes),
         { provide: AuthService, useValue: authStub },
+        { provide: GroupService, useValue: groupStub },
         { provide: InvitationService, useValue: invitationStub },
       ],
     });
@@ -45,6 +48,7 @@ describe('application routes', () => {
     ['/dinner', 'Cena'],
     ['/payments', 'Pagos'],
     ['/invitations', 'Invitar miembros'],
+    ['/groups', 'Mis grupos'],
   ])('loads %s inside the application shell', async (url, heading) => {
     const harness = await RouterTestingHarness.create();
 

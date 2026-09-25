@@ -268,6 +268,7 @@ export type Database = {
         Row: {
           avatar_url: string | null;
           created_at: string;
+          deactivated_at: string | null;
           display_name: string;
           group_id: string;
           id: string;
@@ -279,6 +280,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null;
           created_at?: string;
+          deactivated_at?: string | null;
           display_name: string;
           group_id: string;
           id?: string;
@@ -290,6 +292,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null;
           created_at?: string;
+          deactivated_at?: string | null;
           display_name?: string;
           group_id?: string;
           id?: string;
@@ -510,6 +513,64 @@ export type Database = {
           status: string;
         }[];
       };
+      add_group_member: {
+        Args: {
+          p_display_name: string;
+          p_group_id: string;
+          p_nickname?: string;
+          p_role?: Database['public']['Enums']['group_member_role'];
+        };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          deactivated_at: string | null;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'group_members';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      change_group_member_role: {
+        Args: {
+          p_group_member_id: string;
+          p_role: Database['public']['Enums']['group_member_role'];
+        };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          deactivated_at: string | null;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'group_members';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      create_group: {
+        Args: { p_description?: string; p_name: string };
+        Returns: {
+          group_id: string;
+          group_name: string;
+          membership_id: string;
+        }[];
+      };
       create_group_invitation: {
         Args: { p_group_member_id: string };
         Returns: {
@@ -520,6 +581,27 @@ export type Database = {
           member_display_name: string;
           raw_token: string;
         }[];
+      };
+      deactivate_group_member: {
+        Args: { p_group_member_id: string };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          deactivated_at: string | null;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'group_members';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       get_group_invitation_preview: {
         Args: { p_raw_token: string };
@@ -539,9 +621,81 @@ export type Database = {
           member_display_name: string;
         }[];
       };
+      reactivate_group_member: {
+        Args: { p_group_member_id: string };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          deactivated_at: string | null;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'group_members';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       revoke_group_invitation: {
         Args: { p_group_member_id: string };
         Returns: boolean;
+      };
+      set_group_avatar: {
+        Args: { p_avatar_path: string; p_group_id: string };
+        Returns: string;
+      };
+      set_group_member_avatar: {
+        Args: { p_avatar_path: string; p_group_member_id: string };
+        Returns: string;
+      };
+      update_group: {
+        Args: { p_description?: string; p_group_id: string; p_name: string };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'groups';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      update_group_member: {
+        Args: {
+          p_display_name: string;
+          p_group_member_id: string;
+          p_nickname?: string;
+        };
+        Returns: {
+          avatar_url: string | null;
+          created_at: string;
+          deactivated_at: string | null;
+          display_name: string;
+          group_id: string;
+          id: string;
+          nickname: string | null;
+          profile_id: string | null;
+          role: Database['public']['Enums']['group_member_role'];
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'group_members';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
     };
     Enums: {

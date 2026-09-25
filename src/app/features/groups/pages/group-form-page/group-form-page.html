@@ -1,0 +1,61 @@
+<app-page-container>
+  <div class="groups-page">
+    <a class="groups-page__back" [routerLink]="groupId ? ['/groups', groupId] : ['/groups']">
+      ← Volver
+    </a>
+    <header class="ds-stack">
+      <h1 class="ds-page-title">{{ groupId ? 'Editar grupo' : 'Crear grupo' }}</h1>
+      <p class="ds-body">Sólo necesitamos lo esencial para empezar.</p>
+    </header>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando grupo…</p>
+    } @else {
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      <app-card>
+        <form class="group-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-field">
+            <label for="group-name">Nombre del grupo</label>
+            <input id="group-name" formControlName="name" maxlength="100" autocomplete="off" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <span class="form-field__error">Ingresá un nombre para el grupo.</span>
+            }
+          </div>
+          <div class="form-field">
+            <label for="group-description"
+              >Descripción <span class="ds-caption">(opcional)</span></label
+            >
+            <textarea
+              id="group-description"
+              formControlName="description"
+              maxlength="500"
+            ></textarea>
+          </div>
+          @if (groupId) {
+            <div class="form-field">
+              <label for="group-avatar">Avatar <span class="ds-caption">(opcional)</span></label>
+              <div class="avatar-field">
+                <app-avatar
+                  [name]="form.controls.name.value || 'Grupo'"
+                  [src]="group()?.avatarUrl ?? null"
+                />
+                <input
+                  id="group-avatar"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  (change)="selectAvatar($event)"
+                />
+              </div>
+              <span class="ds-caption">JPEG, PNG o WebP. Máximo 2 MB.</span>
+            </div>
+          }
+          <app-button type="submit" [fullWidth]="true" [disabled]="saving()">
+            {{ saving() ? 'Guardando…' : groupId ? 'Guardar cambios' : 'Crear grupo' }}
+          </app-button>
+        </form>
+      </app-card>
+    }
+  </div>
+</app-page-container>

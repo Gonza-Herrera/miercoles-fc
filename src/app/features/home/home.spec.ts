@@ -14,6 +14,10 @@ describe('Home', () => {
 
     expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('Inicio');
     expect(fixture.nativeElement.textContent).toContain('Tu próximo miércoles aparecerá acá.');
-    expect(fixture.nativeElement.querySelector('a')?.getAttribute('href')).toBe('/invitations');
+    const links = [...fixture.nativeElement.querySelectorAll('a')].map((link: HTMLAnchorElement) =>
+      link.getAttribute('href'),
+    );
+    expect(links).toContain('/groups');
+    expect(links).toContain('/invitations');
   });
 });

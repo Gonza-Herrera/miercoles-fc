@@ -5,6 +5,15 @@
   top: 0;
 }
 
+.account-panel__link {
+  display: flex;
+  min-height: var(--touch-target-min);
+  align-items: center;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
 .app-header {
   padding-block-start: env(safe-area-inset-top);
   border-block-end: 1px solid var(--color-border);

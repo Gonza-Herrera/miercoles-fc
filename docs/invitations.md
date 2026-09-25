@@ -51,7 +51,8 @@ La creación obtiene al llamador mediante `auth.uid()` y comprueba en PostgreSQL
 1. existe su perfil;
 2. representa a un `GroupMember` con rol `ADMIN`;
 3. el objetivo pertenece al mismo grupo;
-4. el objetivo aún no tiene perfil.
+4. el objetivo aún no tiene perfil;
+5. tanto el ADMIN como el objetivo mantienen una membresía activa.
 
 La aplicación no envía ni puede afirmar un rol, un `created_by` o un perfil administrador.
 
@@ -68,6 +69,8 @@ La aplicación no envía ni puede afirmar un rol, un `created_by` o un perfil ad
 
 PostgreSQL ejecuta cada llamada de función como una transacción. Los locks y las restricciones únicas garantizan que dos dispositivos no puedan consumir correctamente el mismo enlace para perfiles diferentes. Repetir con el mismo perfil devuelve un resultado idempotente sin duplicar membresías.
 
+PR08 revoca invitaciones pendientes cuando un miembro es desactivado. Un miembro inactivo no aparece en la lista administrativa de invitables y no puede recibir una invitación nueva.
+
 ## Flujo web y autenticación
 
 `/invite/:token` es pública y presenta la invitación antes de modificar datos. Si la persona no está autenticada, `Unirme al grupo` navega a `/auth` con la misma ruta como `returnUrl` interno seguro.
@@ -78,7 +81,7 @@ La pantalla diferencia invitaciones inválidas, vencidas, revocadas, usadas, mie
 
 ## Superficie administrativa y compartir
 
-`/invitations` es una superficie mínima protegida para probar el flujo antes de PR08. Lista únicamente miembros sin perfil dentro de grupos donde el usuario actual es ADMIN. No implementa creación, edición ni eliminación de miembros.
+`/invitations` conserva la superficie mínima global, mientras `/groups/:groupId` integra la acción en el miembro correspondiente. Una invitación activa puede regenerarse, pero no recuperarse, porque el token crudo nunca se persiste.
 
 El enlace se construye con el origen actual de la aplicación. En móviles se intenta Web Share; si no está disponible, se usa Clipboard API y finalmente una copia manual visible. No existe integración con WhatsApp ni SDK de terceros.
 
