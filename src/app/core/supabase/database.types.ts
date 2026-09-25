@@ -106,7 +106,9 @@ export type Database = {
         Row: {
           actual_dinner: Database['public']['Enums']['actual_attendance_status'];
           actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string | null;
           created_at: string;
+          created_by: string | null;
           dinner_response: Database['public']['Enums']['attendance_response'];
           event_id: string;
           football_response: Database['public']['Enums']['attendance_response'];
@@ -118,7 +120,9 @@ export type Database = {
         Insert: {
           actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
           actual_football?: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at?: string | null;
           created_at?: string;
+          created_by?: string | null;
           dinner_response?: Database['public']['Enums']['attendance_response'];
           event_id: string;
           football_response?: Database['public']['Enums']['attendance_response'];
@@ -130,7 +134,9 @@ export type Database = {
         Update: {
           actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
           actual_football?: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at?: string | null;
           created_at?: string;
+          created_by?: string | null;
           dinner_response?: Database['public']['Enums']['attendance_response'];
           event_id?: string;
           football_response?: Database['public']['Enums']['attendance_response'];
@@ -140,6 +146,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'event_participants_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'event_participants_event_id_fkey';
             columns: ['event_id'];
@@ -539,6 +552,43 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      add_guest_participant: {
+        Args: {
+          p_dines: boolean;
+          p_display_name: string;
+          p_event_id: string;
+          p_plays: boolean;
+        };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string;
+          created_at: string;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string;
+          guest_display_name: string;
+          id: string;
+          updated_at: string;
+        }[];
+      };
+      cancel_guest_participant: {
+        Args: { p_event_participant_id: string };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string;
+          created_at: string;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string;
+          guest_display_name: string;
+          id: string;
+          updated_at: string;
+        }[];
+      };
       change_group_member_role: {
         Args: {
           p_group_member_id: string;
@@ -696,6 +746,27 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      update_guest_participant: {
+        Args: {
+          p_dines: boolean;
+          p_display_name: string;
+          p_event_participant_id: string;
+          p_plays: boolean;
+        };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string;
+          created_at: string;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string;
+          guest_display_name: string;
+          id: string;
+          updated_at: string;
+        }[];
       };
     };
     Enums: {

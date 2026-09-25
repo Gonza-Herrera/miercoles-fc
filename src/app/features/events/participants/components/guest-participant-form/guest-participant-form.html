@@ -1,0 +1,49 @@
+<form class="guest-form" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="guest-form__field">
+    <label for="guest-name">Nombre</label>
+    <input
+      id="guest-name"
+      type="text"
+      autocomplete="off"
+      maxlength="100"
+      formControlName="displayName"
+      aria-describedby="guest-name-error"
+    />
+    @if (form.controls.displayName.touched && form.controls.displayName.invalid) {
+      <p id="guest-name-error" class="guest-form__error" role="alert">
+        Escribí el nombre del invitado.
+      </p>
+    }
+  </div>
+
+  <fieldset class="guest-form__activities">
+    <legend>Participación</legend>
+    <label>
+      <input type="checkbox" formControlName="plays" />
+      <span>Juega</span>
+    </label>
+    <label>
+      <input type="checkbox" formControlName="dines" />
+      <span>Cena</span>
+    </label>
+    @if (form.touched && form.hasError('activityRequired')) {
+      <p class="guest-form__error" role="alert">Seleccioná al menos una actividad.</p>
+    }
+  </fieldset>
+
+  <div class="guest-form__actions">
+    @if (participant()) {
+      <app-button
+        type="button"
+        variant="secondary"
+        [disabled]="saving()"
+        (click)="cancelled.emit()"
+      >
+        Cancelar
+      </app-button>
+    }
+    <app-button type="submit" [fullWidth]="!participant()" [disabled]="saving()">
+      {{ saving() ? 'Guardando…' : participant() ? 'Guardar cambios' : 'Agregar invitado' }}
+    </app-button>
+  </div>
+</form>

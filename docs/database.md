@@ -46,6 +46,8 @@ The XOR check prevents rows with both or neither identity. A unique constraint p
 
 Group-member participants, event managers, and dinner-expense payers are protected by database triggers that require the member to belong to the event's group. Guests remain first-class participants with stable UUIDs and need no Auth or persistent membership row.
 
+PR09 adds `created_by` audit identity and `cancelled_at` lifecycle state to participants. An active guest must confirm at least football or dinner, and its trimmed name is limited to 100 characters. Cancelling preserves the participant UUID and dependent team/payment history instead of deleting the row. Only an active ADMIN of the event's group can add, edit or cancel a guest through narrow RPCs; `CLOSED` events reject those mutations.
+
 ## Attendance
 
 Confirmation and actual attendance are independent:
@@ -109,7 +111,7 @@ Unique constraints provide indexes for most invariants and common event lookups.
 - author/profile foreign keys on groups, memberships, invitations, events, and expenses;
 - `group_invitations(group_id)`;
 - `events(group_id, starts_at desc)`;
-- `event_participants(group_member_id)` and `event_managers(group_member_id)`;
+- `event_participants(group_member_id)`, guest creator, active event participants, and `event_managers(group_member_id)`;
 - `team_members(team_id)` and `team_members(event_participant_id)`;
 - `dinner_expenses(event_id)` and its optional payer;
 - `payments(event_participant_id)`.
@@ -131,7 +133,7 @@ Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid
 
 The local configuration disables automatic Data API exposure. The migration uses explicit grants because grants and RLS are separate security layers. The `service_role` keeps administrative access but must never be shipped to the browser.
 
-Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. Group/business mutations stay deferred to their owning PRs. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
+Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. PR09 guest mutations use ADMIN-authorized RPCs while table writes remain closed. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
 
 ## Browser configuration
 
@@ -183,4 +185,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; and PR08 adds production group/member administration and private avatar storage. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Guest event members, event workflows, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds production group/member administration and private avatar storage; and PR09 adds event-scoped guest participants. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Full event workflows, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

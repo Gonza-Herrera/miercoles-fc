@@ -11,6 +11,8 @@ Profile
 
 Un `Profile` pertenece a una cuenta de la aplicación. Un `GroupMember` es una identidad durable y específica de un grupo: puede existir sin `Profile`, tener un nombre, apodo y avatar propios, y vincularse más adelante mediante PR07.
 
+Un invitado temporal no es un `GroupMember`. PR09 lo representa exclusivamente como un `EventParticipant` con nombre de invitado, limitado a una fecha concreta y sin rol, cuenta, perfil o invitación persistente. Consulte [Invitados de evento](guest-participants.md).
+
 ## Creación y múltiples grupos
 
 `create_group` toma la identidad exclusivamente de `auth.uid()`. En una transacción crea el grupo y el primer `GroupMember`, vinculado al perfil actual con rol `ADMIN`. Angular nunca envía `created_by`, `profile_id` ni el rol del creador.
