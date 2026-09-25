@@ -1,0 +1,71 @@
+<app-page-container>
+  <div class="groups-page">
+    <a class="groups-page__back" [routerLink]="['/groups', groupId]">← Volver al grupo</a>
+    <header class="ds-stack">
+      <h1 class="ds-page-title">{{ memberId ? 'Editar miembro' : 'Agregar miembro' }}</h1>
+      <p class="ds-body">Puede formar parte del grupo aunque todavía no tenga una cuenta.</p>
+    </header>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando miembro…</p>
+    } @else {
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      <app-card>
+        <form class="member-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-field">
+            <label for="member-name">Nombre</label>
+            <input
+              id="member-name"
+              formControlName="displayName"
+              maxlength="100"
+              autocomplete="off"
+            />
+            @if (form.controls.displayName.touched && form.controls.displayName.invalid) {
+              <span class="form-field__error">Ingresá el nombre del miembro.</span>
+            }
+          </div>
+          <div class="form-field">
+            <label for="member-nickname">Apodo <span class="ds-caption">(opcional)</span></label>
+            <input
+              id="member-nickname"
+              formControlName="nickname"
+              maxlength="60"
+              autocomplete="off"
+            />
+          </div>
+          <div class="form-field">
+            <label for="member-role">Rol</label>
+            <select id="member-role" formControlName="role">
+              <option value="MEMBER">Asistente</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+            <span class="ds-caption">Los nuevos miembros son Asistentes por defecto.</span>
+          </div>
+          @if (memberId) {
+            <div class="form-field">
+              <label for="member-avatar">Avatar <span class="ds-caption">(opcional)</span></label>
+              <div class="avatar-field">
+                <app-avatar
+                  [name]="form.controls.displayName.value || 'Miembro'"
+                  [src]="member()?.avatarUrl ?? null"
+                />
+                <input
+                  id="member-avatar"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  (change)="selectAvatar($event)"
+                />
+              </div>
+              <span class="ds-caption">JPEG, PNG o WebP. Máximo 2 MB.</span>
+            </div>
+          }
+          <app-button type="submit" [fullWidth]="true" [disabled]="saving()">
+            {{ saving() ? 'Guardando…' : memberId ? 'Guardar cambios' : 'Agregar miembro' }}
+          </app-button>
+        </form>
+      </app-card>
+    }
+  </div>
+</app-page-container>

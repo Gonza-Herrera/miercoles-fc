@@ -1,0 +1,182 @@
+<app-page-container>
+  <div class="groups-page">
+    <a class="groups-page__back" routerLink="/groups">← Mis grupos</a>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando grupo…</p>
+    } @else if (group(); as currentGroup) {
+      <header class="groups-page__header">
+        <div class="avatar-field">
+          <app-avatar [name]="currentGroup.name" [src]="currentGroup.avatarUrl" size="large" />
+          <div class="ds-stack">
+            <h1 class="ds-page-title">{{ currentGroup.name }}</h1>
+            <p class="ds-body">
+              {{ activeMembers().length }}
+              {{ activeMembers().length === 1 ? 'miembro activo' : 'miembros activos' }}
+            </p>
+          </div>
+        </div>
+        @if (isAdmin()) {
+          <a [routerLink]="['/groups', currentGroup.id, 'settings']">
+            <app-button variant="secondary" size="small">Editar grupo</app-button>
+          </a>
+        }
+      </header>
+
+      @if (currentGroup.description) {
+        <p class="ds-body">{{ currentGroup.description }}</p>
+      }
+
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      @if (feedback(); as message) {
+        <p class="feedback" role="status">{{ message }}</p>
+      }
+
+      @if (createdInvitation(); as invitation) {
+        <app-card variant="elevated">
+          <section class="invitation-result" aria-labelledby="group-invitation-title">
+            <h2 id="group-invitation-title" class="ds-card-title">
+              Invitación para {{ invitation.memberDisplayName }}
+            </h2>
+            <label for="group-invitation-url" class="ds-body-small">Enlace de invitación</label>
+            <input id="group-invitation-url" readonly [value]="invitation.url" />
+            <app-button [fullWidth]="true" (click)="shareInvitation(invitation)">
+              Compartir invitación
+            </app-button>
+            <app-button variant="secondary" [fullWidth]="true" (click)="copyInvitation(invitation)">
+              Copiar enlace
+            </app-button>
+            @if (shareMessage(); as message) {
+              <p role="status">{{ message }}</p>
+            }
+          </section>
+        </app-card>
+      }
+
+      <section class="ds-stack" aria-labelledby="active-members-title">
+        <div class="groups-section__header">
+          <div>
+            <h2 id="active-members-title" class="ds-section-title">Miembros</h2>
+            @if (activeMembers().length === 1) {
+              <p class="ds-body-small">Por ahora sos el único miembro.</p>
+            }
+          </div>
+          @if (isAdmin()) {
+            <a [routerLink]="['/groups', currentGroup.id, 'members', 'new']">
+              <app-button size="small">Agregar miembro</app-button>
+            </a>
+          }
+        </div>
+
+        @if (!activeMembers().length) {
+          <app-card>
+            <app-empty-state
+              title="No hay miembros activos"
+              description="Reactivá un miembro para sumarlo nuevamente."
+            />
+          </app-card>
+        } @else {
+          <ul class="members-list" aria-label="Miembros activos">
+            @for (member of activeMembers(); track member.id) {
+              <li>
+                <app-card>
+                  <article class="member-row">
+                    <app-avatar [name]="member.displayName" [src]="member.avatarUrl" />
+                    <div class="member-row__content">
+                      <h3 class="ds-card-title member-row__name">{{ member.displayName }}</h3>
+                      <div class="member-row__meta">
+                        <span>{{ member.role === 'ADMIN' ? 'Admin' : 'Asistente' }}</span>
+                        @if (member.nickname) {
+                          <span>· {{ member.nickname }}</span>
+                        }
+                      </div>
+                      <div class="member-row__status">
+                        <span>{{
+                          member.profileId ? 'Cuenta vinculada' : 'Cuenta no vinculada'
+                        }}</span>
+                        @if (member.invitation === 'ACTIVE') {
+                          <span>· Invitación pendiente</span>
+                        }
+                      </div>
+                    </div>
+                    @if (isAdmin()) {
+                      <div class="member-row__actions">
+                        @if (!member.profileId) {
+                          <app-button
+                            size="small"
+                            [disabled]="busyMemberId() !== null"
+                            (click)="createInvitation(member)"
+                          >
+                            {{ member.invitation === 'ACTIVE' ? 'Regenerar' : 'Invitar' }}
+                          </app-button>
+                        }
+                        <a
+                          [routerLink]="['/groups', currentGroup.id, 'members', member.id, 'edit']"
+                        >
+                          <app-button variant="secondary" size="small">Editar</app-button>
+                        </a>
+                        <app-button
+                          variant="ghost"
+                          size="small"
+                          [disabled]="busyMemberId() !== null"
+                          (click)="requestDeactivation(member)"
+                        >
+                          Quitar
+                        </app-button>
+                      </div>
+                    }
+                  </article>
+                </app-card>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      @if (isAdmin() && inactiveMembers().length) {
+        <section class="ds-stack" aria-labelledby="inactive-members-title">
+          <h2 id="inactive-members-title" class="ds-section-title">Miembros inactivos</h2>
+          <ul class="members-list" aria-label="Miembros inactivos">
+            @for (member of inactiveMembers(); track member.id) {
+              <li>
+                <app-card>
+                  <article class="member-row member-row--inactive">
+                    <app-avatar [name]="member.displayName" [src]="member.avatarUrl" />
+                    <div class="member-row__content">
+                      <h3 class="ds-card-title">{{ member.displayName }}</h3>
+                      <p class="ds-body-small">Inactivo · historial conservado</p>
+                    </div>
+                    <app-button
+                      variant="secondary"
+                      size="small"
+                      [disabled]="busyMemberId() !== null"
+                      (click)="reactivate(member)"
+                    >
+                      Reactivar
+                    </app-button>
+                  </article>
+                </app-card>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <app-confirm-dialog
+        [open]="confirmMember() !== null"
+        [title]="'¿Quitar a ' + (confirmMember()?.displayName ?? '') + ' del grupo?'"
+        description="Dejará de aparecer como miembro activo, pero conservaremos su historial."
+        confirmLabel="Quitar del grupo"
+        (cancelled)="confirmMember.set(null)"
+        (confirmed)="deactivate()"
+      />
+    } @else if (errorMessage(); as error) {
+      <div class="feedback feedback--error" role="alert">
+        <p>{{ error }}</p>
+        <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+      </div>
+    }
+  </div>
+</app-page-container>

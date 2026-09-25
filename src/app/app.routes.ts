@@ -35,6 +35,11 @@ export const routes: Routes = [
           import('./features/home/home.routes').then(({ HOME_ROUTES }) => HOME_ROUTES),
       },
       {
+        path: 'groups',
+        loadChildren: () =>
+          import('./features/groups/group.routes').then(({ GROUP_ROUTES }) => GROUP_ROUTES),
+      },
+      {
         path: 'match',
         loadChildren: () =>
           import('./features/match/match.routes').then(({ MATCH_ROUTES }) => MATCH_ROUTES),

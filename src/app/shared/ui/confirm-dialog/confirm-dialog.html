@@ -1,0 +1,12 @@
+<dialog #dialog class="confirm-dialog" (cancel)="cancel()">
+  <section aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-description">
+    <h2 id="confirm-dialog-title" class="ds-card-title">{{ title() }}</h2>
+    <p id="confirm-dialog-description" class="ds-body">{{ description() }}</p>
+    <div class="confirm-dialog__actions">
+      <app-button variant="secondary" [fullWidth]="true" (click)="cancel()">Cancelar</app-button>
+      <app-button variant="danger" [fullWidth]="true" (click)="confirm()">
+        {{ confirmLabel() }}
+      </app-button>
+    </div>
+  </section>
+</dialog>

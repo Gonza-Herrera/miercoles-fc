@@ -1,0 +1,28 @@
+.confirm-dialog {
+  width: min(calc(100% - 2rem), 26rem);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+
+  &::backdrop {
+    background: rgb(24 32 51 / 50%);
+  }
+
+  section {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-6);
+  }
+}
+
+.confirm-dialog__actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 30rem) {
+  .confirm-dialog__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

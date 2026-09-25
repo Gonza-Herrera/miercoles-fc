@@ -39,6 +39,9 @@
               <span>{{ email }}</span>
             }
           </div>
+          <a class="account-panel__link" routerLink="/groups" (click)="accountOpen.set(false)">
+            Mis grupos
+          </a>
           <app-button
             variant="ghost"
             size="small"
