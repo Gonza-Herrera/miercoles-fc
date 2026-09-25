@@ -500,7 +500,49 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      accept_group_invitation: {
+        Args: { p_raw_token: string };
+        Returns: {
+          group_id: string;
+          group_member_id: string;
+          group_name: string;
+          member_display_name: string;
+          status: string;
+        }[];
+      };
+      create_group_invitation: {
+        Args: { p_group_member_id: string };
+        Returns: {
+          expires_at: string;
+          group_id: string;
+          group_member_id: string;
+          group_name: string;
+          member_display_name: string;
+          raw_token: string;
+        }[];
+      };
+      get_group_invitation_preview: {
+        Args: { p_raw_token: string };
+        Returns: {
+          expires_at: string;
+          group_name: string;
+          member_display_name: string;
+          status: string;
+        }[];
+      };
+      list_invitable_group_members: {
+        Args: never;
+        Returns: {
+          group_id: string;
+          group_member_id: string;
+          group_name: string;
+          member_display_name: string;
+        }[];
+      };
+      revoke_group_invitation: {
+        Args: { p_group_member_id: string };
+        Returns: boolean;
+      };
     };
     Enums: {
       actual_attendance_status: 'UNSET' | 'YES' | 'NO';

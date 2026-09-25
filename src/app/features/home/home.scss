@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+.home-invitations-link {
+  display: inline-flex;
+  min-height: var(--touch-target-min);
+  align-items: center;
+  margin-block-start: var(--space-4);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
