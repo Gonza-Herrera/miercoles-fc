@@ -28,7 +28,7 @@ Google uses `signInWithOAuth({ provider: 'google' })` with the same callback rou
 
 The installed client uses Supabase's browser implicit flow. Its default Magic Link template can therefore continue using `{{ .ConfirmationURL }}`. Supabase processes callback credentials before emitting `INITIAL_SESSION`; the callback page only waits for centralized initialization and performs safe navigation.
 
-An optional `returnUrl` is accepted only when it is an internal path that does not point back into `/auth`. External, protocol-relative, and auth-loop destinations fall back to `/`.
+An optional `returnUrl` is accepted only when it is an internal path that does not point back into `/auth`. External, protocol-relative, and auth-loop destinations fall back to `/`. PR07 reuses this mechanism for `/invite/:token`: authentication returns to the invitation preview but never accepts it automatically.
 
 ## Profile bootstrap
 
@@ -80,7 +80,7 @@ Sessions are persisted by Supabase for the application origin, so normal reloads
 
 OAuth return-window behavior varies across mobile operating systems and installed-PWA implementations. The flow uses standard HTTPS redirects and does not assume that the provider always returns directly to the standalone window. If a platform keeps browser and standalone storage isolated, reopening the PWA may require another Magic Link or Google sign-in.
 
-Account recovery is re-authentication with the same email or Google identity on another device. There is no application password or password-reset screen. The stable Supabase Auth user ID resolves the same profile and, after PR07, the same linked memberships.
+Account recovery is re-authentication with the same email or Google identity on another device. There is no application password or password-reset screen. The stable Supabase Auth user ID resolves the same profile and its PR07-linked memberships.
 
 ## Manual validation
 

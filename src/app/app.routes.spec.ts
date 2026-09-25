@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { InvitationService } from './features/invitations/invitation.service';
 
 describe('application routes', () => {
   const authenticated = signal(true);
@@ -17,11 +18,24 @@ describe('application routes', () => {
     signOut: vi.fn().mockResolvedValue(undefined),
     user: signal({ email: 'gonzalo@example.com' }),
   };
+  const invitationStub = {
+    listInvitableMembers: vi.fn().mockResolvedValue([]),
+    preview: vi.fn().mockResolvedValue({
+      expiresAt: '2026-10-01T00:00:00Z',
+      groupName: 'Los del Miércoles',
+      memberDisplayName: 'Lucas',
+      status: 'ACTIVE',
+    }),
+  };
 
   beforeEach(() => {
     authenticated.set(true);
     TestBed.configureTestingModule({
-      providers: [provideRouter(routes), { provide: AuthService, useValue: authStub }],
+      providers: [
+        provideRouter(routes),
+        { provide: AuthService, useValue: authStub },
+        { provide: InvitationService, useValue: invitationStub },
+      ],
     });
   });
 
@@ -30,6 +44,7 @@ describe('application routes', () => {
     ['/match', 'Partido'],
     ['/dinner', 'Cena'],
     ['/payments', 'Pagos'],
+    ['/invitations', 'Invitar miembros'],
   ])('loads %s inside the application shell', async (url, heading) => {
     const harness = await RouterTestingHarness.create();
 
@@ -66,5 +81,18 @@ describe('application routes', () => {
 
     expect(TestBed.inject(Router).url).toBe('/auth?returnUrl=%2Fpayments');
     expect(harness.routeNativeElement?.textContent).toContain('Enviarme un enlace');
+  });
+
+  it('keeps invitation previews public before authentication', async () => {
+    authenticated.set(false);
+    const harness = await RouterTestingHarness.create();
+
+    await harness.navigateByUrl('/invite/secure-token');
+    await vi.waitFor(() =>
+      expect(harness.routeNativeElement?.textContent).toContain('¡Hola Lucas!'),
+    );
+
+    expect(TestBed.inject(Router).url).toBe('/invite/secure-token');
+    expect(harness.routeNativeElement?.querySelector('app-bottom-navigation')).toBeFalsy();
   });
 });

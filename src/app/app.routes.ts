@@ -16,6 +16,13 @@ export const routes: Routes = [
       import('./features/auth/auth.routes').then(({ AUTH_ROUTES }) => AUTH_ROUTES),
   },
   {
+    path: 'invite',
+    loadChildren: () =>
+      import('./features/invitations/invitation.routes').then(
+        ({ INVITATION_ROUTES }) => INVITATION_ROUTES,
+      ),
+  },
+  {
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -36,6 +43,13 @@ export const routes: Routes = [
         path: 'dinner',
         loadChildren: () =>
           import('./features/dinner/dinner.routes').then(({ DINNER_ROUTES }) => DINNER_ROUTES),
+      },
+      {
+        path: 'invitations',
+        loadChildren: () =>
+          import('./features/invitations/invitation.routes').then(
+            ({ INVITATION_ADMIN_ROUTES }) => INVITATION_ADMIN_ROUTES,
+          ),
       },
       {
         path: 'payments',

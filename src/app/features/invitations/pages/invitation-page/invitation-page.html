@@ -1,0 +1,80 @@
+<main class="invitation-page">
+  <header class="invitation-brand">
+    <img src="/icons/icon-96x96.png" alt="" width="64" height="64" />
+    <span>Miércoles FC</span>
+  </header>
+
+  <app-card variant="elevated">
+    <section class="invitation-card" aria-labelledby="invitation-title" aria-live="polite">
+      @if (loading()) {
+        <div class="invitation-state" role="status">
+          <span class="invitation-spinner" aria-hidden="true"></span>
+          <h1 id="invitation-title">Revisando invitación…</h1>
+          <p>Un momento, por favor.</p>
+        </div>
+      } @else if (acceptance(); as result) {
+        @if (result.status === 'ACCEPTED_NOW' || result.status === 'ALREADY_MEMBER') {
+          <div class="invitation-state invitation-state--success">
+            <span class="invitation-state__icon" aria-hidden="true">✓</span>
+            <h1 id="invitation-title">
+              {{
+                result.status === 'ACCEPTED_NOW' ? '¡Ya estás adentro!' : 'Ya eras parte del grupo'
+              }}
+            </h1>
+            <p>
+              Ahora sos parte de <strong>{{ result.groupName }}</strong
+              >.
+            </p>
+            <a class="invitation-link invitation-link--primary" routerLink="/">Continuar</a>
+          </div>
+        } @else if (result.status === 'PROFILE_ALREADY_MEMBER') {
+          <div class="invitation-state invitation-state--error">
+            <h1 id="invitation-title">Ya pertenecés a este grupo</h1>
+            <p>Tu cuenta ya representa a otro miembro dentro de este grupo.</p>
+            <a class="invitation-link" routerLink="/">Ir al inicio</a>
+          </div>
+        } @else {
+          <div class="invitation-state invitation-state--error">
+            <h1 id="invitation-title">{{ acceptanceTitle(result.status) }}</h1>
+            <p>Pedile a un administrador del grupo una invitación nueva.</p>
+          </div>
+        }
+      } @else if (preview(); as invitation) {
+        @if (invitation.status === 'ACTIVE') {
+          <div class="invitation-state">
+            <span class="invitation-state__wave" aria-hidden="true">👋</span>
+            <h1 id="invitation-title">¡Hola {{ invitation.memberDisplayName }}!</h1>
+            <p>Te invitaron a</p>
+            <strong class="invitation-group">{{ invitation.groupName }}</strong>
+            <p class="invitation-explanation">
+              Al unirte, tu cuenta quedará vinculada a este miembro del grupo.
+            </p>
+            <app-button
+              size="large"
+              [fullWidth]="true"
+              [disabled]="accepting()"
+              (click)="joinGroup()"
+            >
+              {{ accepting() ? 'Uniéndome…' : 'Unirme al grupo' }}
+            </app-button>
+          </div>
+        } @else {
+          <div class="invitation-state invitation-state--error">
+            <h1 id="invitation-title">{{ previewTitle(invitation.status) }}</h1>
+            <p>Pedile a un administrador del grupo una invitación nueva.</p>
+          </div>
+        }
+      } @else {
+        <div class="invitation-state invitation-state--error">
+          <h1 id="invitation-title">No pudimos abrir la invitación</h1>
+          <p>{{ errorMessage() }}</p>
+          <app-button variant="secondary" (click)="loadPreview()">Intentar nuevamente</app-button>
+        </div>
+      }
+
+      @if (errorMessage() && preview()?.status === 'ACTIVE') {
+        <p class="invitation-error" role="alert">{{ errorMessage() }}</p>
+      }
+    </section>
+  </app-card>
+</main>

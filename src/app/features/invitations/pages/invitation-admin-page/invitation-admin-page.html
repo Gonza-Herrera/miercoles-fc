@@ -1,0 +1,76 @@
+<app-page-container>
+  <div class="invitation-admin ds-stack">
+    <header class="ds-stack">
+      <span class="invitation-admin__eyebrow">Acceso administrativo</span>
+      <h1 class="ds-page-title">Invitar miembros</h1>
+      <p class="ds-body">Generá un enlace para un miembro que todavía no vinculó su cuenta.</p>
+    </header>
+
+    @if (errorMessage(); as error) {
+      <div class="invitation-admin__error" role="alert">
+        <p>{{ error }}</p>
+        <app-button variant="secondary" size="small" (click)="loadMembers()">Reintentar</app-button>
+      </div>
+    }
+
+    @if (createdInvitation(); as invitation) {
+      <app-card variant="elevated">
+        <section class="created-invitation" aria-labelledby="created-invitation-title">
+          <div>
+            <h2 id="created-invitation-title" class="ds-card-title">Invitación lista</h2>
+            <p class="ds-body-small">
+              {{ invitation.memberDisplayName }} · {{ invitation.groupName }}
+            </p>
+          </div>
+          <label for="invitation-url">Enlace de invitación</label>
+          <input id="invitation-url" type="text" readonly [value]="invitation.url" />
+          <div class="created-invitation__actions">
+            <app-button [fullWidth]="true" (click)="shareInvitation(invitation)">
+              Compartir invitación
+            </app-button>
+            <app-button variant="secondary" [fullWidth]="true" (click)="copyInvitation(invitation)">
+              Copiar enlace
+            </app-button>
+          </div>
+          <p class="ds-caption">El enlace vence en 7 días. Crear otro invalida este enlace.</p>
+          @if (shareMessage(); as message) {
+            <p class="created-invitation__status" role="status">{{ message }}</p>
+          }
+        </section>
+      </app-card>
+    }
+
+    @if (loading()) {
+      <p class="invitation-admin__loading" role="status">Cargando miembros…</p>
+    } @else if (!members().length && !errorMessage()) {
+      <app-card>
+        <app-empty-state
+          title="No hay miembros para invitar"
+          description="Los miembros sin cuenta de tus grupos aparecerán acá."
+        />
+      </app-card>
+    } @else {
+      <ul class="invitation-members" aria-label="Miembros disponibles para invitar">
+        @for (member of members(); track member.groupMemberId) {
+          <li>
+            <app-card>
+              <div class="invitation-member">
+                <div>
+                  <h2 class="ds-card-title">{{ member.memberDisplayName }}</h2>
+                  <p class="ds-body-small">{{ member.groupName }}</p>
+                </div>
+                <app-button
+                  size="small"
+                  [disabled]="activeMemberId() !== null"
+                  (click)="createInvitation(member)"
+                >
+                  {{ activeMemberId() === member.groupMemberId ? 'Generando…' : 'Invitar' }}
+                </app-button>
+              </div>
+            </app-card>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</app-page-container>

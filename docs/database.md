@@ -10,7 +10,7 @@ Supabase Auth owns authentication identity. `profiles.id` extends `auth.users.id
 - `group_members` represents a person's identity and persistent role inside one group.
 - `group_members.profile_id` is nullable, so an admin can create “Lucas” before Lucas registers.
 - A partial unique index prevents one profile from being linked twice to the same group while allowing multiple unlinked people to share a display name.
-- Linking an existing member to a profile is intentionally deferred to the invitation flow in PR07.
+- Linking an existing member to a profile occurs only through the explicit, authenticated invitation flow implemented in PR07.
 
 ```mermaid
 erDiagram
@@ -67,7 +67,7 @@ Persistent membership roles are the PostgreSQL enum `ADMIN | MEMBER`. “Manager
 
 ## Invitations and tokens
 
-`group_invitations` targets a specific `(group_member_id, group_id)` pair. It stores only a 32-byte token hash, never a raw bearer token. A partial unique index allows only one active invitation per member. Acceptance, revocation, token generation, and profile linking are deferred to PR07.
+`group_invitations` targets a specific `(group_member_id, group_id)` pair. It stores only a 32-byte SHA-256 token hash, never a raw bearer token. A partial unique index allows only one unconsumed/unrevoked invitation per member. PR07 adds private database implementations for secure generation, seven-day expiration, safe preview, revocation and atomic member linking, exposed through narrow public RPC wrappers.
 
 ## Money and payments
 
@@ -123,7 +123,7 @@ Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid
 
 The local configuration disables automatic Data API exposure. The migration uses explicit grants because grants and RLS are separate security layers. The `service_role` keeps administrative access but must never be shipped to the browser.
 
-Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. Invitation mutations/linking remain deferred to PR07, and group/business mutations to their owning PRs. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
+Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. Group/business mutations stay deferred to their owning PRs. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
 
 ## Browser configuration
 
@@ -175,4 +175,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides schema and access foundations only. The foundation migration is deployed to the linked Supabase project and the committed database types are generated from that hosted schema. It does not create users, sessions, groups, seed business data, Realtime subscriptions, settlement calculations, or business UI. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity, and PR07 adds the narrow invitation RPC boundary plus the atomic Profile-to-GroupMember link. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Full group management, seed business data, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

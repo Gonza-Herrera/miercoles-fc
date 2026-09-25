@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, and Supabase/PostgreSQL backend contract. It does not yet implement those business workflows.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, and secure member invitations. The broader group, match, dinner, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR05 — Supabase Foundation**
+**PR07 — Invitations & Member Linking**
 
-PR01–PR05 established the Angular application, Design System, responsive mobile shell, installable PWA, and Supabase/PostgreSQL foundation. PR06 adds passwordless identity with Magic Links and Google OAuth, persistent session restoration, protected routes, logout, and automatic profile bootstrap. Group membership and business features are not implemented yet.
+PR01–PR06 established the Angular application, Design System, responsive mobile shell, installable PWA, Supabase/PostgreSQL foundation, and passwordless identity. PR07 adds secure invitations that link an authenticated Profile to an existing GroupMember without creating duplicates. Full group/member management remains deferred to PR08.
 
 ## Tech stack
 
@@ -26,7 +26,7 @@ PR01–PR05 established the Angular application, Design System, responsive mobil
 - ESLint and Prettier
 - Node.js 24
 
-Angular PWA and Supabase infrastructure are configured. Identity UI and feature-specific data access arrive in later roadmap stages.
+Angular PWA, Supabase infrastructure, passwordless identity, and invitation data access are configured. The remaining feature-specific workflows arrive in later roadmap stages.
 
 ## Architecture
 
@@ -58,10 +58,12 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | ---------------- | ------------------------------------------------------- |
 | `/auth`          | Passwordless sign-in                                    |
 | `/auth/callback` | Magic Link and OAuth callback                           |
+| `/invite/:token` | Public invitation preview and explicit acceptance       |
 | `/`              | Protected Home placeholder inside the application shell |
 | `/match`         | Protected Match placeholder                             |
 | `/dinner`        | Protected Dinner placeholder                            |
 | `/payments`      | Protected Payments placeholder                          |
+| `/invitations`   | Minimal protected ADMIN invitation surface              |
 | `/design-system` | Development showcase outside primary navigation         |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
@@ -120,6 +122,8 @@ Copy `public/config/supabase-config.example.json` to the Git-ignored `public/con
 
 Supabase owns browser session persistence and callback processing. Angular waits for `INITIAL_SESSION` before guards decide whether to show the protected shell or `/auth`, avoiding a login flash when the PWA restores an existing session. New Auth users receive a profile through a database trigger; group membership remains separate. See [authentication documentation](docs/authentication.md) for architecture, provider setup, redirects, PWA limitations, and manual validation.
 
+Invitations use 256-bit bearer tokens while PostgreSQL stores only SHA-256 hashes. Anonymous preview, ADMIN-only creation and authenticated acceptance use narrow RPCs; acceptance links the existing member atomically and is protected against reuse and concurrent claims. See [invitation documentation](docs/invitations.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -127,7 +131,8 @@ Supabase owns browser session persistence and callback processing. Angular waits
 - Completed: **PR03 — Mobile App Shell**
 - Completed: **PR04 — PWA Foundation**
 - Completed: **PR05 — Supabase Foundation**
-- Current: **PR06 — Identity & Authentication**
-- Next: **PR07 — Invitations & Member Linking**
+- Completed: **PR06 — Identity & Authentication**
+- Current: **PR07 — Invitations & Member Linking**
+- Next: **PR08 — Groups & Members**
 
-Invitation linking, group authorization workflows, realtime behavior, and offline business data will be implemented only in later roadmap stages.
+Full group/member management, realtime behavior, and offline business data will be implemented only in later roadmap stages.
