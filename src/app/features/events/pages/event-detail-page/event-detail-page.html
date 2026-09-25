@@ -1,0 +1,72 @@
+<app-page-container>
+  <div class="events-page">
+    @if (event(); as currentEvent) {
+      <a class="events-page__back" [routerLink]="['/groups', currentEvent.groupId, 'events']">
+        ← Todos los miércoles
+      </a>
+    }
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando evento…</p>
+    } @else if (event(); as currentEvent) {
+      <header class="events-page__header">
+        <div>
+          <h1 class="ds-page-title">Detalle del miércoles</h1>
+          @if (group(); as currentGroup) {
+            <p class="ds-body">{{ currentGroup.name }}</p>
+          }
+        </div>
+        @if (canEdit()) {
+          <a [routerLink]="['/events', currentEvent.id, 'edit']">
+            <app-button variant="secondary" size="small">Editar</app-button>
+          </a>
+        }
+      </header>
+
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      @if (feedback(); as message) {
+        <p class="feedback" role="status">{{ message }}</p>
+      }
+
+      <app-event-card [event]="currentEvent" [linked]="false" />
+
+      @if (isAdmin() && nextStatus()) {
+        <app-card variant="elevated">
+          <section class="event-transition" aria-labelledby="event-transition-title">
+            <div>
+              <h2 id="event-transition-title" class="ds-card-title">Siguiente paso</h2>
+              <p class="ds-body-small">El ciclo avanza de a una etapa y no permite volver atrás.</p>
+            </div>
+            <app-button
+              [variant]="nextStatus() === 'CLOSED' ? 'danger' : 'primary'"
+              [disabled]="transitioning()"
+              (click)="requestTransition()"
+            >
+              {{ transitioning() ? 'Actualizando…' : transitionLabel() }}
+            </app-button>
+          </section>
+        </app-card>
+      }
+
+      <app-guest-participant-manager [eventId]="currentEvent.id" [isAdmin]="canManageGuests()" />
+
+      <app-confirm-dialog
+        [open]="confirmClose()"
+        title="¿Cerrar este miércoles?"
+        description="Después de cerrarlo no se podrán editar sus datos ni sus invitados. El historial seguirá disponible."
+        confirmLabel="Cerrar miércoles"
+        (cancelled)="confirmClose.set(false)"
+        (confirmed)="transition()"
+      />
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="feedback feedback--error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    }
+  </div>
+</app-page-container>

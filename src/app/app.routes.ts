@@ -40,6 +40,11 @@ export const routes: Routes = [
           import('./features/groups/group.routes').then(({ GROUP_ROUTES }) => GROUP_ROUTES),
       },
       {
+        path: 'events',
+        loadChildren: () =>
+          import('./features/events/event.routes').then(({ EVENT_ROUTES }) => EVENT_ROUTES),
+      },
+      {
         path: 'match',
         loadChildren: () =>
           import('./features/match/match.routes').then(({ MATCH_ROUTES }) => MATCH_ROUTES),

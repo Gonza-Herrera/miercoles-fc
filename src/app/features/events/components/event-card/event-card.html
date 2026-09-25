@@ -1,0 +1,32 @@
+<app-card [variant]="linked() ? 'interactive' : 'default'">
+  <article class="event-card">
+    <div class="event-card__heading">
+      <div>
+        <p class="event-card__eyebrow">Miércoles</p>
+        <h2 class="ds-card-title">{{ eventTitle(event()) }}</h2>
+      </div>
+      <app-badge [variant]="statusVariants[event().status]">
+        {{ statusLabels[event().status] }}
+      </app-badge>
+    </div>
+    <dl class="event-card__details">
+      <div>
+        <dt>Hora</dt>
+        <dd>{{ eventTime(event().startsAt) }}</dd>
+      </div>
+      <div>
+        <dt>Lugar</dt>
+        <dd>{{ event().location }}</dd>
+      </div>
+      <div>
+        <dt>Cancha</dt>
+        <dd>{{ formatMoneyMinor(event().courtPriceMinor, event().currencyCode) }}</dd>
+      </div>
+    </dl>
+    @if (linked()) {
+      <a class="event-card__link" [routerLink]="['/events', event().id]">
+        Ver evento <span aria-hidden="true">→</span>
+      </a>
+    }
+  </article>
+</app-card>

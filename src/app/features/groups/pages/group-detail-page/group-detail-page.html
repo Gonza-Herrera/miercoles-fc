@@ -27,6 +27,10 @@
         <p class="ds-body">{{ currentGroup.description }}</p>
       }
 
+      <a [routerLink]="['/groups', currentGroup.id, 'events']">
+        <app-button [fullWidth]="true">Ver los miércoles</app-button>
+      </a>
+
       @if (errorMessage(); as error) {
         <p class="feedback feedback--error" role="alert">{{ error }}</p>
       }

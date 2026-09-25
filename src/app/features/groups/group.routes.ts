@@ -24,6 +24,20 @@ export const GROUP_ROUTES: Routes = [
       import('./pages/group-form-page/group-form-page').then(({ GroupFormPage }) => GroupFormPage),
   },
   {
+    path: ':groupId/events/new',
+    loadComponent: () =>
+      import('../events/pages/event-form-page/event-form-page').then(
+        ({ EventFormPage }) => EventFormPage,
+      ),
+  },
+  {
+    path: ':groupId/events',
+    loadComponent: () =>
+      import('../events/pages/event-list-page/event-list-page').then(
+        ({ EventListPage }) => EventListPage,
+      ),
+  },
+  {
     path: ':groupId/members/new',
     loadComponent: () =>
       import('./pages/member-form-page/member-form-page').then(

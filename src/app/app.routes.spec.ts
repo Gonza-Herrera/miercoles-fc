@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { EventService } from './features/events/event.service';
 import { GroupService } from './features/groups/group.service';
 import { InvitationService } from './features/invitations/invitation.service';
 
@@ -38,6 +39,7 @@ describe('application routes', () => {
         { provide: AuthService, useValue: authStub },
         { provide: GroupService, useValue: groupStub },
         { provide: InvitationService, useValue: invitationStub },
+        { provide: EventService, useValue: { current: vi.fn().mockResolvedValue(null) } },
       ],
     });
   });

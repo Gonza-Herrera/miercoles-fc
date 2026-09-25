@@ -61,4 +61,4 @@ Los RPC bloquean la fila del evento durante cada mutación. Así, la autorizaci�
 - una fila que presenta miembros e invitados de manera uniforme, con badge “Invitado” y Avatar por iniciales;
 - un gestor de invitados con edición, confirmación de cancelación, estados de carga y mensajes en español.
 
-PR09 no registra una ruta ni crea eventos ficticios. PR10 podrá insertar el gestor en la vista real del evento y suministrarle `eventId` e `isAdmin`. Las mutaciones requieren confirmación del backend y no se encolan offline. Tampoco se agregan suscripciones Realtime; cada participante sigue siendo una fila compatible con Realtime futuro.
+PR10 inserta el gestor en la vista real del evento y le suministra el `eventId` estable y el permiso ADMIN del grupo. Al cerrar el evento, la interfaz oculta las acciones y PostgreSQL conserva la prohibición definitiva. Las mutaciones requieren confirmación del backend y no se encolan offline. Tampoco se agregan suscripciones Realtime; cada participante sigue siendo una fila compatible con Realtime futuro.

@@ -1,0 +1,72 @@
+<app-page-container>
+  <div class="events-page">
+    <a
+      class="events-page__back"
+      [routerLink]="eventId ? ['/events', eventId] : ['/groups', groupId, 'events']"
+    >
+      ← Volver
+    </a>
+    <header>
+      <h1 class="ds-page-title">{{ eventId ? 'Editar miércoles' : 'Crear miércoles' }}</h1>
+      <p class="ds-body">
+        {{
+          event() && event()?.status !== 'DRAFT' && event()?.status !== 'OPEN'
+            ? 'En esta etapa sólo podés ajustar el precio de la cancha.'
+            : 'Definí cuándo y dónde se juega. El evento empezará como borrador.'
+        }}
+      </p>
+    </header>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando evento…</p>
+    } @else {
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      <app-card>
+        <form class="event-form" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="event-form__row">
+            <div class="form-field">
+              <label for="event-date">Fecha</label>
+              <input id="event-date" type="date" formControlName="date" />
+            </div>
+            <div class="form-field">
+              <label for="event-time">Hora</label>
+              <input id="event-time" type="time" formControlName="time" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="event-location">Lugar</label>
+            <input
+              id="event-location"
+              formControlName="location"
+              maxlength="200"
+              autocomplete="street-address"
+              placeholder="Cancha o dirección"
+            />
+          </div>
+          <div class="form-field">
+            <label for="event-price">Precio total de la cancha</label>
+            <div class="event-form__money">
+              <span aria-hidden="true">$</span>
+              <input
+                id="event-price"
+                formControlName="courtPrice"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="50000"
+              />
+            </div>
+            <span class="ds-caption">Pesos argentinos. Podés usar coma para los centavos.</span>
+          </div>
+          @if (form.touched && form.invalid) {
+            <p class="form-field__error">Completá todos los campos con valores válidos.</p>
+          }
+          <app-button type="submit" [fullWidth]="true" [disabled]="saving() || form.disabled">
+            {{ saving() ? 'Guardando…' : eventId ? 'Guardar cambios' : 'Crear miércoles' }}
+          </app-button>
+        </form>
+      </app-card>
+    }
+  </div>
+</app-page-container>

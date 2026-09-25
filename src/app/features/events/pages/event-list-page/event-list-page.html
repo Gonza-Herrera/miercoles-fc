@@ -1,0 +1,67 @@
+<app-page-container>
+  <div class="events-page">
+    <a class="events-page__back" [routerLink]="['/groups', groupId]">← Volver al grupo</a>
+
+    <header class="events-page__header">
+      <div>
+        <h1 class="ds-page-title">Miércoles</h1>
+        @if (group(); as currentGroup) {
+          <p class="ds-body">{{ currentGroup.name }}</p>
+        }
+      </div>
+      @if (isAdmin()) {
+        <a [routerLink]="['/groups', groupId, 'events', 'new']">
+          <app-button size="small">Crear miércoles</app-button>
+        </a>
+      }
+    </header>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Cargando miércoles…</p>
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="feedback feedback--error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    } @else {
+      <section class="events-section" aria-labelledby="active-events-title">
+        <h2 id="active-events-title" class="ds-section-title">Próximos y activos</h2>
+        @if (!activeEvents().length) {
+          <app-card>
+            <app-empty-state
+              [title]="
+                isAdmin()
+                  ? 'No hay un miércoles programado.'
+                  : 'Todavía no hay un miércoles programado.'
+              "
+              [description]="
+                isAdmin()
+                  ? 'Creá el próximo evento para empezar a organizarlo.'
+                  : 'Cuando un administrador cree el próximo evento, aparecerá acá.'
+              "
+            />
+          </app-card>
+        } @else {
+          <div class="events-list">
+            @for (event of activeEvents(); track event.id) {
+              <app-event-card [event]="event" />
+            }
+          </div>
+        }
+      </section>
+
+      @if (previousEvents().length) {
+        <section class="events-section" aria-labelledby="previous-events-title">
+          <h2 id="previous-events-title" class="ds-section-title">Anteriores</h2>
+          <div class="events-list">
+            @for (event of previousEvents(); track event.id) {
+              <app-event-card [event]="event" />
+            }
+          </div>
+        </section>
+      }
+    }
+  </div>
+</app-page-container>
