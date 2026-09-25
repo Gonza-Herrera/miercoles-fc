@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, and event-scoped guest participants. Full event, match, dinner, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, and event-scoped guest participants. Match, dinner, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR09 — Guest Members**
+**PR10 — Events**
 
-PR01–PR08 established the Angular application, Design System, responsive mobile shell, installable PWA, Supabase/PostgreSQL foundation, passwordless identity, secure invitations, and group/member administration. PR09 adds temporary event guests through the common `EventParticipant` identity without creating accounts or persistent memberships.
+PR01–PR09 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, and temporary guests. PR10 adds the production weekly-event flow with deterministic current-event selection, exact court pricing, ADMIN-only mutations, and a database-enforced lifecycle.
 
 ## Tech stack
 
@@ -26,7 +26,7 @@ PR01–PR08 established the Angular application, Design System, responsive mobil
 - ESLint and Prettier
 - Node.js 24
 
-Angular PWA, Supabase infrastructure, passwordless identity, invitations, and group/member administration are configured. Event-specific workflows arrive in later roadmap stages.
+Angular PWA, Supabase infrastructure, passwordless identity, invitations, group/member administration, and weekly event management are configured.
 
 ## Architecture
 
@@ -54,20 +54,24 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 
 ## Application routes
 
-| Route            | Purpose                                                 |
-| ---------------- | ------------------------------------------------------- |
-| `/auth`          | Passwordless sign-in                                    |
-| `/auth/callback` | Magic Link and OAuth callback                           |
-| `/invite/:token` | Public invitation preview and explicit acceptance       |
-| `/`              | Protected Home placeholder inside the application shell |
-| `/match`         | Protected Match placeholder                             |
-| `/dinner`        | Protected Dinner placeholder                            |
-| `/payments`      | Protected Payments placeholder                          |
-| `/invitations`   | Minimal protected ADMIN invitation surface              |
-| `/groups`        | Protected group selection and administration            |
-| `/groups/new`    | Atomic group creation                                   |
-| `/groups/:id`    | Group detail, members, lifecycle and invitations        |
-| `/design-system` | Development showcase outside primary navigation         |
+| Route                    | Purpose                                           |
+| ------------------------ | ------------------------------------------------- |
+| `/auth`                  | Passwordless sign-in                              |
+| `/auth/callback`         | Magic Link and OAuth callback                     |
+| `/invite/:token`         | Public invitation preview and explicit acceptance |
+| `/`                      | Current event for the selected group              |
+| `/match`                 | Protected Match placeholder                       |
+| `/dinner`                | Protected Dinner placeholder                      |
+| `/payments`              | Protected Payments placeholder                    |
+| `/invitations`           | Minimal protected ADMIN invitation surface        |
+| `/groups`                | Protected group selection and administration      |
+| `/groups/new`            | Atomic group creation                             |
+| `/groups/:id`            | Group detail, members, lifecycle and invitations  |
+| `/groups/:id/events`     | Event list and history for one group              |
+| `/groups/:id/events/new` | ADMIN event creation                              |
+| `/events/:id`            | Stable event detail and lifecycle actions         |
+| `/events/:id/edit`       | Lifecycle-aware ADMIN editing                     |
+| `/design-system`         | Development showcase outside primary navigation   |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
 
@@ -129,7 +133,9 @@ Invitations use 256-bit bearer tokens while PostgreSQL stores only SHA-256 hashe
 
 Groups support multiple active memberships per Profile, atomic creator-as-ADMIN setup, safe role changes, durable member deactivation/reactivation, and private avatar storage. See [groups and members documentation](docs/groups-and-members.md).
 
-Guests are event-scoped `EventParticipant` identities with independent football/dinner intent, ADMIN-only mutations and safe cancellation. PR10 will place the reusable flow in the complete Events experience. See [guest participant documentation](docs/guest-participants.md).
+Events start as `DRAFT` and advance one step through `OPEN`, `IN_PROGRESS`, `SETTLEMENT`, and `CLOSED`. PostgreSQL enforces transitions and ADMIN authorization while Angular provides local date/time entry and exact ARS minor-unit conversion. See [event documentation](docs/events.md).
+
+Guests are event-scoped `EventParticipant` identities with independent football/dinner intent, ADMIN-only mutations and safe cancellation. The reusable PR09 manager now runs inside each real event detail. See [guest participant documentation](docs/guest-participants.md).
 
 ## Roadmap
 
@@ -141,7 +147,8 @@ Guests are event-scoped `EventParticipant` identities with independent football/
 - Completed: **PR06 — Identity & Authentication**
 - Completed: **PR07 — Invitations & Member Linking**
 - Completed: **PR08 — Groups & Members**
-- Current: **PR09 — Guest Members**
-- Next: **PR10 — Events**
+- Completed: **PR09 — Guest Members**
+- Current: **PR10 — Events**
+- Next: **PR11 — Attendance**
 
-Full event workflows, realtime behavior, and offline business data will be implemented only in later roadmap stages.
+Attendance, teams, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.

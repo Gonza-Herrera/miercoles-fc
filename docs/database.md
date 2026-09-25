@@ -37,6 +37,10 @@ All major entities use database-generated UUIDs and `timestamptz`. Mutable recor
 
 ## Events, participants, and guests
 
+PR10 makes `location` and `court_price_minor` required event data and exposes only three narrow authenticated RPCs: create, update details, and advance status. Direct browser writes remain revoked. Each RPC derives the caller from `auth.uid()`, verifies an active ADMIN membership, and locks the event row before mutation.
+
+The lifecycle is strictly `DRAFT → OPEN → IN_PROGRESS → SETTLEMENT → CLOSED`. A trigger independently rejects skipped, reversed, or post-close changes. Schedule and location are editable only in `DRAFT` and `OPEN`; `IN_PROGRESS` and `SETTLEMENT` allow only a court-price correction; `CLOSED` is immutable. Reads continue through the existing active-member RLS policy.
+
 `event_participants` is the event-scoped identity used by teams and payments. Each row represents exactly one of:
 
 - a registered `group_member`; or
@@ -110,7 +114,7 @@ Unique constraints provide indexes for most invariants and common event lookups.
 - `group_members(group_id)`;
 - author/profile foreign keys on groups, memberships, invitations, events, and expenses;
 - `group_invitations(group_id)`;
-- `events(group_id, starts_at desc)`;
+- `events(group_id, starts_at desc)` plus a partial active-event lookup by group and date;
 - `event_participants(group_member_id)`, guest creator, active event participants, and `event_managers(group_member_id)`;
 - `team_members(team_id)` and `team_members(event_participant_id)`;
 - `dinner_expenses(event_id)` and its optional payer;
@@ -127,13 +131,13 @@ RLS is enabled on every application-owned table. `anon` has no table privileges.
 - users can select and update their own profile; column grants restrict profile updates to `display_name` and `avatar_url`;
 - linked members can read their groups, co-members, events, participants, teams, managers, expenses, and payments;
 - only group admins can read invitation metadata;
-- no browser role can insert or mutate business records yet.
+- browser roles cannot write event tables directly; authenticated ADMINs mutate events only through the narrow PR10 RPCs.
 
 Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid recursive RLS while checking membership. They set an empty `search_path`, qualify every object, verify `auth.uid()`, and expose only the minimum `EXECUTE` rights. Trigger helpers are not callable by browser roles.
 
 The local configuration disables automatic Data API exposure. The migration uses explicit grants because grants and RLS are separate security layers. The `service_role` keeps administrative access but must never be shipped to the browser.
 
-Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. PR09 guest mutations use ADMIN-authorized RPCs while table writes remain closed. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
+Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. PR09 guest mutations and PR10 event mutations use ADMIN-authorized RPCs while table writes remain closed. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
 
 ## Browser configuration
 
@@ -185,4 +189,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds production group/member administration and private avatar storage; and PR09 adds event-scoped guest participants. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Full event workflows, Realtime subscriptions, settlement calculations, and the remaining business UI are still deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; and PR10 adds weekly-event creation, editing, discovery, and lifecycle management. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Attendance, teams, settlement calculations, Realtime subscriptions, and the remaining business UI are deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

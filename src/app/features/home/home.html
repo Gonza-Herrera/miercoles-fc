@@ -1,18 +1,58 @@
 <app-page-container>
-  <header class="ds-stack">
-    <h1 class="ds-page-title">Inicio</h1>
-    <p class="ds-body">Tu próximo miércoles aparecerá acá.</p>
-  </header>
+  <div class="home-page">
+    <header class="ds-stack">
+      <h1 class="ds-page-title">Inicio</h1>
+      <p class="ds-body">
+        @if (group(); as currentGroup) {
+          {{ currentGroup.name }} · tu miércoles, organizado.
+        } @else {
+          Tu miércoles, organizado.
+        }
+      </p>
+    </header>
 
-  <app-card>
-    <app-empty-state
-      title="Todo listo para empezar"
-      description="Cuando exista un próximo encuentro, vas a encontrarlo en este espacio."
-    />
-  </app-card>
+    @if (loading()) {
+      <p class="ds-body" role="status">Buscando tu próximo miércoles…</p>
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="home-feedback" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    } @else if (currentEvent(); as event) {
+      <section class="home-current" aria-labelledby="home-current-title">
+        <h2 id="home-current-title" class="ds-section-title">Tu próximo miércoles</h2>
+        <app-event-card [event]="event" />
+      </section>
+    } @else {
+      <app-card>
+        <app-empty-state
+          [title]="
+            isAdmin()
+              ? 'No hay un miércoles programado.'
+              : 'Todavía no hay un miércoles programado.'
+          "
+          [description]="
+            isAdmin()
+              ? 'Creá el próximo evento y empezá a organizarlo.'
+              : 'Cuando un administrador cree el próximo evento, aparecerá acá.'
+          "
+        />
+        @if (isAdmin() && group(); as currentGroup) {
+          <a [routerLink]="['/groups', currentGroup.id, 'events', 'new']">
+            <app-button [fullWidth]="true">Crear próximo miércoles</app-button>
+          </a>
+        }
+      </app-card>
+    }
 
-  <nav class="home-links" aria-label="Administración">
-    <a routerLink="/groups">Mis grupos</a>
-    <a routerLink="/invitations">Invitar miembros</a>
-  </nav>
+    <nav class="home-links" aria-label="Accesos del grupo">
+      @if (group(); as currentGroup) {
+        <a [routerLink]="['/groups', currentGroup.id, 'events']">Todos los miércoles</a>
+      }
+      <a routerLink="/groups">Mis grupos</a>
+      <a routerLink="/invitations">Invitar miembros</a>
+    </nav>
+  </div>
 </app-page-container>

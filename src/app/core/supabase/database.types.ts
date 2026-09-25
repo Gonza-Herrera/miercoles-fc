@@ -171,39 +171,39 @@ export type Database = {
       };
       events: {
         Row: {
-          court_price_minor: number | null;
+          court_price_minor: number;
           created_at: string;
           created_by: string;
           currency_code: string;
           group_id: string;
           id: string;
-          location: string | null;
+          location: string;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
           title: string | null;
           updated_at: string;
         };
         Insert: {
-          court_price_minor?: number | null;
+          court_price_minor: number;
           created_at?: string;
           created_by: string;
           currency_code?: string;
           group_id: string;
           id?: string;
-          location?: string | null;
+          location: string;
           starts_at: string;
           status?: Database['public']['Enums']['event_status'];
           title?: string | null;
           updated_at?: string;
         };
         Update: {
-          court_price_minor?: number | null;
+          court_price_minor?: number;
           created_at?: string;
           created_by?: string;
           currency_code?: string;
           group_id?: string;
           id?: string;
-          location?: string | null;
+          location?: string;
           starts_at?: string;
           status?: Database['public']['Enums']['event_status'];
           title?: string | null;
@@ -613,6 +613,33 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      create_event: {
+        Args: {
+          p_court_price_minor: number;
+          p_group_id: string;
+          p_location: string;
+          p_starts_at: string;
+        };
+        Returns: {
+          court_price_minor: number;
+          created_at: string;
+          created_by: string;
+          currency_code: string;
+          group_id: string;
+          id: string;
+          location: string;
+          starts_at: string;
+          status: Database['public']['Enums']['event_status'];
+          title: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'events';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
       create_group: {
         Args: { p_description?: string; p_name: string };
         Returns: {
@@ -703,6 +730,58 @@ export type Database = {
       set_group_member_avatar: {
         Args: { p_avatar_path: string; p_group_member_id: string };
         Returns: string;
+      };
+      transition_event_status: {
+        Args: {
+          p_event_id: string;
+          p_target_status: Database['public']['Enums']['event_status'];
+        };
+        Returns: {
+          court_price_minor: number;
+          created_at: string;
+          created_by: string;
+          currency_code: string;
+          group_id: string;
+          id: string;
+          location: string;
+          starts_at: string;
+          status: Database['public']['Enums']['event_status'];
+          title: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'events';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      update_event_details: {
+        Args: {
+          p_court_price_minor: number;
+          p_event_id: string;
+          p_location: string;
+          p_starts_at: string;
+        };
+        Returns: {
+          court_price_minor: number;
+          created_at: string;
+          created_by: string;
+          currency_code: string;
+          group_id: string;
+          id: string;
+          location: string;
+          starts_at: string;
+          status: Database['public']['Enums']['event_status'];
+          title: string | null;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'events';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
       };
       update_group: {
         Args: { p_description?: string; p_group_id: string; p_name: string };
