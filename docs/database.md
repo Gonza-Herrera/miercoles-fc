@@ -65,6 +65,10 @@ Confirmation and actual attendance are independent:
 
 This avoids ambiguous nullable booleans. Future settlement must use actual attendance, never confirmation.
 
+PR11 exposes independent authenticated RPCs for football and dinner. Both derive the persistent member from `auth.uid()`, require an active membership in the event group and accept writes only while the event is `OPEN`. They lock the event before an `INSERT ... ON CONFLICT` and update only their own response column, preventing duplicate participants and lost updates between the two activities. The browser never supplies a `group_member_id`.
+
+`get_event_attendance` projects active members with `UNKNOWN` even before a participant row exists, keeps answered deactivated members visible for historical integrity, and unions active guests from PR09. Read access is validated by `private.can_access_event`; direct table writes remain revoked. See [attendance documentation](attendance.md).
+
 ## Roles, teams, and managers
 
 Persistent membership roles are the PostgreSQL enum `ADMIN | MEMBER`. “Manager/DT” is not a persistent role: `event_managers` assigns a group member to exactly one team for one event. One team has at most one manager in v1, and one member manages at most one team per event. Being a manager, player, or group admin are independent concepts.
@@ -131,7 +135,7 @@ RLS is enabled on every application-owned table. `anon` has no table privileges.
 - users can select and update their own profile; column grants restrict profile updates to `display_name` and `avatar_url`;
 - linked members can read their groups, co-members, events, participants, teams, managers, expenses, and payments;
 - only group admins can read invitation metadata;
-- browser roles cannot write event tables directly; authenticated ADMINs mutate events only through the narrow PR10 RPCs.
+- browser roles cannot write event tables directly; authenticated ADMINs mutate events only through the narrow PR10 RPCs, while active linked members self-confirm only through the two PR11 RPCs.
 
 Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid recursive RLS while checking membership. They set an empty `search_path`, qualify every object, verify `auth.uid()`, and expose only the minimum `EXECUTE` rights. Trigger helpers are not callable by browser roles.
 
@@ -189,4 +193,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; and PR10 adds weekly-event creation, editing, discovery, and lifecycle management. The migrations are deployed to the linked Supabase project and the committed database types match that hosted schema. Attendance, teams, settlement calculations, Realtime subscriptions, and the remaining business UI are deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10 adds weekly-event creation, editing, discovery, and lifecycle management; and PR11 adds independent planned attendance. Actual attendance, teams, settlement calculations, Realtime subscriptions, and the remaining business UI are deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.

@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { PageContainer } from '../../shared/layout';
-import { Card, EmptyState } from '../../shared/ui';
+import { CurrentAttendancePage } from '../attendance';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Card, EmptyState, PageContainer],
+  imports: [CurrentAttendancePage],
   selector: 'app-dinner',
   templateUrl: './dinner.html',
 })

@@ -1,0 +1,22 @@
+<div class="attendance-choice" role="group" [attr.aria-label]="accessibleLabel()">
+  <button
+    type="button"
+    class="attendance-choice__option attendance-choice__option--yes"
+    [class.attendance-choice__option--selected]="response() === 'YES'"
+    [attr.aria-pressed]="response() === 'YES'"
+    [disabled]="disabled() || saving()"
+    (click)="responseChange.emit('YES')"
+  >
+    <span aria-hidden="true">✓</span> Voy
+  </button>
+  <button
+    type="button"
+    class="attendance-choice__option attendance-choice__option--no"
+    [class.attendance-choice__option--selected]="response() === 'NO'"
+    [attr.aria-pressed]="response() === 'NO'"
+    [disabled]="disabled() || saving()"
+    (click)="responseChange.emit('NO')"
+  >
+    <span aria-hidden="true">×</span> No voy
+  </button>
+</div>

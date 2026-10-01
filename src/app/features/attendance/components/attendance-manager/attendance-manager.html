@@ -1,0 +1,91 @@
+<section class="attendance" aria-labelledby="attendance-title">
+  <header class="attendance__header">
+    <div>
+      <h2 id="attendance-title" class="ds-section-title">Asistencia</h2>
+      <p class="ds-body-small">
+        Esto expresa lo que cada persona planea hacer; no es asistencia final.
+      </p>
+    </div>
+    @if (!loading()) {
+      <div class="attendance__counts" aria-label="Confirmaciones positivas">
+        @if (mode() !== 'dinner') {
+          <span>⚽ {{ footballYesCount() }}</span>
+        }
+        @if (mode() !== 'football') {
+          <span>🍽️ {{ dinnerYesCount() }}</span>
+        }
+      </div>
+    }
+  </header>
+
+  @if (loading()) {
+    <p class="ds-body" role="status">Cargando confirmaciones…</p>
+  } @else if (errorMessage() && !attendees().length) {
+    <app-card>
+      <div class="attendance__feedback" role="alert">
+        <p>{{ errorMessage() }}</p>
+        <app-button size="small" variant="secondary" (click)="load()">Reintentar</app-button>
+      </div>
+    </app-card>
+  } @else {
+    @if (currentUser(); as ownAttendance) {
+      <app-card variant="elevated">
+        <div class="attendance__own">
+          @if (mode() !== 'dinner') {
+            <section class="attendance__question" aria-labelledby="football-question">
+              <div>
+                <h3 id="football-question" class="ds-card-title">¿Jugás al fútbol?</h3>
+                <p class="ds-body-small">Podés cambiar tu respuesta mientras esté abierto.</p>
+              </div>
+              <app-attendance-choice
+                accessibleLabel="Confirmación para el partido"
+                [response]="ownAttendance.footballResponse"
+                [disabled]="!editable()"
+                [saving]="savingActivity() === 'football'"
+                (responseChange)="confirm('football', $event)"
+              />
+            </section>
+          }
+
+          @if (mode() === 'both') {
+            <hr />
+          }
+
+          @if (mode() !== 'football') {
+            <section class="attendance__question" aria-labelledby="dinner-question">
+              <div>
+                <h3 id="dinner-question" class="ds-card-title">¿Cenás después?</h3>
+                <p class="ds-body-small">La cena se confirma de forma independiente.</p>
+              </div>
+              <app-attendance-choice
+                accessibleLabel="Confirmación para la cena"
+                [response]="ownAttendance.dinnerResponse"
+                [disabled]="!editable()"
+                [saving]="savingActivity() === 'dinner'"
+                (responseChange)="confirm('dinner', $event)"
+              />
+            </section>
+          }
+
+          @if (!editable()) {
+            <p class="attendance__readonly" role="status">{{ readOnlyMessage() }}</p>
+          }
+          @if (feedback(); as message) {
+            <p class="attendance__success" role="status">{{ message }}</p>
+          }
+          @if (errorMessage(); as error) {
+            <p class="attendance__error" role="alert">{{ error }}</p>
+          }
+        </div>
+      </app-card>
+    }
+
+    <app-card>
+      <div class="attendance__list-heading">
+        <h3 class="ds-card-title">El grupo</h3>
+        <span class="ds-body-small">Sin responder no significa “No”</span>
+      </div>
+      <app-attendance-list [attendees]="attendees()" [mode]="mode()" />
+    </app-card>
+  }
+</section>

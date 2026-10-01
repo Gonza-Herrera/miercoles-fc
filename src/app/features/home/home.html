@@ -24,6 +24,11 @@
       <section class="home-current" aria-labelledby="home-current-title">
         <h2 id="home-current-title" class="ds-section-title">Tu próximo miércoles</h2>
         <app-event-card [event]="event" />
+        @if (event.status === 'OPEN') {
+          <a [routerLink]="['/events', event.id]">
+            <app-button [fullWidth]="true">Confirmar asistencia</app-button>
+          </a>
+        }
       </section>
     } @else {
       <app-card>

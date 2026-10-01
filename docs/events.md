@@ -1,6 +1,6 @@
 # Eventos semanales
 
-PR10 convierte `events` en el agregado real que organiza cada miércoles. No implementa asistencia, equipos, cena ni liquidaciones: esas capacidades futuras referenciarán el UUID estable creado aquí.
+PR10 convierte `events` en el agregado real que organiza cada miércoles. PR11 usa ese UUID estable para asistencia planificada; equipos, asistencia real y liquidaciones continúan diferidos.
 
 ## Modelo y ciclo de vida
 
@@ -28,7 +28,7 @@ El evento actual se elige de forma determinista: primero `IN_PROGRESS`, después
 
 ## Experiencia Angular
 
-Las rutas por grupo listan activos e historial y permiten el alta ADMIN. Las rutas `/events/:eventId` y `/events/:eventId/edit` usan UUID, no posición ni fecha. La vista detalle expone únicamente la siguiente transición válida, confirma el cierre definitivo y aloja el gestor real de invitados de PR09. Inicio recupera el último grupo visitado —con fallback al primero disponible— y muestra su evento actual.
+Las rutas por grupo listan activos e historial y permiten el alta ADMIN. Las rutas `/events/:eventId` y `/events/:eventId/edit` usan UUID, no posición ni fecha. La vista detalle expone únicamente la siguiente transición válida, confirma el cierre definitivo y aloja el gestor real de invitados de PR09 junto con la confirmación de fútbol/cena de PR11. Inicio recupera el último grupo visitado —con fallback al primero disponible—, muestra su evento actual y ofrece confirmar cuando está `OPEN`.
 
 Los estados de carga, vacío, error y permisos tienen mensajes en español. Los layouts reducen columnas a 430, 390 y 360 px sin depender de hover. Las operaciones de negocio requieren red y confirmación del servidor; el Service Worker sólo mantiene el shell instalable.
 

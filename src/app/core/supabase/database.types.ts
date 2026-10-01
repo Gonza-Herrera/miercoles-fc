@@ -689,6 +689,21 @@ export type Database = {
           status: string;
         }[];
       };
+      get_event_attendance: {
+        Args: { p_event_id: string };
+        Returns: {
+          avatar_path: string | null;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          display_name: string;
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string | null;
+          is_current_user: boolean;
+          is_guest: boolean;
+          membership_active: boolean;
+          participant_id: string | null;
+        }[];
+      };
       list_invitable_group_members: {
         Args: never;
         Returns: {
@@ -752,6 +767,32 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'events';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      set_my_dinner_confirmation: {
+        Args: {
+          p_event_id: string;
+          p_response: Database['public']['Enums']['attendance_response'];
+        };
+        Returns: Database['public']['Tables']['event_participants']['Row'];
+        SetofOptions: {
+          from: '*';
+          to: 'event_participants';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      set_my_football_confirmation: {
+        Args: {
+          p_event_id: string;
+          p_response: Database['public']['Enums']['attendance_response'];
+        };
+        Returns: Database['public']['Tables']['event_participants']['Row'];
+        SetofOptions: {
+          from: '*';
+          to: 'event_participants';
           isOneToOne: true;
           isSetofReturn: false;
         };
