@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, event-scoped guest participants, independent football/dinner attendance confirmation, and the current-event dashboard. Teams, settlement, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, event-scoped guest participants, independent football/dinner attendance confirmation, the current-event dashboard, and a pure team-formation engine. Player assignment, team persistence, settlement, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR12 — Event Dashboard**
+**PR14 — Team Formation Engine**
 
-PR01–PR11 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, temporary guests, weekly events, and independent attendance. PR12 turns Home into a glanceable current-Wednesday dashboard with real confirmation counts and an explicitly non-final court estimate.
+PR01–PR12 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, temporary guests, weekly events, independent attendance, and current-event dashboard. PR14 adds a deterministic, framework-independent calculation of team capacities. The roadmap identifies PR13 Match Attendance as its input boundary, but that implementation is not present in this branch, so the engine remains intentionally unintegrated.
 
 ## Tech stack
 
@@ -141,6 +141,8 @@ Attendance confirmation resolves the caller from `auth.uid()` and independently 
 
 Home combines the deterministic current event with the existing secure attendance read model. It shows independent football/dinner counts and an integer-derived, visibly estimated court share without creating debt or payment state. See [event dashboard documentation](docs/event-dashboard.md).
 
+The pure Team Formation Engine converts an actual-player count into deterministic team capacities, including explicit insufficient-player and invalid-input outcomes. It performs no player assignment or persistence. See [Team Formation Engine documentation](docs/team-formation-engine.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -154,7 +156,9 @@ Home combines the deterministic current event with the existing secure attendanc
 - Completed: **PR09 — Guest Members**
 - Completed: **PR10 — Events**
 - Completed: **PR11 — Attendance**
-- Current: **PR12 — Event Dashboard**
-- Next: **PR13 — Match Attendance**
+- Completed: **PR12 — Event Dashboard**
+- Roadmap prerequisite not present in this branch: **PR13 — Match Attendance**
+- Current: **PR14 — Team Formation Engine**
+- Next: **PR15 — Random Team Generator**
 
-PR12 completes Milestone 3 — El miércoles. Teams, actual attendance, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.
+PR12 completes Milestone 3 — El miércoles. PR14 starts the pure team-capacity logic for Milestone 4 without inventing the absent PR13 actual-player read model. Player assignment, team persistence, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.
