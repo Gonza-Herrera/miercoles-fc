@@ -1,0 +1,44 @@
+<app-card variant="elevated">
+  <article class="summary-card summary-card--dinner" aria-labelledby="dinner-summary-title">
+    <header class="summary-card__header">
+      <span class="summary-card__icon" aria-hidden="true">🍽️</span>
+      <div>
+        <p class="summary-card__eyebrow">Cena</p>
+        <h2 id="dinner-summary-title" class="summary-card__title">
+          @if (!dataAvailable()) {
+            Confirmaciones no disponibles
+          } @else if (eventStatus() === 'DRAFT') {
+            Todavía no está abierta
+          } @else {
+            {{ confirmedCount() }} {{ confirmedCount() === 1 ? 'confirmado' : 'confirmados' }}
+          }
+        </h2>
+      </div>
+    </header>
+
+    <dl class="summary-card__metrics summary-card__metrics--single">
+      <div>
+        <dt>Menú</dt>
+        <dd>{{ menu() || 'Por definir' }}</dd>
+      </div>
+    </dl>
+
+    <p class="summary-card__note">
+      @if (!dataAvailable()) {
+        No pudimos cargar las confirmaciones.
+      } @else if (eventStatus() === 'DRAFT') {
+        Las confirmaciones se habilitan cuando se abra el miércoles.
+      } @else if (eventStatus() === 'IN_PROGRESS') {
+        Confirmaciones de planificación previas al inicio.
+      } @else if (eventStatus() === 'SETTLEMENT' || eventStatus() === 'CLOSED') {
+        Confirmaciones históricas; no representan asistencia real.
+      } @else {
+        La cena se confirma de forma independiente del partido.
+      }
+    </p>
+
+    <a routerLink="/dinner" aria-label="Ver cena y confirmaciones">
+      <app-button variant="secondary" [fullWidth]="true">Ver cena</app-button>
+    </a>
+  </article>
+</app-card>

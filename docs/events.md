@@ -24,11 +24,11 @@ El formulario captura fecha y hora local del dispositivo, construye un `Date` lo
 
 El precio se analiza como texto decimal y se convierte con aritmética entera a centavos antes del RPC. PostgreSQL lo conserva como `bigint`; no hay columnas monetarias de punto flotante. Por ejemplo, ARS 50.000 se guarda como `5000000`.
 
-El evento actual se elige de forma determinista: primero `IN_PROGRESS`, después `SETTLEMENT`, luego el no cerrado futuro más cercano y, como último recurso, el no cerrado pasado más reciente. `CLOSED` sólo aparece en historial.
+El evento actual se elige de forma determinista: primero `IN_PROGRESS`, después `SETTLEMENT`, luego el no cerrado futuro más cercano y, como último recurso, el no cerrado pasado más reciente. `CLOSED` sólo aparece en historial. PR12 reutiliza exactamente esta selección para el Dashboard y actualiza el contexto compartido del evento.
 
 ## Experiencia Angular
 
-Las rutas por grupo listan activos e historial y permiten el alta ADMIN. Las rutas `/events/:eventId` y `/events/:eventId/edit` usan UUID, no posición ni fecha. La vista detalle expone únicamente la siguiente transición válida, confirma el cierre definitivo y aloja el gestor real de invitados de PR09 junto con la confirmación de fútbol/cena de PR11. Inicio recupera el último grupo visitado —con fallback al primero disponible—, muestra su evento actual y ofrece confirmar cuando está `OPEN`.
+Las rutas por grupo listan activos e historial y permiten el alta ADMIN. Las rutas `/events/:eventId` y `/events/:eventId/edit` usan UUID, no posición ni fecha. La vista detalle expone únicamente la siguiente transición válida, confirma el cierre definitivo y aloja el gestor real de invitados de PR09 junto con la confirmación de fútbol/cena de PR11. Inicio recupera el último grupo visitado —con fallback al primero disponible— y muestra el Dashboard PR12 con fecha, estado, lugar, conteos, cancha y navegación.
 
 Los estados de carga, vacío, error y permisos tienen mensajes en español. Los layouts reducen columnas a 430, 390 y 360 px sin depender de hover. Las operaciones de negocio requieren red y confirmación del servidor; el Service Worker sólo mantiene el shell instalable.
 

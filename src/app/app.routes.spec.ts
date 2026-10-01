@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { AttendanceService } from './features/attendance/attendance.service';
 import { EventService } from './features/events/event.service';
 import { GroupService } from './features/groups/group.service';
 import { InvitationService } from './features/invitations/invitation.service';
@@ -37,6 +38,7 @@ describe('application routes', () => {
       providers: [
         provideRouter(routes),
         { provide: AuthService, useValue: authStub },
+        { provide: AttendanceService, useValue: { listForDashboard: vi.fn() } },
         { provide: GroupService, useValue: groupStub },
         { provide: InvitationService, useValue: invitationStub },
         { provide: EventService, useValue: { current: vi.fn().mockResolvedValue(null) } },

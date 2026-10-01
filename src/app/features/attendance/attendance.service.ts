@@ -18,12 +18,23 @@ export class AttendanceService {
   private readonly client = inject(SUPABASE_CLIENT);
 
   async list(eventId: string): Promise<readonly AttendanceRecord[]> {
+    return this.load(eventId, true);
+  }
+
+  async listForDashboard(eventId: string): Promise<readonly AttendanceRecord[]> {
+    return this.load(eventId, false);
+  }
+
+  private async load(
+    eventId: string,
+    includeSignedAvatars: boolean,
+  ): Promise<readonly AttendanceRecord[]> {
     const { data, error } = await this.client.rpc('get_event_attendance', {
       p_event_id: eventId,
     });
     if (error) throw this.mapError(error, 'LOAD');
 
-    return Promise.all((data ?? []).map((row) => this.mapRecord(row)));
+    return Promise.all((data ?? []).map((row) => this.mapRecord(row, includeSignedAvatars)));
   }
 
   async setFootball(eventId: string, response: AttendanceResponse): Promise<SavedAttendance> {
@@ -48,10 +59,13 @@ export class AttendanceService {
     return this.mapSaved(data);
   }
 
-  private async mapRecord(row: AttendanceRpcRow): Promise<AttendanceRecord> {
+  private async mapRecord(
+    row: AttendanceRpcRow,
+    includeSignedAvatar: boolean,
+  ): Promise<AttendanceRecord> {
     return {
       avatarPath: row.avatar_path,
-      avatarUrl: await this.signedAvatar(row.avatar_path),
+      avatarUrl: includeSignedAvatar ? await this.signedAvatar(row.avatar_path) : null,
       dinnerResponse: row.dinner_response,
       displayName: row.display_name,
       eventId: row.event_id,

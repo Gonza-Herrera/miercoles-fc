@@ -1,36 +1,67 @@
 <app-page-container>
   <div class="home-page">
-    <header class="ds-stack">
-      <h1 class="ds-page-title">Inicio</h1>
-      <p class="ds-body">
-        @if (group(); as currentGroup) {
-          {{ currentGroup.name }} · tu miércoles, organizado.
-        } @else {
-          Tu miércoles, organizado.
-        }
-      </p>
-    </header>
-
     @if (loading()) {
-      <p class="ds-body" role="status">Buscando tu próximo miércoles…</p>
+      <header class="ds-stack">
+        <h1 class="ds-page-title">Inicio</h1>
+        <p class="ds-body" role="status">Preparando tu miércoles…</p>
+      </header>
     } @else if (errorMessage(); as error) {
+      <h1 class="ds-page-title">Inicio</h1>
       <app-card>
         <div class="home-feedback" role="alert">
           <p>{{ error }}</p>
+          <p class="ds-body-small">Revisá tu conexión e intentá nuevamente.</p>
           <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
         </div>
       </app-card>
-    } @else if (currentEvent(); as event) {
-      <section class="home-current" aria-labelledby="home-current-title">
-        <h2 id="home-current-title" class="ds-section-title">Tu próximo miércoles</h2>
-        <app-event-card [event]="event" />
-        @if (event.status === 'OPEN') {
-          <a [routerLink]="['/events', event.id]">
-            <app-button [fullWidth]="true">Confirmar asistencia</app-button>
-          </a>
-        }
+    } @else if (dashboard(); as currentDashboard) {
+      @if (group(); as currentGroup) {
+        <app-event-dashboard-header
+          [event]="currentDashboard.event"
+          [groupName]="currentGroup.name"
+        />
+      }
+
+      @if (attendanceError()) {
+        <div class="home-feedback home-feedback--inline" role="alert">
+          <span>No pudimos cargar las confirmaciones.</span>
+          <app-button variant="ghost" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      }
+
+      <section class="home-dashboard" aria-label="Resumen del miércoles">
+        <app-match-summary-card
+          [confirmedCount]="currentDashboard.footballConfirmedCount"
+          [courtPriceMinor]="currentDashboard.event.courtPriceMinor"
+          [currencyCode]="currentDashboard.event.currencyCode"
+          [dataAvailable]="!attendanceError()"
+          [estimatedPerPlayerMinor]="currentDashboard.estimatedCourtPerPlayerMinor"
+          [eventStatus]="currentDashboard.event.status"
+        />
+        <app-dinner-summary-card
+          [confirmedCount]="currentDashboard.dinnerConfirmedCount"
+          [dataAvailable]="!attendanceError()"
+          [eventStatus]="currentDashboard.event.status"
+        />
       </section>
+
+      <nav class="home-links" aria-label="Accesos del grupo">
+        @if (group(); as currentGroup) {
+          <a [routerLink]="['/groups', currentGroup.id, 'events']">Todos los miércoles</a>
+        }
+        <a [routerLink]="['/events', currentDashboard.event.id]">Detalle del miércoles</a>
+      </nav>
     } @else {
+      <header class="ds-stack">
+        <h1 class="ds-page-title">Inicio</h1>
+        <p class="ds-body">
+          @if (group(); as currentGroup) {
+            {{ currentGroup.name }} · tu miércoles, organizado.
+          } @else {
+            Tu miércoles, organizado.
+          }
+        </p>
+      </header>
       <app-card>
         <app-empty-state
           [title]="
@@ -52,12 +83,11 @@
       </app-card>
     }
 
-    <nav class="home-links" aria-label="Accesos del grupo">
-      @if (group(); as currentGroup) {
-        <a [routerLink]="['/groups', currentGroup.id, 'events']">Todos los miércoles</a>
-      }
-      <a routerLink="/groups">Mis grupos</a>
-      <a routerLink="/invitations">Invitar miembros</a>
-    </nav>
+    @if (!currentEvent() && !loading() && !errorMessage()) {
+      <nav class="home-links" aria-label="Accesos del grupo">
+        <a routerLink="/groups">Mis grupos</a>
+        <a routerLink="/invitations">Invitar miembros</a>
+      </nav>
+    }
   </div>
 </app-page-container>

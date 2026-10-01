@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, event-scoped guest participants, and independent football/dinner attendance confirmation. Teams, settlement, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, event-scoped guest participants, independent football/dinner attendance confirmation, and the current-event dashboard. Teams, settlement, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR11 — Attendance**
+**PR12 — Event Dashboard**
 
-PR01–PR10 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, temporary guests, and weekly events. PR11 adds secure self-confirmation for football and dinner, preserves `UNKNOWN` as unanswered, and makes planning read-only once an event starts.
+PR01–PR11 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, temporary guests, weekly events, and independent attendance. PR12 turns Home into a glanceable current-Wednesday dashboard with real confirmation counts and an explicitly non-final court estimate.
 
 ## Tech stack
 
@@ -59,7 +59,7 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | `/auth`                  | Passwordless sign-in                              |
 | `/auth/callback`         | Magic Link and OAuth callback                     |
 | `/invite/:token`         | Public invitation preview and explicit acceptance |
-| `/`                      | Current event for the selected group              |
+| `/`                      | Current-event dashboard for the selected group    |
 | `/match`                 | Football attendance for the current event         |
 | `/dinner`                | Dinner attendance for the current event           |
 | `/payments`              | Protected Payments placeholder                    |
@@ -139,6 +139,8 @@ Guests are event-scoped `EventParticipant` identities with independent football/
 
 Attendance confirmation resolves the caller from `auth.uid()` and independently upserts only football or dinner intent while an event is `OPEN`. The read model represents unanswered members without pre-creating rows and includes current guests. See [attendance documentation](docs/attendance.md).
 
+Home combines the deterministic current event with the existing secure attendance read model. It shows independent football/dinner counts and an integer-derived, visibly estimated court share without creating debt or payment state. See [event dashboard documentation](docs/event-dashboard.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -151,7 +153,8 @@ Attendance confirmation resolves the caller from `auth.uid()` and independently 
 - Completed: **PR08 — Groups & Members**
 - Completed: **PR09 — Guest Members**
 - Completed: **PR10 — Events**
-- Current: **PR11 — Attendance**
-- Next: **PR12 — Event Dashboard**
+- Completed: **PR11 — Attendance**
+- Current: **PR12 — Event Dashboard**
+- Next: **PR13 — Match Attendance**
 
-Teams, actual attendance, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.
+PR12 completes Milestone 3 — El miércoles. Teams, actual attendance, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.
