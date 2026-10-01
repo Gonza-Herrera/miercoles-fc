@@ -91,17 +91,22 @@ export function mapEvent(row: EventRow): WeeklyEvent {
 
 export function eventTitle(event: WeeklyEvent): string {
   if (event.title) return event.title;
+  return eventDateLabel(event.startsAt);
+}
+
+export function eventDateLabel(startsAt: string): string {
   const value = new Intl.DateTimeFormat('es-AR', {
     day: 'numeric',
     month: 'long',
     weekday: 'long',
-  }).format(new Date(event.startsAt));
+  }).format(new Date(startsAt));
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function eventTime(startsAt: string): string {
   return new Intl.DateTimeFormat('es-AR', {
     hour: '2-digit',
+    hourCycle: 'h23',
     minute: '2-digit',
   }).format(new Date(startsAt));
 }

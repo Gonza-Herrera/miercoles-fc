@@ -1,0 +1,5 @@
+@use '../summary-card';
+
+.summary-card--dinner {
+  border-block-start: 0.25rem solid var(--color-social);
+}

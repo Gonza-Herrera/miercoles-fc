@@ -1,0 +1,14 @@
+<header class="event-dashboard-header">
+  <div class="event-dashboard-header__eyebrow">
+    <span>{{ groupName() }}</span>
+    <app-badge [variant]="statusVariant()">{{ statusLabel() }}</app-badge>
+  </div>
+  <h1 class="event-dashboard-header__title">
+    <time [attr.datetime]="event().startsAt">{{ dateLabel() }}</time>
+  </h1>
+  <p class="event-dashboard-header__details">
+    <time [attr.datetime]="event().startsAt">{{ timeLabel() }}</time>
+    <span aria-hidden="true">·</span>
+    <span>{{ event().location }}</span>
+  </p>
+</header>

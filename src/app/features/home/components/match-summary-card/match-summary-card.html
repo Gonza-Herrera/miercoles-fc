@@ -1,0 +1,60 @@
+<app-card variant="elevated">
+  <article class="summary-card summary-card--match" aria-labelledby="match-summary-title">
+    <header class="summary-card__header">
+      <span class="summary-card__icon" aria-hidden="true">⚽</span>
+      <div>
+        <p class="summary-card__eyebrow">Partido</p>
+        <h2 id="match-summary-title" class="summary-card__title">
+          @if (!dataAvailable()) {
+            Confirmaciones no disponibles
+          } @else if (eventStatus() === 'DRAFT') {
+            Todavía no está abierto
+          } @else {
+            {{ confirmedCount() }} {{ confirmedCount() === 1 ? 'confirmado' : 'confirmados' }}
+          }
+        </h2>
+      </div>
+    </header>
+
+    <dl class="summary-card__metrics">
+      <div>
+        <dt>Cancha</dt>
+        <dd>{{ courtPrice() }}</dd>
+      </div>
+      <div>
+        <dt>{{ planningComplete() ? 'Estimado previo' : 'Estimado por jugador' }}</dt>
+        <dd>
+          @if (!dataAvailable()) {
+            —
+          } @else if (eventStatus() === 'DRAFT') {
+            —
+          } @else if (planningComplete()) {
+            No disponible como valor final
+          } @else if (estimate(); as value) {
+            {{ value }} <small>c/u</small>
+          } @else {
+            Esperando confirmaciones
+          }
+        </dd>
+      </div>
+    </dl>
+
+    <p class="summary-card__note">
+      @if (!dataAvailable()) {
+        No pudimos cargar las confirmaciones.
+      } @else if (eventStatus() === 'DRAFT') {
+        Las confirmaciones se habilitan cuando se abra el miércoles.
+      } @else if (planningComplete()) {
+        El importe final dependerá de quienes realmente jugaron.
+      } @else if (eventStatus() === 'IN_PROGRESS') {
+        Confirmaciones de planificación previas al inicio.
+      } @else {
+        Calculado con los confirmados actuales; puede cambiar.
+      }
+    </p>
+
+    <a routerLink="/match" aria-label="Ver partido y confirmaciones">
+      <app-button variant="secondary" [fullWidth]="true">Ver partido</app-button>
+    </a>
+  </article>
+</app-card>

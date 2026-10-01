@@ -14,6 +14,7 @@ describe('AttendanceService', () => {
 
   beforeEach(() => {
     rpc.mockReset();
+    fromStorage.mockClear();
     createSignedUrl.mockReset().mockResolvedValue({ data: null, error: null });
     TestBed.configureTestingModule({
       providers: [
@@ -65,6 +66,19 @@ describe('AttendanceService', () => {
       TestBed.inject(AttendanceService).setFootball('event-id', 'UNKNOWN'),
     ).rejects.toEqual(new AttendanceOperationError('VALIDATION'));
     expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it('loads dashboard counts without issuing per-member Storage requests', async () => {
+    rpc.mockResolvedValue({
+      data: [readRow({ avatar_path: 'members/group/member/avatar' })],
+      error: null,
+    });
+
+    const attendance = await TestBed.inject(AttendanceService).listForDashboard('event-id');
+
+    expect(attendance[0].avatarPath).toBe('members/group/member/avatar');
+    expect(attendance[0].avatarUrl).toBeNull();
+    expect(fromStorage).not.toHaveBeenCalled();
   });
 });
 
