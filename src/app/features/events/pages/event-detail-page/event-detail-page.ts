@@ -10,6 +10,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
 import { Button, Card, ConfirmDialog } from '../../../../shared/ui';
+import { AttendanceManager } from '../../../attendance';
 import { GroupContextService } from '../../../groups/group-context.service';
 import { GroupDetail } from '../../../groups/group.models';
 import { GroupService } from '../../../groups/group.service';
@@ -32,6 +33,7 @@ import { EventService } from '../../event.service';
     Button,
     Card,
     ConfirmDialog,
+    AttendanceManager,
     EventCard,
     GuestParticipantManager,
     PageContainer,

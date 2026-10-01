@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
+import { AttendanceService } from '../../../attendance/attendance.service';
 import { GroupMemberRole } from '../../../groups/group.models';
 import { GroupService } from '../../../groups/group.service';
 import { GuestParticipantService } from '../../participants/data-access/guest-participant.service';
@@ -93,6 +94,7 @@ async function setup(
         },
       },
       { provide: GuestParticipantService, useValue: { list: vi.fn().mockResolvedValue([]) } },
+      { provide: AttendanceService, useValue: { list: vi.fn().mockResolvedValue([]) } },
     ],
   }).compileComponents();
   const fixture = TestBed.createComponent(EventDetailPage);

@@ -1,0 +1,33 @@
+<ul class="attendance-list" aria-label="Asistencia planificada">
+  @for (attendee of attendees(); track attendee.groupMemberId ?? attendee.participantId) {
+    <li class="attendance-list__row">
+      <app-avatar size="small" [name]="attendee.displayName" [src]="attendee.avatarUrl" />
+      <div class="attendance-list__identity">
+        <span class="attendance-list__name">{{ attendee.displayName }}</span>
+        <span class="attendance-list__labels">
+          @if (attendee.isGuest) {
+            <app-badge variant="primary">Invitado</app-badge>
+          }
+          @if (!attendee.membershipActive) {
+            <app-badge>Miembro inactivo</app-badge>
+          }
+          @if (attendee.isCurrentUser) {
+            <span class="ds-body-small">Vos</span>
+          }
+        </span>
+      </div>
+      <div class="attendance-list__responses">
+        @if (mode() !== 'dinner') {
+          <span [attr.aria-label]="'Fútbol: ' + responseLabel(attendee.footballResponse)">
+            ⚽ {{ responseLabel(attendee.footballResponse) }}
+          </span>
+        }
+        @if (mode() !== 'football') {
+          <span [attr.aria-label]="'Cena: ' + responseLabel(attendee.dinnerResponse)">
+            🍽️ {{ responseLabel(attendee.dinnerResponse) }}
+          </span>
+        }
+      </div>
+    </li>
+  }
+</ul>

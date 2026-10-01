@@ -32,6 +32,12 @@
 
       <app-event-card [event]="currentEvent" [linked]="false" />
 
+      <app-attendance-manager
+        [eventId]="currentEvent.id"
+        [eventStatus]="currentEvent.status"
+        mode="both"
+      />
+
       @if (isAdmin() && nextStatus()) {
         <app-card variant="elevated">
           <section class="event-transition" aria-labelledby="event-transition-title">

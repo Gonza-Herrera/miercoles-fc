@@ -1,0 +1,39 @@
+<app-page-container>
+  <div class="current-attendance">
+    <header class="ds-stack">
+      <h1 class="ds-page-title">{{ activity() === 'football' ? 'Partido' : 'Cena' }}</h1>
+      <p class="ds-body">
+        {{
+          activity() === 'football'
+            ? 'Confirmá si jugás este miércoles.'
+            : 'Confirmá si cenás después.'
+        }}
+      </p>
+    </header>
+
+    @if (loading()) {
+      <p class="ds-body" role="status">Buscando el miércoles actual…</p>
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="current-attendance__feedback" role="alert">
+          <p>{{ error }}</p>
+          <app-button size="small" variant="secondary" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    } @else if (currentEvent(); as event) {
+      <app-event-card [event]="event" />
+      <app-attendance-manager
+        [eventId]="event.id"
+        [eventStatus]="event.status"
+        [mode]="activity()"
+      />
+    } @else {
+      <app-card>
+        <app-empty-state
+          title="No hay un miércoles para confirmar"
+          description="Cuando el grupo programe el próximo encuentro, su asistencia aparecerá acá."
+        />
+      </app-card>
+    }
+  </div>
+</app-page-container>
