@@ -1,0 +1,106 @@
+<app-page-container>
+  <div class="match-attendance-page">
+    @if (event(); as currentEvent) {
+      <a class="match-attendance__back" [routerLink]="['/events', currentEvent.id]">
+        ← Volver al detalle
+      </a>
+    }
+
+    @if (loading()) {
+      <div class="ds-stack" role="status">
+        <h1 class="ds-page-title">¿Quiénes jugaron?</h1>
+        <p class="ds-body">Cargando jugadores…</p>
+      </div>
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="feedback feedback--error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    } @else {
+      <header class="match-attendance__header">
+        <div>
+          <h1 class="ds-page-title">¿Quiénes jugaron?</h1>
+          <p class="ds-body-small">Seleccioná los jugadores que asistieron al partido.</p>
+        </div>
+
+        <div class="match-attendance__summary">
+          <app-badge variant="primary"> {{ presentCount() }} presentes </app-badge>
+
+          <div class="match-attendance__bulk-actions">
+            <button type="button" class="match-attendance__link-button" (click)="selectAll(true)">
+              Todos
+            </button>
+            <span class="match-attendance__bulk-divider">·</span>
+            <button type="button" class="match-attendance__link-button" (click)="selectAll(false)">
+              Ninguno
+            </button>
+          </div>
+        </div>
+      </header>
+
+      @if (saveError(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+
+      <section class="match-attendance__content" aria-label="Lista de jugadores">
+        <div class="match-attendance__list" role="group" aria-label="Jugadores">
+          @for (player of attendees(); track player.id) {
+            <button
+              type="button"
+              class="match-attendance__item"
+              [class.match-attendance__item--checked]="player.attended"
+              role="checkbox"
+              [attr.aria-checked]="player.attended"
+              [attr.aria-label]="
+                player.displayName + (player.attended ? ', presente' : ', ausente')
+              "
+              (click)="toggle(player.id)"
+            >
+              <div class="match-attendance__player-info">
+                <app-avatar [name]="player.displayName" [src]="player.avatarUrl" size="medium" />
+                <div class="match-attendance__player-names">
+                  <span class="match-attendance__name">{{ player.displayName }}</span>
+                  @if (player.isGuest) {
+                    <app-badge variant="neutral" size="small">Invitado</app-badge>
+                  } @else if (player.footballResponse === 'YES') {
+                    <span class="match-attendance__tag">Confirmó</span>
+                  }
+                </div>
+              </div>
+
+              <div class="match-attendance__checkbox" aria-hidden="true">
+                @if (player.attended) {
+                  <svg
+                    class="match-attendance__check-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                }
+              </div>
+            </button>
+          } @empty {
+            <app-card>
+              <p class="ds-body" style="text-align: center; padding: var(--space-4)">
+                No hay miembros registrados para este evento.
+              </p>
+            </app-card>
+          }
+        </div>
+      </section>
+
+      <footer class="match-attendance__footer">
+        <app-button size="large" [fullWidth]="true" [disabled]="saving()" (click)="save()">
+          {{ saving() ? 'Guardando presentes…' : 'Guardar y continuar' }}
+        </app-button>
+      </footer>
+    }
+  </div>
+</app-page-container>

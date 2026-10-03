@@ -7,6 +7,7 @@ import {
   AttendanceOperationError,
   AttendanceRecord,
   AttendanceResponse,
+  MatchAttendanceItemInput,
   SavedAttendance,
 } from './attendance.models';
 
@@ -45,6 +46,21 @@ export class AttendanceService {
     return this.save('set_my_dinner_confirmation', eventId, response);
   }
 
+  async recordMatchAttendance(
+    eventId: string,
+    items: readonly MatchAttendanceItemInput[],
+  ): Promise<void> {
+    const { error } = await this.client.rpc('record_match_attendance', {
+      p_attendances: items.map((item) => ({
+        attended: item.attended,
+        group_member_id: item.groupMemberId ?? null,
+        participant_id: item.participantId ?? null,
+      })),
+      p_event_id: eventId,
+    });
+    if (error) throw this.mapError(error, 'SAVE');
+  }
+
   private async save(
     rpc: 'set_my_dinner_confirmation' | 'set_my_football_confirmation',
     eventId: string,
@@ -64,6 +80,8 @@ export class AttendanceService {
     includeSignedAvatar: boolean,
   ): Promise<AttendanceRecord> {
     return {
+      actualDinner: row.actual_dinner,
+      actualFootball: row.actual_football,
       avatarPath: row.avatar_path,
       avatarUrl: includeSignedAvatar ? await this.signedAvatar(row.avatar_path) : null,
       dinnerResponse: row.dinner_response,
@@ -103,10 +121,14 @@ export class AttendanceService {
     if (
       message.includes('ATTENDANCE_AUTH_REQUIRED') ||
       message.includes('ATTENDANCE_ACTIVE_MEMBER_REQUIRED') ||
+      message.includes('ATTENDANCE_ADMIN_REQUIRED') ||
       message.includes('ATTENDANCE_ACCESS_DENIED') ||
       message.includes('permission denied')
     ) {
       return new AttendanceOperationError('PERMISSION');
+    }
+    if (message.includes('ATTENDANCE_EVENT_CLOSED')) {
+      return new AttendanceOperationError('CLOSED');
     }
     if (message.includes('ATTENDANCE_EVENT_NOT_FOUND')) {
       return new AttendanceOperationError('NOT_FOUND');
@@ -114,7 +136,10 @@ export class AttendanceService {
     if (message.includes('ATTENDANCE_EVENT_NOT_OPEN')) {
       return new AttendanceOperationError('NOT_OPEN');
     }
-    if (message.includes('ATTENDANCE_RESPONSE_INVALID')) {
+    if (
+      message.includes('ATTENDANCE_RESPONSE_INVALID') ||
+      message.includes('ATTENDANCE_LIST_INVALID')
+    ) {
       return new AttendanceOperationError('VALIDATION');
     }
     return new AttendanceOperationError(fallback);

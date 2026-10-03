@@ -80,10 +80,39 @@ describe('AttendanceService', () => {
     expect(attendance[0].avatarUrl).toBeNull();
     expect(fromStorage).not.toHaveBeenCalled();
   });
+
+  it('records match attendance via record_match_attendance RPC', async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    const service = TestBed.inject(AttendanceService);
+
+    await service.recordMatchAttendance('event-id', [
+      { groupMemberId: 'member-1', participantId: 'part-1', attended: true },
+      { groupMemberId: 'member-2', participantId: null, attended: false },
+    ]);
+
+    expect(rpc).toHaveBeenCalledWith('record_match_attendance', {
+      p_attendances: [
+        { attended: true, group_member_id: 'member-1', participant_id: 'part-1' },
+        { attended: false, group_member_id: 'member-2', participant_id: null },
+      ],
+      p_event_id: 'event-id',
+    });
+  });
+
+  it('maps admin permissions error correctly for match attendance', async () => {
+    rpc.mockResolvedValue({ data: null, error: { message: 'ATTENDANCE_ADMIN_REQUIRED' } });
+    const service = TestBed.inject(AttendanceService);
+
+    await expect(
+      service.recordMatchAttendance('event-id', [{ attended: true, groupMemberId: 'm-1' }]),
+    ).rejects.toEqual(new AttendanceOperationError('PERMISSION'));
+  });
 });
 
 function readRow(overrides: Record<string, unknown> = {}) {
   return {
+    actual_dinner: 'UNSET',
+    actual_football: 'UNSET',
     avatar_path: null,
     dinner_response: 'UNKNOWN',
     display_name: 'Lucas',

@@ -38,6 +38,20 @@
         mode="both"
       />
 
+      @if (isAdmin() && currentEvent.status !== 'DRAFT' && currentEvent.status !== 'CLOSED') {
+        <app-card variant="elevated">
+          <section class="event-transition" aria-labelledby="match-attendance-title">
+            <div>
+              <h2 id="match-attendance-title" class="ds-card-title">Asistencia al partido</h2>
+              <p class="ds-body-small">Confirmá quiénes jugaron realmente para liquidar cancha.</p>
+            </div>
+            <a [routerLink]="['/events', currentEvent.id, 'match-attendance']">
+              <app-button variant="secondary">⚽ ¿Quiénes jugaron?</app-button>
+            </a>
+          </section>
+        </app-card>
+      }
+
       @if (isAdmin() && nextStatus()) {
         <app-card variant="elevated">
           <section class="event-transition" aria-labelledby="event-transition-title">
