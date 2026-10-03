@@ -1,0 +1,219 @@
+:host {
+  display: block;
+}
+
+.team-gen-page {
+  display: grid;
+  gap: var(--space-5);
+  padding-bottom: var(--space-6);
+}
+
+.team-gen__back {
+  width: fit-content;
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+}
+
+.team-gen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.team-gen__mode-switch {
+  display: inline-flex;
+  padding: var(--space-1);
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+}
+
+.team-gen__mode-btn {
+  border: none;
+  background: transparent;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &--active {
+    background: var(--color-surface);
+    color: var(--color-brand);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.team-gen__plan-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.team-gen__plan-icon {
+  font-size: var(--font-size-xl);
+}
+
+.team-gen__plan-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+.team-gen__section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.team-gen__player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.team-gen__player-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.team-gen__player-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-gen__action-bar {
+  margin-top: var(--space-2);
+}
+
+.team-gen__swap-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.team-gen__swap-cancel {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.team-gen__teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.team-gen__team-card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.team-gen__team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
+}
+
+.team-gen__team-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.team-gen__team-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+
+  &--alt {
+    background: var(--color-secondary);
+  }
+}
+
+.team-gen__team-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.team-gen__team-player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #f3effc;
+    border-color: rgba(109, 69, 198, 0.3);
+  }
+
+  &--selected {
+    background: #f3effc;
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 2px rgba(109, 69, 198, 0.2);
+  }
+}
+
+.team-gen__team-player-name {
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.team-gen__footer {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
+  background: linear-gradient(to top, var(--color-background) 85%, transparent);
+  z-index: 5;
+}
+
+.feedback--error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 430px) {
+  .team-gen__footer {
+    grid-template-columns: 1fr;
+  }
+}

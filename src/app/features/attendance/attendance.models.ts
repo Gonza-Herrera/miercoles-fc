@@ -3,8 +3,11 @@ import { Database } from '../../core/supabase/database.types';
 export type AttendanceActivity = 'dinner' | 'football';
 export type AttendanceMode = AttendanceActivity | 'both';
 export type AttendanceResponse = Database['public']['Enums']['attendance_response'];
+export type ActualAttendanceStatus = Database['public']['Enums']['actual_attendance_status'];
 
 export interface AttendanceRecord {
+  readonly actualDinner: ActualAttendanceStatus;
+  readonly actualFootball: ActualAttendanceStatus;
   readonly avatarPath: string | null;
   readonly avatarUrl: string | null;
   readonly dinnerResponse: AttendanceResponse;
@@ -18,6 +21,12 @@ export interface AttendanceRecord {
   readonly participantId: string | null;
 }
 
+export interface MatchAttendanceItemInput {
+  readonly groupMemberId?: string | null;
+  readonly participantId?: string | null;
+  readonly attended: boolean;
+}
+
 export interface SavedAttendance {
   readonly dinnerResponse: AttendanceResponse;
   readonly footballResponse: AttendanceResponse;
@@ -26,7 +35,7 @@ export interface SavedAttendance {
 }
 
 export type AttendanceOperation =
-  'LOAD' | 'NOT_FOUND' | 'NOT_OPEN' | 'PERMISSION' | 'SAVE' | 'VALIDATION';
+  'CLOSED' | 'LOAD' | 'NOT_FOUND' | 'NOT_OPEN' | 'PERMISSION' | 'SAVE' | 'VALIDATION';
 
 export class AttendanceOperationError extends Error {
   constructor(readonly operation: AttendanceOperation) {

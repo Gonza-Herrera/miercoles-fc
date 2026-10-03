@@ -143,6 +143,8 @@ Home combines the deterministic current event with the existing secure attendanc
 
 The pure Team Formation Engine converts an actual-player count into deterministic team capacities, including explicit insufficient-player and invalid-input outcomes. It performs no player assignment or persistence. See [Team Formation Engine documentation](docs/team-formation-engine.md).
 
+Match Attendance implements the boundary between planned football intent and actual attendees who played on match day, corresponding to Screen 7 ("¿Quiénes jugaron?"). See [Match Attendance documentation](docs/match-attendance.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -157,8 +159,8 @@ The pure Team Formation Engine converts an actual-player count into deterministi
 - Completed: **PR10 — Events**
 - Completed: **PR11 — Attendance**
 - Completed: **PR12 — Event Dashboard**
-- Roadmap prerequisite not present in this branch: **PR13 — Match Attendance**
-- Current: **PR14 — Team Formation Engine**
+- Completed: **PR13 — Match Attendance**
+- Completed: **PR14 — Team Formation Engine**
 - Next: **PR15 — Random Team Generator**
 
-PR12 completes Milestone 3 — El miércoles. PR14 starts the pure team-capacity logic for Milestone 4 without inventing the absent PR13 actual-player read model. Player assignment, team persistence, settlement calculations, realtime behavior, and offline business data remain for later roadmap stages.
+PR13 bridges attendance planning and match execution with the real-world attendance checklist. PR14 calculates deterministic team capacities. The project is ready for PR15 to generate random team rosters.

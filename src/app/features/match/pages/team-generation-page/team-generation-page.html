@@ -1,0 +1,204 @@
+<app-page-container>
+  <div class="team-gen-page">
+    @if (event(); as currentEvent) {
+      <a class="team-gen__back" [routerLink]="['/events', currentEvent.id]">
+        ← Volver al detalle
+      </a>
+    }
+
+    @if (loading()) {
+      <div class="ds-stack" role="status">
+        <h1 class="ds-page-title">Armar equipos</h1>
+        <p class="ds-body">Cargando jugadores convocados…</p>
+      </div>
+    } @else if (errorMessage(); as error) {
+      <app-card>
+        <div class="feedback feedback--error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    } @else {
+      <header class="team-gen__header">
+        <div>
+          <h1 class="ds-page-title">Armar equipos</h1>
+          <p class="ds-body-small">
+            {{ availablePlayers().length }} jugadores disponibles para el miércoles.
+          </p>
+        </div>
+
+        <div class="team-gen__mode-switch" role="tablist" aria-label="Modo de armado">
+          <button
+            type="button"
+            class="team-gen__mode-btn"
+            [class.team-gen__mode-btn--active]="mode() === 'random'"
+            role="tab"
+            [attr.aria-selected]="mode() === 'random'"
+            (click)="mode.set('random')"
+          >
+            🎲 Aleatorio
+          </button>
+          <button
+            type="button"
+            class="team-gen__mode-btn"
+            [class.team-gen__mode-btn--active]="mode() === 'manual'"
+            role="tab"
+            [attr.aria-selected]="mode() === 'manual'"
+            (click)="mode.set('manual')"
+          >
+            👔 DTs / Manual
+          </button>
+        </div>
+      </header>
+
+      @if (formationPlan(); as plan) {
+        @if (plan.valid) {
+          <app-card variant="elevated">
+            <div class="team-gen__plan-hint">
+              <span class="team-gen__plan-icon" aria-hidden="true">⚽</span>
+              <div>
+                <strong class="team-gen__plan-title">
+                  Se armarán {{ plan.teamCount }} equipos ({{ plan.teamSizes.join(' vs ') }})
+                </strong>
+                <p class="ds-body-small">
+                  Formación calculada automáticamente según los convocados.
+                </p>
+              </div>
+            </div>
+          </app-card>
+        } @else {
+          <app-card>
+            <p class="ds-body" style="text-align: center;">
+              Se necesitan al menos 2 jugadores convocados para armar los equipos.
+            </p>
+          </app-card>
+        }
+      }
+
+      @if (saveError(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+
+      <!-- MODO SIN EQUIPOS GENERADOS TODAVÍA -->
+      @if (teams().length === 0) {
+        <section class="team-gen__section" aria-label="Jugadores disponibles">
+          <h2 class="ds-card-title">Jugadores disponibles ({{ availablePlayers().length }})</h2>
+
+          <div class="team-gen__player-grid">
+            @for (player of availablePlayers(); track player.id) {
+              <div class="team-gen__player-chip">
+                <app-avatar
+                  [name]="player.displayName"
+                  [src]="player.avatarUrl"
+                  size="small"
+                />
+                <span class="team-gen__player-name">{{ player.displayName }}</span>
+                @if (player.isGuest) {
+                  <app-badge variant="neutral" size="small">Invitado</app-badge>
+                }
+              </div>
+            } @empty {
+              <p class="ds-body">No hay jugadores disponibles.</p>
+            }
+          </div>
+
+          @if (isAdmin() && availablePlayers().length >= 2) {
+            <div class="team-gen__action-bar">
+              <app-button
+                size="large"
+                [fullWidth]="true"
+                (click)="generate()"
+              >
+                🎲 Generar equipos
+              </app-button>
+            </div>
+          }
+        </section>
+      } @else {
+        <!-- MODO CON EQUIPOS ARMED/GENERADOS -->
+        <section class="team-gen__section" aria-label="Equipos sorteados">
+          @if (selectedPlayerForSwap(); as selectedId) {
+            <div class="team-gen__swap-banner" role="status">
+              <span>🔄 Tocá otro jugador para intercambiar de equipo.</span>
+              <button
+                type="button"
+                class="team-gen__swap-cancel"
+                (click)="selectedPlayerForSwap.set(null)"
+              >
+                Cancelar
+              </button>
+            </div>
+          } @else {
+            <p class="ds-body-small" style="color: var(--color-text-secondary);">
+              Tip: Tocá cualquier jugador para seleccionarlo e intercambiarlo manualmente.
+            </p>
+          }
+
+          <div class="team-gen__teams-grid">
+            @for (team of teams(); track team.id; let idx = $index) {
+              <app-card variant="elevated">
+                <div class="team-gen__team-card">
+                  <header class="team-gen__team-header">
+                    <div class="team-gen__team-title">
+                      <span
+                        class="team-gen__team-dot"
+                        [class.team-gen__team-dot--alt]="idx % 2 === 1"
+                      ></span>
+                      <h3 class="ds-card-title">{{ team.name }}</h3>
+                    </div>
+                    <app-badge [variant]="idx % 2 === 0 ? 'primary' : 'neutral'">
+                      {{ team.players.length }} jugadores
+                    </app-badge>
+                  </header>
+
+                  <ul class="team-gen__team-list" role="list">
+                    @for (player of team.players; track player.id) {
+                      <li>
+                        <button
+                          type="button"
+                          class="team-gen__team-player"
+                          [class.team-gen__team-player--selected]="selectedPlayerForSwap() === player.id"
+                          (click)="handlePlayerClick(player.id)"
+                        >
+                          <app-avatar
+                            [name]="player.displayName"
+                            [src]="player.avatarUrl"
+                            size="small"
+                          />
+                          <span class="team-gen__team-player-name">{{ player.displayName }}</span>
+                          @if (player.isGuest) {
+                            <app-badge variant="neutral" size="small">Invitado</app-badge>
+                          }
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </app-card>
+            }
+          </div>
+
+          @if (isAdmin()) {
+            <footer class="team-gen__footer">
+              <app-button
+                variant="secondary"
+                size="large"
+                [disabled]="saving()"
+                (click)="generate()"
+              >
+                🎲 Volver a sortear
+              </app-button>
+              <app-button
+                size="large"
+                [disabled]="saving()"
+                (click)="save()"
+              >
+                {{ saving() ? 'Guardando…' : '✓ Confirmar equipos' }}
+              </app-button>
+            </footer>
+          }
+        </section>
+      }
+    }
+  </div>
+</app-page-container>
