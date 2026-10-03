@@ -15,6 +15,22 @@ export const EVENT_ROUTES: Routes = [
     title: 'Marcar presentes · Miércoles FC',
   },
   {
+    path: ':eventId/team-generation',
+    loadComponent: () =>
+      import('../match/pages/team-generation-page/team-generation-page').then(
+        ({ TeamGenerationPage }) => TeamGenerationPage,
+      ),
+    title: 'Armar equipos · Miércoles FC',
+  },
+  {
+    path: ':eventId/teams',
+    loadComponent: () =>
+      import('../match/pages/team-generation-page/team-generation-page').then(
+        ({ TeamGenerationPage }) => TeamGenerationPage,
+      ),
+    title: 'Armar equipos · Miércoles FC',
+  },
+  {
     path: ':eventId',
     loadComponent: () =>
       import('./pages/event-detail-page/event-detail-page').then(

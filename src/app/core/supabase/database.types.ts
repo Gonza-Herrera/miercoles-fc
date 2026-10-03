@@ -706,10 +706,33 @@ export type Database = {
           participant_id: string | null;
         }[];
       };
+      get_event_teams: {
+        Args: { p_event_id: string };
+        Returns: {
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          avatar_path: string | null;
+          display_name: string;
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string | null;
+          is_guest: boolean;
+          participant_id: string;
+          position: number;
+          team_id: string;
+          team_name: string;
+        }[];
+      };
       record_match_attendance: {
         Args: {
           p_attendances: Json;
           p_event_id: string;
+        };
+        Returns: undefined;
+      };
+      save_event_teams: {
+        Args: {
+          p_event_id: string;
+          p_teams: Json;
         };
         Returns: undefined;
       };
