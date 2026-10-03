@@ -1,0 +1,65 @@
+<div class="pitch" [attr.aria-label]="'Formación visual de ' + team().name">
+  <div class="pitch__halfway" aria-hidden="true"></div>
+  <div class="pitch__circle" aria-hidden="true"></div>
+  <div class="pitch__area pitch__area--top" aria-hidden="true"></div>
+  <div class="pitch__area pitch__area--bottom" aria-hidden="true"></div>
+
+  @for (marker of markers(); track marker.player.eventParticipantId) {
+    @if (selectable()) {
+      <button
+        type="button"
+        class="pitch-player"
+        [class.pitch-player--selected]="selectedPlayerId() === marker.player.eventParticipantId"
+        [style.left.%]="marker.slot.x"
+        [style.top.%]="marker.slot.y"
+        [attr.aria-label]="
+          playerLabel(marker.player) +
+          (marker.player.isGuest ? ', invitado' : '') +
+          ', ' +
+          team().name
+        "
+        [attr.aria-pressed]="selectedPlayerId() === marker.player.eventParticipantId"
+        (click)="select(marker.player)"
+      >
+        <app-avatar
+          [name]="playerLabel(marker.player)"
+          [src]="marker.player.avatarUrl"
+          size="medium"
+        />
+        <span>{{ playerLabel(marker.player) }}</span>
+      </button>
+    } @else {
+      <div
+        class="pitch-player"
+        [style.left.%]="marker.slot.x"
+        [style.top.%]="marker.slot.y"
+        [attr.aria-label]="
+          playerLabel(marker.player) +
+          (marker.player.isGuest ? ', invitado' : '') +
+          ', ' +
+          team().name
+        "
+      >
+        <app-avatar
+          [name]="playerLabel(marker.player)"
+          [src]="marker.player.avatarUrl"
+          size="medium"
+        />
+        <span>{{ playerLabel(marker.player) }}</span>
+      </div>
+    }
+  }
+</div>
+
+<section class="sr-only" [attr.aria-label]="'Lista de jugadores de ' + team().name">
+  <h3>{{ team().name }}</h3>
+  @if (team().manager; as manager) {
+    <p>Director técnico: {{ manager.nickname || manager.displayName }}</p>
+  }
+  <p>{{ team().players.length }} jugadores</p>
+  <ol>
+    @for (player of team().players; track player.eventParticipantId) {
+      <li>{{ playerLabel(player) }}{{ player.isGuest ? ', invitado' : '' }}</li>
+    }
+  </ol>
+</section>

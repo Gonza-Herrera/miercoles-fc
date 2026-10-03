@@ -113,3 +113,7 @@ Selectors use active linked members only and work without relying on color.
 
 The operation requires backend confirmation. There is no offline mutation
 queue and the UI never claims success before Supabase accepts the transaction.
+
+PR18 displays the assigned DT in the final lineup header, separately from pitch
+players. When that DT also played and PR17 assigned them to the roster, the same
+person correctly appears both as DT metadata and as a player marker.

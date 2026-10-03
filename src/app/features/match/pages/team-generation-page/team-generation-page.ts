@@ -22,6 +22,7 @@ import {
   swapTeamPlayers,
 } from '../../domain/random-team-generator';
 import { calculateTeamFormation } from '../../domain/team-formation';
+import { rosterMatchesActualPlayers } from '../../domain/team-roster';
 import {
   TeamFormationMode,
   TeamManagerAssignment,
@@ -62,6 +63,8 @@ export class TeamGenerationPage implements OnInit {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly saveError = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
+  protected readonly rosterNotice = signal<string | null>(null);
+  protected readonly lineupIsPersisted = signal(false);
 
   protected readonly formationPlan = computed(() =>
     calculateTeamFormation(this.availablePlayers().length),
@@ -113,6 +116,7 @@ export class TeamGenerationPage implements OnInit {
     this.loading.set(true);
     this.errorMessage.set(null);
     this.saveError.set(null);
+    this.rosterNotice.set(null);
 
     try {
       const currentEvent = await this.eventService.get(eventId);
@@ -140,7 +144,18 @@ export class TeamGenerationPage implements OnInit {
         participantId: record.participantId,
       }));
       this.availablePlayers.set(players);
-      this.teams.set(existingTeams);
+      const rosterIsCurrent = rosterMatchesActualPlayers(existingTeams, players);
+      this.lineupIsPersisted.set(
+        managerConfiguration.mode === 'RANDOM' && rosterIsCurrent && existingTeams.length > 0,
+      );
+      this.teams.set(
+        managerConfiguration.mode === 'RANDOM' && rosterIsCurrent ? existingTeams : [],
+      );
+      if (managerConfiguration.mode === 'RANDOM' && !rosterIsCurrent) {
+        this.rosterNotice.set(
+          'La asistencia cambió. Generá nuevamente los equipos con los jugadores presentes.',
+        );
+      }
       this.applyManagerConfiguration(managerConfiguration.mode, managerConfiguration.teams);
 
       const plan = calculateTeamFormation(players.length);
@@ -187,6 +202,7 @@ export class TeamGenerationPage implements OnInit {
       const configuration = await this.teamManagerService.getConfiguration(currentEvent.id);
       this.applyManagerConfiguration(configuration.mode, configuration.teams);
       this.teams.set([]);
+      this.lineupIsPersisted.set(false);
       this.selectedPlayerForSwap.set(null);
       this.successMessage.set('Modo de armado actualizado.');
     } catch (error) {
@@ -252,6 +268,7 @@ export class TeamGenerationPage implements OnInit {
     const players = this.availablePlayers();
     if (this.mode() !== 'RANDOM' || players.length < 2) return;
     this.teams.set(generateRandomTeams(players));
+    this.lineupIsPersisted.set(false);
     this.selectedPlayerForSwap.set(null);
   }
 
@@ -266,6 +283,7 @@ export class TeamGenerationPage implements OnInit {
       return;
     }
     this.teams.set(swapTeamPlayers(this.teams(), selected, playerId));
+    this.lineupIsPersisted.set(false);
     this.selectedPlayerForSwap.set(null);
   }
 

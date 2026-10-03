@@ -93,6 +93,9 @@
       @if (successMessage(); as message) {
         <p class="feedback feedback--success" role="status">{{ message }}</p>
       }
+      @if (rosterNotice(); as message) {
+        <p class="feedback" role="status">{{ message }}</p>
+      }
       @if (saveError(); as error) {
         <p class="feedback feedback--error" role="alert">{{ error }}</p>
       }
@@ -298,6 +301,19 @@
                 {{ saving() ? 'Guardando…' : '✓ Confirmar equipos' }}
               </app-button>
             </footer>
+          }
+          @if (lineupIsPersisted()) {
+            @if (event(); as currentEvent) {
+              <a [routerLink]="['/events', currentEvent.id, 'lineup']">
+                <app-button variant="secondary" size="large" [fullWidth]="true">
+                  Ver formación en cancha
+                </app-button>
+              </a>
+            }
+          } @else if (teams().length > 0) {
+            <p class="feedback" role="status">
+              Confirmá los equipos para ver la formación en cancha actualizada.
+            </p>
           }
         </section>
       }

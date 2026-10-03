@@ -765,6 +765,10 @@ export type Database = {
         Args: { p_event_id: string };
         Returns: Json;
       };
+      get_event_team_lineup: {
+        Args: { p_event_id: string };
+        Returns: Json;
+      };
       get_event_teams: {
         Args: { p_event_id: string };
         Returns: {
@@ -805,6 +809,14 @@ export type Database = {
       };
       start_event_player_draft: {
         Args: { p_event_id: string };
+        Returns: undefined;
+      };
+      swap_event_team_players: {
+        Args: {
+          p_event_id: string;
+          p_first_participant_id: string;
+          p_second_participant_id: string;
+        };
         Returns: undefined;
       };
       list_invitable_group_members: {

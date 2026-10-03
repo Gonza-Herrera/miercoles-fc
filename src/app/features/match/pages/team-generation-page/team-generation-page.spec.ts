@@ -28,6 +28,31 @@ describe('TeamGenerationPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Se requieren 2 equipos (5 / 5)');
   });
 
+  it('invalidates a persisted RANDOM roster when actual attendance changed', async () => {
+    const staleTeams = sampleTeams().map((team, index) => ({
+      ...team,
+      players:
+        index === 0
+          ? [
+              ...team.players,
+              {
+                avatarUrl: null,
+                displayName: 'Jugador retirado',
+                groupMemberId: null,
+                id: 'removed-player',
+                isGuest: true,
+                participantId: 'removed-player',
+              },
+            ]
+          : team.players,
+    }));
+    const fixture = await setupFixture('ADMIN', sampleAttendees(10), staleTeams);
+
+    expect(fixture.nativeElement.textContent).toContain('La asistencia cambió');
+    expect(fixture.nativeElement.textContent).toContain('Generar equipos');
+    expect(fixture.nativeElement.textContent).not.toContain('6 jugadores');
+  });
+
   it('generates random teams upon clicking "Generar equipos"', async () => {
     const fixture = await setupFixture('ADMIN', sampleAttendees(10), []);
 
@@ -40,6 +65,16 @@ describe('TeamGenerationPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Equipo A');
     expect(fixture.nativeElement.textContent).toContain('Equipo B');
     expect(fixture.nativeElement.textContent).toContain('Volver a sortear');
+    expect(fixture.nativeElement.textContent).toContain(
+      'Confirmá los equipos para ver la formación en cancha actualizada.',
+    );
+    expect(fixture.nativeElement.textContent).not.toContain('Ver formación en cancha');
+  });
+
+  it('offers the pitch view only when the current roster is persisted', async () => {
+    const fixture = await setupFixture('ADMIN', sampleAttendees(10), sampleTeams());
+
+    expect(fixture.nativeElement.textContent).toContain('Ver formación en cancha');
   });
 
   it('lets an ADMIN switch from RANDOM to MANAGERS using PR14 team count', async () => {
