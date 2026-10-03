@@ -40,6 +40,8 @@ function attendee(
   isGuest = false,
 ): AttendanceRecord {
   return {
+    actualDinner: 'UNSET',
+    actualFootball: 'UNSET',
     avatarPath: null,
     avatarUrl: null,
     dinnerResponse,

@@ -692,6 +692,8 @@ export type Database = {
       get_event_attendance: {
         Args: { p_event_id: string };
         Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
           avatar_path: string | null;
           dinner_response: Database['public']['Enums']['attendance_response'];
           display_name: string;
@@ -703,6 +705,13 @@ export type Database = {
           membership_active: boolean;
           participant_id: string | null;
         }[];
+      };
+      record_match_attendance: {
+        Args: {
+          p_attendances: Json;
+          p_event_id: string;
+        };
+        Returns: undefined;
       };
       list_invitable_group_members: {
         Args: never;
