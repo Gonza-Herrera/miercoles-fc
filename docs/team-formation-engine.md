@@ -101,17 +101,16 @@ share or mutate external state.
 
 ## Boundaries with later features
 
-The intended Match Attendance boundary is:
+The Match Attendance boundary is:
 
 ```ts
 const actualPlayers = await getActualPlayers(eventId);
 const formation = calculateTeamFormation(actualPlayers.length);
 ```
 
-Filtering `actual_football_attendance` belongs to the attendance read model,
-not this engine. The Match Attendance implementation described as PR13 is not
-present in the current branch, so PR14 does not fabricate or duplicate that
-missing boundary.
+Filtering `actual_football = YES` belongs to the PR13 attendance read model,
+not this engine. PR16 consumes this plan's `teamCount` to create the required
+number of temporary DT slots without copying the formation formulas.
 
 PR15 can consume `actualPlayers` together with a valid plan's `teamSizes` to
 assign players randomly. Future Manager/DT and draft flows can use the same

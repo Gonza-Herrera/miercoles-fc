@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, event-scoped guest participants, independent football/dinner attendance confirmation, the current-event dashboard, and a pure team-formation engine. Player assignment, team persistence, settlement, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, and temporary event DT assignments. The player draft, settlement, and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR14 — Team Formation Engine**
+**PR16 — Managers / DT**
 
-PR01–PR12 established the Angular application, Design System, responsive mobile shell, Supabase foundation, identity, invitations, groups, temporary guests, weekly events, independent attendance, and current-event dashboard. PR14 adds a deterministic, framework-independent calculation of team capacities. The roadmap identifies PR13 Match Attendance as its input boundary, but that implementation is not present in this branch, so the engine remains intentionally unintegrated.
+PR01–PR15 established the application, secure backend, identity and groups, weekly-event flow, actual match attendance, deterministic team capacities, and random team generation. PR16 adds an event-specific RANDOM/MANAGERS mode and atomic temporary DT assignments without changing persistent group roles.
 
 ## Tech stack
 
@@ -145,6 +145,8 @@ The pure Team Formation Engine converts an actual-player count into deterministi
 
 Match Attendance implements the boundary between planned football intent and actual attendees who played on match day, corresponding to Screen 7 ("¿Quiénes jugaron?"). See [Match Attendance documentation](docs/match-attendance.md).
 
+Managers mode assigns one temporary, linked GroupMember DT to every team for one event. Assignments remain separate from persistent ADMIN/MEMBER roles and prepare the secure boundary for PR17. See [Managers / DT documentation](docs/managers-dt.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -161,6 +163,8 @@ Match Attendance implements the boundary between planned football intent and act
 - Completed: **PR12 — Event Dashboard**
 - Completed: **PR13 — Match Attendance**
 - Completed: **PR14 — Team Formation Engine**
-- Next: **PR15 — Random Team Generator**
+- Completed: **PR15 — Random Team Generator**
+- Current: **PR16 — Managers / DT**
+- Next: **PR17 — Player Draft**
 
-PR13 bridges attendance planning and match execution with the real-world attendance checklist. PR14 calculates deterministic team capacities. The project is ready for PR15 to generate random team rosters.
+PR16 keeps temporary event responsibility separate from persistent membership authorization. The project is ready for PR17 to fill Manager-mode rosters through an authenticated player draft.
