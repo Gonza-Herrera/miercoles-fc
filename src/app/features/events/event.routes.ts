@@ -39,6 +39,14 @@ export const EVENT_ROUTES: Routes = [
     title: 'Draft de jugadores · Miércoles FC',
   },
   {
+    path: ':eventId/lineup',
+    loadComponent: () =>
+      import('../match/pages/team-lineup-page/team-lineup-page').then(
+        ({ TeamLineupPage }) => TeamLineupPage,
+      ),
+    title: 'Formación de equipos · Miércoles FC',
+  },
+  {
     path: ':eventId',
     loadComponent: () =>
       import('./pages/event-detail-page/event-detail-page').then(

@@ -130,6 +130,9 @@
               <p class="ds-body-small">Los equipos quedaron listos para jugar.</p>
             </div>
           </div>
+          <a [routerLink]="['/events', eventId, 'lineup']">
+            <app-button size="large" [fullWidth]="true">Ver formación final</app-button>
+          </a>
         </app-card>
       }
 

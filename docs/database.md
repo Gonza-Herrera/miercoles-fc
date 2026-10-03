@@ -86,6 +86,14 @@ locks the draft and participant, validates the current linked DT, advances to th
 next non-full team, and completes when no actual player remains. Attendance, mode,
 teams, DT assignments, and existing roster rows are locked after the draft begins.
 
+PR18 keeps the same roster tables and adds no pitch coordinates or football-role
+columns. `get_event_team_lineup` projects the event-scoped Team, optional Manager and
+EventParticipant identities needed by the final lineup. The ADMIN-only
+`swap_event_team_players` RPC atomically exchanges two existing roster rows from
+different Teams while preserving Team sizes. The existing one-Team-per-participant
+constraint is made deferrable so both sides can be updated together and checked at
+transaction end.
+
 ## Invitations and tokens
 
 `group_invitations` targets a specific `(group_member_id, group_id)` pair. It stores only a 32-byte SHA-256 token hash, never a raw bearer token. A partial unique index allows only one unconsumed/unrevoked invitation per member. PR07 adds private database implementations for secure generation, seven-day expiration, safe preview, revocation and atomic member linking, exposed through narrow public RPC wrappers.
@@ -163,6 +171,11 @@ PR16 exposes read-only team-manager configuration to active event-group members.
 PR17 exposes one read snapshot RPC to linked event-group members, ADMIN-only start,
 and current-DT-only selection. Direct `event_drafts` writes are revoked and RLS
 permits only event-scoped reads. See [Player Draft documentation](player-draft.md).
+
+PR18 reuses those read policies and direct-write revocations. Active linked members
+may obtain the focused lineup snapshot; only an active group ADMIN in `OPEN` or
+`IN_PROGRESS` may invoke the swap successfully. See
+[Team Lineup UI documentation](team-lineup-ui.md).
 
 ## Browser configuration
 

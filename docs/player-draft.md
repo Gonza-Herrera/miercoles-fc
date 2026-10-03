@@ -89,3 +89,7 @@ Post-draft player swaps/corrections, ratings, position balancing, settlement,
 payments, chat, notifications, and offline writes remain outside PR17. The next PR
 number is not documented in the current repository, so this implementation does
 not invent a PR18 contract.
+
+PR18 now consumes the completed roster as the Team Lineup UI. It does not recalculate
+the draft or its capacities; its controlled ADMIN swap exchanges two players while
+keeping both Team sizes unchanged.

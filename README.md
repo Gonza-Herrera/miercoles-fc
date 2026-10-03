@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, and the synchronized player draft. Settlement and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, and final Team Lineup UI. Dinner, settlement and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR17 — Player Draft**
+**PR18 — Team Lineup UI**
 
-PR01–PR16 established the secure application, weekly-event flow, actual attendance, deterministic capacities, random teams, and temporary DT assignments. PR17 adds an atomic, turn-based and Realtime-synchronized player draft for Managers mode.
+PR01–PR17 established the secure application, weekly-event flow, actual attendance, deterministic capacities, random teams, temporary DT assignments and synchronized draft. PR18 adds the original mobile pitch, dynamic Team navigation and safe atomic swaps.
 
 ## Tech stack
 
@@ -72,6 +72,7 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | `/events/:id`            | Stable event detail and lifecycle actions         |
 | `/events/:id/edit`       | Lifecycle-aware ADMIN editing                     |
 | `/events/:id/draft`      | Synchronized Managers-mode player draft           |
+| `/events/:id/lineup`     | Final mobile football-pitch Team view             |
 | `/design-system`         | Development showcase outside primary navigation   |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
@@ -150,6 +151,8 @@ Managers mode assigns one temporary, linked GroupMember DT to every team for one
 
 Player Draft captures the capacity plan, auto-assigns DTs who played, authorizes each turn in PostgreSQL, prevents duplicate concurrent selections, synchronizes open phones, and completes automatically. See [Player Draft documentation](docs/player-draft.md).
 
+Team Lineup UI renders persisted Random or Managers rosters on an original responsive football pitch, supports dynamic tabs/swipe and offers ADMIN-only atomic cross-Team swaps. See [Team Lineup UI documentation](docs/team-lineup-ui.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -168,7 +171,8 @@ Player Draft captures the capacity plan, auto-assigns DTs who played, authorizes
 - Completed: **PR14 — Team Formation Engine**
 - Completed: **PR15 — Random Team Generator**
 - Completed: **PR16 — Managers / DT**
-- Current: **PR17 — Player Draft**
-- Next: **Not yet documented in this repository**
+- Completed: **PR17 — Player Draft**
+- Current: **PR18 — Team Lineup UI**
+- Next: **PR19 — Dinner Planning**
 
-PR17 keeps every pick server-authoritative and synchronized while preserving the distinction between authentication, persistent group roles, and temporary DT responsibility.
+PR18 completes Milestone 4 with a football-first representation of existing Team state. It never regenerates teams, duplicates formation/draft logic or persists visual coordinates.

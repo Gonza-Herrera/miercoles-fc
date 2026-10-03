@@ -1,0 +1,125 @@
+<app-page-container>
+  <main class="lineup-page">
+    <a class="lineup-page__back" [routerLink]="['/events', eventId]">← Volver al miércoles</a>
+
+    @if (loading()) {
+      <section class="lineup-loading" role="status" aria-live="polite">
+        <div class="lineup-loading__tabs"></div>
+        <div class="lineup-loading__pitch"></div>
+        <p>Cargando formación…</p>
+      </section>
+    } @else if (state(); as lineup) {
+      <header class="lineup-page__heading">
+        <div>
+          <p class="lineup-page__eyebrow">Formación final</p>
+          <h1 class="ds-page-title">Así quedaron los equipos</h1>
+        </div>
+        @if (lineup.canEdit) {
+          @if (editing()) {
+            <app-button variant="secondary" size="small" (click)="cancelEdit()"
+              >Cancelar</app-button
+            >
+          } @else {
+            <app-button variant="secondary" size="small" (click)="enterEdit()">Editar</app-button>
+          }
+        }
+      </header>
+
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      @if (feedback(); as message) {
+        <p class="feedback" role="status">{{ message }}</p>
+      }
+
+      @if (!lineup.isComplete && lineup.formationMode === 'MANAGERS') {
+        <app-card>
+          <p class="ds-body">El draft todavía no terminó. Esta formación es provisoria.</p>
+        </app-card>
+      }
+
+      @if (lineup.teams.length > 0) {
+        <nav class="lineup-tabs" role="tablist" aria-label="Equipos">
+          @for (team of lineup.teams; track team.teamId; let index = $index) {
+            <button
+              type="button"
+              role="tab"
+              [id]="'lineup-tab-' + team.teamId"
+              [attr.aria-selected]="selectedTeamIndex() === index"
+              [attr.aria-controls]="'lineup-panel-' + team.teamId"
+              [class.lineup-tabs__tab--active]="selectedTeamIndex() === index"
+              (click)="selectTeam(index)"
+            >
+              {{ team.name }}
+            </button>
+          }
+        </nav>
+
+        @if (activeTeam(); as team) {
+          <section
+            class="lineup-panel"
+            role="tabpanel"
+            tabindex="0"
+            [id]="'lineup-panel-' + team.teamId"
+            [attr.aria-labelledby]="'lineup-tab-' + team.teamId"
+            (touchstart)="onTouchStart($event)"
+            (touchend)="onTouchEnd($event)"
+          >
+            <header class="lineup-team-header">
+              <div>
+                <p class="lineup-team-header__count">{{ team.players.length }} jugadores</p>
+                <h2>{{ team.name }}</h2>
+              </div>
+              @if (lineup.formationMode === 'MANAGERS' && team.manager; as manager) {
+                <div class="lineup-manager">
+                  <app-avatar
+                    [name]="manager.nickname || manager.displayName"
+                    [src]="manager.avatarUrl"
+                    size="small"
+                  />
+                  <span>DT · {{ manager.nickname || manager.displayName }}</span>
+                </div>
+              }
+            </header>
+
+            <app-football-pitch
+              [team]="team"
+              [selectable]="editing() && lineup.canEdit && !swapping()"
+              [selectedPlayerId]="firstSelection()?.player?.eventParticipantId ?? null"
+              (playerSelected)="selectPlayer($event)"
+            />
+
+            <p class="lineup-page__swipe-hint">Deslizá para cambiar de equipo</p>
+          </section>
+        }
+      } @else {
+        <app-card variant="elevated">
+          <section class="lineup-empty">
+            <span aria-hidden="true">⚽</span>
+            <h2 class="ds-card-title">Los equipos todavía no están armados</h2>
+            <p class="ds-body">Primero registrá los presentes y prepará los equipos.</p>
+            @if (lineup.canEdit) {
+              <a [routerLink]="['/events', eventId, 'teams']">Ir a armar equipos</a>
+            }
+          </section>
+        </app-card>
+      }
+
+      <app-confirm-dialog
+        [open]="pendingSwap() !== null"
+        title="Intercambiar jugadores"
+        [description]="swapDescription()"
+        confirmLabel="Intercambiar"
+        (cancelled)="pendingSwap.set(null)"
+        (confirmed)="confirmSwap()"
+      />
+    } @else {
+      <app-card>
+        <section class="lineup-empty" role="alert">
+          <h1 class="ds-card-title">No pudimos cargar los equipos</h1>
+          <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+        </section>
+      </app-card>
+    }
+  </main>
+</app-page-container>
