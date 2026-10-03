@@ -9,7 +9,7 @@
     @if (loading()) {
       <div class="ds-stack" role="status">
         <h1 class="ds-page-title">Armar equipos</h1>
-        <p class="ds-body">Cargando jugadores convocados…</p>
+        <p class="ds-body">Cargando configuración…</p>
       </div>
     } @else if (errorMessage(); as error) {
       <app-card>
@@ -23,33 +23,50 @@
         <div>
           <h1 class="ds-page-title">Armar equipos</h1>
           <p class="ds-body-small">
-            {{ availablePlayers().length }} jugadores disponibles para el miércoles.
+            {{ availablePlayers().length }} jugadores presentes este miércoles.
           </p>
         </div>
-
-        <div class="team-gen__mode-switch" role="tablist" aria-label="Modo de armado">
-          <button
-            type="button"
-            class="team-gen__mode-btn"
-            [class.team-gen__mode-btn--active]="mode() === 'random'"
-            role="tab"
-            [attr.aria-selected]="mode() === 'random'"
-            (click)="mode.set('random')"
-          >
-            🎲 Aleatorio
-          </button>
-          <button
-            type="button"
-            class="team-gen__mode-btn"
-            [class.team-gen__mode-btn--active]="mode() === 'manual'"
-            role="tab"
-            [attr.aria-selected]="mode() === 'manual'"
-            (click)="mode.set('manual')"
-          >
-            👔 DTs / Manual
-          </button>
-        </div>
       </header>
+
+      <section class="team-gen__mode-section" aria-labelledby="formation-mode-title">
+        <div>
+          <h2 id="formation-mode-title" class="ds-card-title">Modo de armado</h2>
+          @if (!canConfigure()) {
+            <p class="ds-body-small">Solo un administrador puede modificarlo en este momento.</p>
+          }
+        </div>
+
+        @if (canConfigure()) {
+          <div class="team-gen__mode-switch" role="radiogroup" aria-label="Modo de armado">
+            <button
+              type="button"
+              class="team-gen__mode-btn"
+              [class.team-gen__mode-btn--active]="mode() === 'RANDOM'"
+              role="radio"
+              [attr.aria-checked]="mode() === 'RANDOM'"
+              [disabled]="savingMode()"
+              (click)="changeMode('RANDOM')"
+            >
+              🎲 Aleatorio
+            </button>
+            <button
+              type="button"
+              class="team-gen__mode-btn"
+              [class.team-gen__mode-btn--active]="mode() === 'MANAGERS'"
+              role="radio"
+              [attr.aria-checked]="mode() === 'MANAGERS'"
+              [disabled]="savingMode() || !formationPlan().valid"
+              (click)="changeMode('MANAGERS')"
+            >
+              👔 Directores Técnicos
+            </button>
+          </div>
+        } @else {
+          <p class="team-gen__mode-readonly">
+            {{ mode() === 'RANDOM' ? '🎲 Aleatorio' : '👔 Directores Técnicos' }}
+          </p>
+        }
+      </section>
 
       @if (formationPlan(); as plan) {
         @if (plan.valid) {
@@ -58,66 +75,143 @@
               <span class="team-gen__plan-icon" aria-hidden="true">⚽</span>
               <div>
                 <strong class="team-gen__plan-title">
-                  Se armarán {{ plan.teamCount }} equipos ({{ plan.teamSizes.join(' vs ') }})
+                  Se requieren {{ plan.teamCount }} equipos ({{ plan.teamSizes.join(' / ') }})
                 </strong>
-                <p class="ds-body-small">
-                  Formación calculada automáticamente según los convocados.
-                </p>
+                <p class="ds-body-small">Formación calculada con los jugadores presentes.</p>
               </div>
             </div>
           </app-card>
         } @else {
           <app-card>
-            <p class="ds-body" style="text-align: center;">
-              Se necesitan al menos 2 jugadores convocados para armar los equipos.
+            <p class="ds-body team-gen__centered">
+              Se necesitan al menos 2 jugadores presentes para armar los equipos.
             </p>
           </app-card>
         }
       }
 
+      @if (successMessage(); as message) {
+        <p class="feedback feedback--success" role="status">{{ message }}</p>
+      }
       @if (saveError(); as error) {
         <p class="feedback feedback--error" role="alert">{{ error }}</p>
       }
 
-      <!-- MODO SIN EQUIPOS GENERADOS TODAVÍA -->
-      @if (teams().length === 0) {
-        <section class="team-gen__section" aria-label="Jugadores disponibles">
-          <h2 class="ds-card-title">Jugadores disponibles ({{ availablePlayers().length }})</h2>
+      @if (mode() === 'MANAGERS') {
+        <section class="team-gen__section" aria-labelledby="managers-title">
+          <div class="team-gen__section-heading">
+            <div>
+              <h2 id="managers-title" class="ds-card-title">Directores técnicos</h2>
+              <p class="ds-body-small">
+                {{ managerCounts().assigned }} de {{ managerCounts().required }} DT asignados.
+              </p>
+            </div>
+            @if (managerCounts().missing > 0) {
+              <app-badge variant="warning">
+                Falta asignar {{ managerCounts().missing }}
+                {{ managerCounts().missing === 1 ? 'DT' : 'DTs' }}
+              </app-badge>
+            } @else if (managerCounts().complete) {
+              <app-badge variant="success">Configuración completa</app-badge>
+            }
+          </div>
+
+          <div class="team-gen__manager-grid">
+            @for (team of managerTeams(); track team.teamId; let idx = $index) {
+              <app-card variant="elevated">
+                <article class="team-gen__manager-card">
+                  <header class="team-gen__team-title">
+                    <span
+                      class="team-gen__team-dot"
+                      [class.team-gen__team-dot--alt]="idx === 1"
+                      [class.team-gen__team-dot--third]="idx === 2"
+                    ></span>
+                    <h3 class="ds-card-title">{{ team.teamName }}</h3>
+                  </header>
+
+                  @if (canConfigure()) {
+                    <label class="team-gen__manager-field" [attr.for]="'manager-' + team.teamId">
+                      <span>Director técnico</span>
+                      <select
+                        [id]="'manager-' + team.teamId"
+                        [value]="managerSelections()[team.teamId] ?? ''"
+                        [disabled]="saving()"
+                        (change)="selectManager(team.teamId, $any($event.target).value)"
+                      >
+                        <option value="">Sin asignar</option>
+                        @for (member of eligibleManagers(); track member.id) {
+                          <option
+                            [value]="member.id"
+                            [disabled]="managerIsSelectedElsewhere(member.id, team.teamId)"
+                          >
+                            {{ member.nickname || member.displayName }}
+                            {{ member.role === 'ADMIN' ? ' · Admin' : '' }}
+                          </option>
+                        }
+                      </select>
+                    </label>
+                  } @else {
+                    <div class="team-gen__manager-readonly">
+                      <span class="ds-body-small">DT</span>
+                      <strong>{{ managerName(team) }}</strong>
+                    </div>
+                  }
+                </article>
+              </app-card>
+            } @empty {
+              <app-card>
+                <p class="ds-body">Todavía no hay equipos configurados para asignar DTs.</p>
+              </app-card>
+            }
+          </div>
+
+          @if (unlinkedActiveMembers().length > 0 && canConfigure()) {
+            <p class="team-gen__account-note">
+              Los miembros sin cuenta vinculada no aparecen en la lista. Necesitan aceptar su
+              invitación para ser DT.
+            </p>
+          }
+
+          @if (canConfigure()) {
+            <app-button
+              size="large"
+              [fullWidth]="true"
+              [disabled]="saving() || !managerCounts().complete"
+              (click)="saveManagers()"
+            >
+              {{ saving() ? 'Guardando…' : 'Guardar DTs' }}
+            </app-button>
+          }
+        </section>
+      } @else if (teams().length === 0) {
+        <section class="team-gen__section" aria-label="Jugadores presentes">
+          <h2 class="ds-card-title">Jugadores presentes ({{ availablePlayers().length }})</h2>
 
           <div class="team-gen__player-grid">
             @for (player of availablePlayers(); track player.id) {
               <div class="team-gen__player-chip">
-                <app-avatar
-                  [name]="player.displayName"
-                  [src]="player.avatarUrl"
-                  size="small"
-                />
+                <app-avatar [name]="player.displayName" [src]="player.avatarUrl" size="small" />
                 <span class="team-gen__player-name">{{ player.displayName }}</span>
                 @if (player.isGuest) {
                   <app-badge variant="neutral" size="small">Invitado</app-badge>
                 }
               </div>
             } @empty {
-              <p class="ds-body">No hay jugadores disponibles.</p>
+              <p class="ds-body">No hay jugadores presentes.</p>
             }
           </div>
 
-          @if (isAdmin() && availablePlayers().length >= 2) {
+          @if (canConfigure() && availablePlayers().length >= 2) {
             <div class="team-gen__action-bar">
-              <app-button
-                size="large"
-                [fullWidth]="true"
-                (click)="generate()"
-              >
+              <app-button size="large" [fullWidth]="true" (click)="generate()">
                 🎲 Generar equipos
               </app-button>
             </div>
           }
         </section>
       } @else {
-        <!-- MODO CON EQUIPOS ARMED/GENERADOS -->
         <section class="team-gen__section" aria-label="Equipos sorteados">
-          @if (selectedPlayerForSwap(); as selectedId) {
+          @if (selectedPlayerForSwap()) {
             <div class="team-gen__swap-banner" role="status">
               <span>🔄 Tocá otro jugador para intercambiar de equipo.</span>
               <button
@@ -129,8 +223,8 @@
               </button>
             </div>
           } @else {
-            <p class="ds-body-small" style="color: var(--color-text-secondary);">
-              Tip: Tocá cualquier jugador para seleccionarlo e intercambiarlo manualmente.
+            <p class="ds-body-small team-gen__secondary-copy">
+              Tip: Tocá dos jugadores para intercambiarlos antes de guardar.
             </p>
           }
 
@@ -142,7 +236,8 @@
                     <div class="team-gen__team-title">
                       <span
                         class="team-gen__team-dot"
-                        [class.team-gen__team-dot--alt]="idx % 2 === 1"
+                        [class.team-gen__team-dot--alt]="idx === 1"
+                        [class.team-gen__team-dot--third]="idx === 2"
                       ></span>
                       <h3 class="ds-card-title">{{ team.name }}</h3>
                     </div>
@@ -157,7 +252,10 @@
                         <button
                           type="button"
                           class="team-gen__team-player"
-                          [class.team-gen__team-player--selected]="selectedPlayerForSwap() === player.id"
+                          [class.team-gen__team-player--selected]="
+                            selectedPlayerForSwap() === player.id
+                          "
+                          [disabled]="!canConfigure()"
                           (click)="handlePlayerClick(player.id)"
                         >
                           <app-avatar
@@ -178,7 +276,7 @@
             }
           </div>
 
-          @if (isAdmin()) {
+          @if (canConfigure()) {
             <footer class="team-gen__footer">
               <app-button
                 variant="secondary"
@@ -188,11 +286,7 @@
               >
                 🎲 Volver a sortear
               </app-button>
-              <app-button
-                size="large"
-                [disabled]="saving()"
-                (click)="save()"
-              >
+              <app-button size="large" [disabled]="saving()" (click)="save()">
                 {{ saving() ? 'Guardando…' : '✓ Confirmar equipos' }}
               </app-button>
             </footer>

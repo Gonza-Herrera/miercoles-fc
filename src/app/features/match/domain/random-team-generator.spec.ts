@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  GeneratedTeamPlayer,
-  generateRandomTeams,
-  swapTeamPlayers,
-} from './random-team-generator';
+import { GeneratedTeamPlayer, generateRandomTeams, swapTeamPlayers } from './random-team-generator';
 
 describe('RandomTeamGenerator', () => {
   it('creates 2 teams of 5 for 10 players', () => {

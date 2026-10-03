@@ -73,6 +73,10 @@ PR11 exposes independent authenticated RPCs for football and dinner. Both derive
 
 Persistent membership roles are the PostgreSQL enum `ADMIN | MEMBER`. “Manager/DT” is not a persistent role: `event_managers` assigns a group member to exactly one team for one event. One team has at most one manager in v1, and one member manages at most one team per event. Being a manager, player, or group admin are independent concepts.
 
+PR16 adds the event-owned `team_formation_mode` enum (`RANDOM | MANAGERS`). In Managers mode, a DT must be an active member of the event's group with a linked Profile. ADMIN and MEMBER are both eligible; playing is not required and guests are excluded. Removing a Profile link or deactivating a member clears their assignment from mutable events.
+
+Mode changes and complete Manager assignment use narrow atomic RPCs. Both lock the event; Manager saves also lock selected GroupMember rows. `RANDOM → MANAGERS` discards the incompatible random roster and creates empty stable teams, while `MANAGERS → RANDOM` clears temporary DT assignments and empty teams. Only `OPEN` and `IN_PROGRESS` permit team-setup writes; later lifecycle states retain historical read access.
+
 `team_members` references `event_participants`, not profiles, so guests can play. Composite foreign keys require the team and participant to belong to the same event. The `(event_id, event_participant_id)` unique constraint prevents concurrent writes from placing one participant on multiple teams.
 
 ## Invitations and tokens
@@ -105,6 +109,7 @@ PostgreSQL, rather than a prior client-side `SELECT`, protects:
 - one team name and position per event;
 - one team assignment per participant/event;
 - one manager per team and one managed team per member/event;
+- active, linked, same-group Manager eligibility for mutable events;
 - one payment per participant/event/category;
 - participant/team/event and manager/member/group consistency;
 - valid attendance, status, role, currency, amount, and paid timestamp states.
@@ -142,6 +147,8 @@ Small `SECURITY DEFINER` helpers live in the unexposed `private` schema to avoid
 The local configuration disables automatic Data API exposure. The migration uses explicit grants because grants and RLS are separate security layers. The `service_role` keeps administrative access but must never be shipped to the browser.
 
 Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. PR09 guest mutations and PR10 event mutations use ADMIN-authorized RPCs while table writes remain closed. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
+
+PR16 exposes read-only team-manager configuration to active event-group members. Only active ADMINs can switch modes or replace the complete Manager set through the focused RPCs; a DT assignment never grants ADMIN authorization. See [Managers / DT documentation](managers-dt.md).
 
 ## Browser configuration
 
@@ -193,4 +200,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10 adds weekly-event creation, editing, discovery, and lifecycle management; and PR11 adds independent planned attendance. Actual attendance, teams, settlement calculations, Realtime subscriptions, and the remaining business UI are deferred. The current development host still needs a Docker-compatible runtime to execute the optional local `supabase db reset` workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14 calculates team capacities; PR15 persists random teams; and PR16 configures temporary DTs. The player draft, settlement calculations, Realtime subscriptions, and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset, database tests, lint/advisors, and type-generation workflow.

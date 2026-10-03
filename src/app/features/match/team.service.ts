@@ -47,7 +47,10 @@ export class TeamService {
   }
 
   private async mapTeamsResponse(rows: readonly TeamRpcRow[]): Promise<readonly GeneratedTeam[]> {
-    const teamsMap = new Map<string, { id: string; name: string; position: number; players: GeneratedTeamPlayer[] }>();
+    const teamsMap = new Map<
+      string,
+      { id: string; name: string; position: number; players: GeneratedTeamPlayer[] }
+    >();
 
     for (const row of rows) {
       if (!teamsMap.has(row.team_id)) {
