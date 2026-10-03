@@ -21,7 +21,7 @@ export class EventService {
     const { data, error } = await this.client
       .from('events')
       .select(
-        'id, group_id, created_by, title, starts_at, location, court_price_minor, currency_code, status, created_at, updated_at',
+        'id, group_id, created_by, title, starts_at, location, court_price_minor, currency_code, status, team_formation_mode, created_at, updated_at',
       )
       .eq('group_id', groupId)
       .order('starts_at', { ascending: false });
@@ -33,7 +33,7 @@ export class EventService {
     const { data, error } = await this.client
       .from('events')
       .select(
-        'id, group_id, created_by, title, starts_at, location, court_price_minor, currency_code, status, created_at, updated_at',
+        'id, group_id, created_by, title, starts_at, location, court_price_minor, currency_code, status, team_formation_mode, created_at, updated_at',
       )
       .eq('id', eventId)
       .single();

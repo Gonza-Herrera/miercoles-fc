@@ -182,6 +182,14 @@
               {{ saving() ? 'Guardando…' : 'Guardar DTs' }}
             </app-button>
           }
+
+          @if (managerCounts().complete && event(); as currentEvent) {
+            <a class="team-gen__draft-link" [routerLink]="['/events', currentEvent.id, 'draft']">
+              <app-button size="large" variant="secondary" [fullWidth]="true">
+                Abrir draft de jugadores
+              </app-button>
+            </a>
+          }
         </section>
       } @else if (teams().length === 0) {
         <section class="team-gen__section" aria-label="Jugadores presentes">

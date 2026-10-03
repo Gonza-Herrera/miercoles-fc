@@ -102,6 +102,57 @@ export type Database = {
           },
         ];
       };
+      event_drafts: {
+        Row: {
+          completed_at: string | null;
+          current_team_id: string | null;
+          event_id: string;
+          pick_number: number;
+          started_at: string | null;
+          status: Database['public']['Enums']['player_draft_status'];
+          team_capacities: number[];
+          updated_at: string;
+          version: number;
+        };
+        Insert: {
+          completed_at?: string | null;
+          current_team_id?: string | null;
+          event_id: string;
+          pick_number?: number;
+          started_at?: string | null;
+          status?: Database['public']['Enums']['player_draft_status'];
+          team_capacities: number[];
+          updated_at?: string;
+          version?: number;
+        };
+        Update: {
+          completed_at?: string | null;
+          current_team_id?: string | null;
+          event_id?: string;
+          pick_number?: number;
+          started_at?: string | null;
+          status?: Database['public']['Enums']['player_draft_status'];
+          team_capacities?: number[];
+          updated_at?: string;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_drafts_current_team_fk';
+            columns: ['current_team_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id', 'event_id'];
+          },
+          {
+            foreignKeyName: 'event_drafts_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       event_participants: {
         Row: {
           actual_dinner: Database['public']['Enums']['actual_attendance_status'];
@@ -180,6 +231,7 @@ export type Database = {
           location: string;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
+          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
           title: string | null;
           updated_at: string;
         };
@@ -193,6 +245,7 @@ export type Database = {
           location: string;
           starts_at: string;
           status?: Database['public']['Enums']['event_status'];
+          team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
           title?: string | null;
           updated_at?: string;
         };
@@ -206,6 +259,7 @@ export type Database = {
           location?: string;
           starts_at?: string;
           status?: Database['public']['Enums']['event_status'];
+          team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
           title?: string | null;
           updated_at?: string;
         };
@@ -630,6 +684,7 @@ export type Database = {
           location: string;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
+          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
           title: string | null;
           updated_at: string;
         };
@@ -706,6 +761,10 @@ export type Database = {
           participant_id: string | null;
         }[];
       };
+      get_event_player_draft: {
+        Args: { p_event_id: string };
+        Returns: Json;
+      };
       get_event_teams: {
         Args: { p_event_id: string };
         Returns: {
@@ -734,6 +793,18 @@ export type Database = {
           p_event_id: string;
           p_teams: Json;
         };
+        Returns: undefined;
+      };
+      select_draft_player: {
+        Args: {
+          p_event_id: string;
+          p_event_participant_id: string;
+          p_expected_version: number;
+        };
+        Returns: undefined;
+      };
+      start_event_player_draft: {
+        Args: { p_event_id: string };
         Returns: undefined;
       };
       list_invitable_group_members: {
@@ -793,6 +864,7 @@ export type Database = {
           location: string;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
+          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
           title: string | null;
           updated_at: string;
         };
@@ -846,6 +918,7 @@ export type Database = {
           location: string;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
+          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
           title: string | null;
           updated_at: string;
         };
@@ -928,6 +1001,8 @@ export type Database = {
       group_member_role: 'ADMIN' | 'MEMBER';
       payment_category: 'COURT' | 'DINNER';
       payment_status: 'PENDING' | 'PAID';
+      player_draft_status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
+      team_formation_mode: 'RANDOM' | 'MANAGERS';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -1055,6 +1130,8 @@ export const Constants = {
       group_member_role: ['ADMIN', 'MEMBER'],
       payment_category: ['COURT', 'DINNER'],
       payment_status: ['PENDING', 'PAID'],
+      player_draft_status: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'],
+      team_formation_mode: ['RANDOM', 'MANAGERS'],
     },
   },
 } as const;

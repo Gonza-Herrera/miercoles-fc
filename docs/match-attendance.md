@@ -11,6 +11,10 @@ En un grupo de fútbol de amigos, confirmar asistencia previa no garantiza asist
 
 La liquidación de cancha (PR21) y el control de pagos (PR23) deben basarse estrictamente en los jugadores que efectivamente estuvieron en la cancha. `actual_football` es la única fuente de verdad contable y deportiva.
 
+PR17 también usa `actual_football = YES` como lista autoritativa del draft. Una vez
+iniciado el draft, PostgreSQL bloquea cambios de asistencia real para evitar que la
+lista disponible o las capacidades cambien a mitad de la selección.
+
 ## Modelo y Base de Datos
 
 1. `actual_football` usa el enum de PostgreSQL `actual_attendance_status`:

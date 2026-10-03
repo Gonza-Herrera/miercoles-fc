@@ -1,0 +1,155 @@
+<app-page-container>
+  <div class="draft-page">
+    <a class="draft-page__back" [routerLink]="['/events', eventId, 'teams']">← Volver a equipos</a>
+
+    @if (loading()) {
+      <div role="status">
+        <h1 class="ds-page-title">Draft de jugadores</h1>
+        <p class="ds-body">Cargando draft…</p>
+      </div>
+    } @else if (draft(); as state) {
+      <header class="draft-page__header">
+        <div>
+          <h1 class="ds-page-title">
+            {{ state.status === 'COMPLETED' ? 'Draft finalizado' : 'Draft de jugadores' }}
+          </h1>
+          <p class="ds-body-small">Selección por turnos de los Directores Técnicos.</p>
+        </div>
+        <app-badge [variant]="realtimeStatus() === 'CONNECTED' ? 'success' : 'warning'">
+          {{ realtimeStatus() === 'CONNECTED' ? 'Sincronizado' : 'Reconectando…' }}
+        </app-badge>
+      </header>
+
+      @if (errorMessage(); as error) {
+        <p class="feedback feedback--error" role="alert">{{ error }}</p>
+      }
+      @if (feedback(); as message) {
+        <p class="feedback" role="status">{{ message }}</p>
+      }
+
+      <section class="draft-page__teams" aria-label="Equipos del draft">
+        @for (team of state.teams; track team.teamId; let index = $index) {
+          <app-card variant="elevated">
+            <article class="draft-team" [attr.aria-labelledby]="'draft-team-' + team.teamId">
+              <header class="draft-team__header">
+                <div>
+                  <h2 class="ds-card-title" [id]="'draft-team-' + team.teamId">
+                    {{ team.teamName }}
+                  </h2>
+                  <p class="ds-body-small">
+                    DT: {{ team.manager.nickname || team.manager.displayName }}
+                  </p>
+                </div>
+                <app-badge [variant]="state.currentTeamId === team.teamId ? 'primary' : 'neutral'">
+                  {{ team.players.length }} / {{ team.capacity }}
+                </app-badge>
+              </header>
+
+              <ul class="draft-team__players" role="list">
+                @for (player of team.players; track player.participantId) {
+                  <li>
+                    <app-avatar [name]="player.displayName" [src]="player.avatarUrl" size="small" />
+                    <span>{{ player.displayName }}</span>
+                    @if (player.isGuest) {
+                      <app-badge variant="neutral" size="small">Invitado</app-badge>
+                    }
+                  </li>
+                } @empty {
+                  <li class="draft-team__empty">Sin jugadores todavía</li>
+                }
+              </ul>
+              <p class="draft-team__remaining">{{ remaining(team) }} lugares disponibles</p>
+            </article>
+          </app-card>
+        }
+      </section>
+
+      @if (state.status === 'NOT_STARTED') {
+        <app-card variant="elevated">
+          <section class="draft-page__start" aria-labelledby="draft-start-title">
+            <div>
+              <h2 id="draft-start-title" class="ds-card-title">Los DT están listos</h2>
+              <p class="ds-body">
+                Al comenzar, los DT que jugaron se asignarán automáticamente a su equipo.
+              </p>
+            </div>
+            @if (state.canStart) {
+              <app-button size="large" [disabled]="acting()" (click)="start()">
+                {{ acting() ? 'Comenzando…' : 'Comenzar draft' }}
+              </app-button>
+            } @else {
+              <p class="ds-body-small">Esperando que un administrador inicie el draft.</p>
+            }
+          </section>
+        </app-card>
+      } @else if (state.status === 'IN_PROGRESS') {
+        <app-card variant="elevated">
+          <section class="draft-page__turn" aria-live="polite">
+            <p class="draft-page__eyebrow">Turno actual</p>
+            <h2 class="ds-card-title">{{ state.currentManagerName }}</h2>
+            @if (currentTeam(); as team) {
+              <p class="ds-body">{{ team.teamName }}</p>
+            }
+            @if (state.canCurrentUserPick) {
+              <strong>Es tu turno. Elegí un jugador.</strong>
+            } @else {
+              <p class="ds-body-small">Esperando la selección del equipo actual.</p>
+            }
+          </section>
+        </app-card>
+
+        <section class="draft-page__available" aria-labelledby="available-players-title">
+          <h2 id="available-players-title" class="ds-card-title">
+            Jugadores disponibles ({{ state.availablePlayers.length }})
+          </h2>
+          <div class="draft-page__player-list">
+            @for (player of state.availablePlayers; track player.participantId) {
+              <button
+                type="button"
+                class="draft-player"
+                [disabled]="
+                  !state.canCurrentUserPick || acting() || realtimeStatus() !== 'CONNECTED'
+                "
+                (click)="requestPick(player)"
+              >
+                <app-avatar [name]="player.displayName" [src]="player.avatarUrl" size="small" />
+                <span>{{ player.displayName }}</span>
+                @if (player.isGuest) {
+                  <app-badge variant="neutral" size="small">Invitado</app-badge>
+                }
+              </button>
+            }
+          </div>
+        </section>
+      } @else {
+        <app-card variant="elevated">
+          <div class="draft-page__completed" role="status">
+            <span aria-hidden="true">✓</span>
+            <div>
+              <h2 class="ds-card-title">Todos los jugadores fueron asignados</h2>
+              <p class="ds-body-small">Los equipos quedaron listos para jugar.</p>
+            </div>
+          </div>
+        </app-card>
+      }
+
+      <app-confirm-dialog
+        [open]="selectedPlayer() !== null"
+        title="Confirmar selección"
+        [description]="
+          selectedPlayer() ? '¿Elegir a ' + selectedPlayer()!.displayName + ' para tu equipo?' : ''
+        "
+        confirmLabel="Elegir jugador"
+        (cancelled)="selectedPlayer.set(null)"
+        (confirmed)="confirmPick()"
+      />
+    } @else {
+      <app-card>
+        <div class="feedback feedback--error" role="alert">
+          <p>{{ errorMessage() || 'No pudimos cargar el draft.' }}</p>
+          <app-button variant="secondary" size="small" (click)="load()">Reintentar</app-button>
+        </div>
+      </app-card>
+    }
+  </div>
+</app-page-container>
