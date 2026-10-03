@@ -5,8 +5,8 @@
 PR16 gives each event an explicit team-building mode:
 
 - `RANDOM` uses the PR15 random team generator and persisted roster.
-- `MANAGERS` creates the team structure but leaves rosters empty so PR17 can
-  fill them through a player draft.
+- `MANAGERS` creates the team structure and PR17 fills its rosters through a
+  player draft.
 
 The mode belongs to an event. It is not a group or profile preference, so two
 Wednesdays in the same group may use different modes.
@@ -68,9 +68,9 @@ Mode changes are transactional and allowed only for active ADMINs in `OPEN` or
 - `MANAGERS → RANDOM` removes temporary manager assignments and empty draft
   teams. The ADMIN can then run PR15 again.
 
-Actual attendance and the PR14 plan are never modified. PR17 must add a draft
-lifecycle lock before a started draft can exist; PR16 deliberately implements
-no turns, picks, available-player list, or draft completion.
+Actual attendance and the PR14 plan are never modified. PR17 now snapshots that
+plan on start and locks attendance, mode, teams, and DT assignments for the rest
+of the draft lifecycle. See [Player Draft](player-draft.md).
 
 ## Atomic manager configuration
 

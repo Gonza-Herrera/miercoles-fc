@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, and temporary event DT assignments. The player draft, settlement, and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, and the synchronized player draft. Settlement and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR16 — Managers / DT**
+**PR17 — Player Draft**
 
-PR01–PR15 established the application, secure backend, identity and groups, weekly-event flow, actual match attendance, deterministic team capacities, and random team generation. PR16 adds an event-specific RANDOM/MANAGERS mode and atomic temporary DT assignments without changing persistent group roles.
+PR01–PR16 established the secure application, weekly-event flow, actual attendance, deterministic capacities, random teams, and temporary DT assignments. PR17 adds an atomic, turn-based and Realtime-synchronized player draft for Managers mode.
 
 ## Tech stack
 
@@ -71,6 +71,7 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | `/groups/:id/events/new` | ADMIN event creation                              |
 | `/events/:id`            | Stable event detail and lifecycle actions         |
 | `/events/:id/edit`       | Lifecycle-aware ADMIN editing                     |
+| `/events/:id/draft`      | Synchronized Managers-mode player draft           |
 | `/design-system`         | Development showcase outside primary navigation   |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
@@ -147,6 +148,8 @@ Match Attendance implements the boundary between planned football intent and act
 
 Managers mode assigns one temporary, linked GroupMember DT to every team for one event. Assignments remain separate from persistent ADMIN/MEMBER roles and prepare the secure boundary for PR17. See [Managers / DT documentation](docs/managers-dt.md).
 
+Player Draft captures the capacity plan, auto-assigns DTs who played, authorizes each turn in PostgreSQL, prevents duplicate concurrent selections, synchronizes open phones, and completes automatically. See [Player Draft documentation](docs/player-draft.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -164,7 +167,8 @@ Managers mode assigns one temporary, linked GroupMember DT to every team for one
 - Completed: **PR13 — Match Attendance**
 - Completed: **PR14 — Team Formation Engine**
 - Completed: **PR15 — Random Team Generator**
-- Current: **PR16 — Managers / DT**
-- Next: **PR17 — Player Draft**
+- Completed: **PR16 — Managers / DT**
+- Current: **PR17 — Player Draft**
+- Next: **Not yet documented in this repository**
 
-PR16 keeps temporary event responsibility separate from persistent membership authorization. The project is ready for PR17 to fill Manager-mode rosters through an authenticated player draft.
+PR17 keeps every pick server-authoritative and synchronized while preserving the distinction between authentication, persistent group roles, and temporary DT responsibility.

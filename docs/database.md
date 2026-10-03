@@ -79,6 +79,13 @@ Mode changes and complete Manager assignment use narrow atomic RPCs. Both lock t
 
 `team_members` references `event_participants`, not profiles, so guests can play. Composite foreign keys require the team and participant to belong to the same event. The `(event_id, event_participant_id)` unique constraint prevents concurrent writes from placing one participant on multiple teams.
 
+PR17 adds one `event_drafts` state row per Managers event. Its immutable capacity
+snapshot, current team, optimistic version, pick count, and lifecycle timestamps are
+updated only by focused start/pick RPCs. Starting auto-assigns playing DTs; each pick
+locks the draft and participant, validates the current linked DT, advances to the
+next non-full team, and completes when no actual player remains. Attendance, mode,
+teams, DT assignments, and existing roster rows are locked after the draft begins.
+
 ## Invitations and tokens
 
 `group_invitations` targets a specific `(group_member_id, group_id)` pair. It stores only a 32-byte SHA-256 token hash, never a raw bearer token. A partial unique index allows only one unconsumed/unrevoked invitation per member. PR07 adds private database implementations for secure generation, seven-day expiration, safe preview, revocation and atomic member linking, exposed through narrow public RPC wrappers.
@@ -109,6 +116,7 @@ PostgreSQL, rather than a prior client-side `SELECT`, protects:
 - one team name and position per event;
 - one team assignment per participant/event;
 - one manager per team and one managed team per member/event;
+- one atomic current-DT pick and one capacity-bounded draft roster;
 - active, linked, same-group Manager eligibility for mutable events;
 - one payment per participant/event/category;
 - participant/team/event and manager/member/group consistency;
@@ -131,7 +139,9 @@ Unique constraints provide indexes for most invariants and common event lookups.
 
 Composite indexes follow the exact column order of the foreign keys that connect invitations, managers, payments, and team assignments to their parent records. This keeps referential checks and parent updates efficient and satisfies the hosted Supabase database advisor.
 
-No speculative indexes or Realtime publications are enabled.
+PR17 publishes only `event_drafts` and the already-authoritative `team_members` table
+for its bounded event-filtered Postgres Changes subscriptions. No speculative
+publications are enabled.
 
 ## RLS and API grants
 
@@ -149,6 +159,10 @@ The local configuration disables automatic Data API exposure. The migration uses
 Profile creation is handled by the PR06 `auth.users` trigger rather than a browser write policy. PR07 invitation writes are available only through authorization-aware RPCs; direct browser writes remain closed. PR09 guest mutations and PR10 event mutations use ADMIN-authorized RPCs while table writes remain closed. Each future write policy must include both ownership checks and `WITH CHECK` where applicable.
 
 PR16 exposes read-only team-manager configuration to active event-group members. Only active ADMINs can switch modes or replace the complete Manager set through the focused RPCs; a DT assignment never grants ADMIN authorization. See [Managers / DT documentation](managers-dt.md).
+
+PR17 exposes one read snapshot RPC to linked event-group members, ADMIN-only start,
+and current-DT-only selection. Direct `event_drafts` writes are revoked and RLS
+permits only event-scoped reads. See [Player Draft documentation](player-draft.md).
 
 ## Browser configuration
 
@@ -200,4 +214,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14 calculates team capacities; PR15 persists random teams; and PR16 configures temporary DTs. The player draft, settlement calculations, Realtime subscriptions, and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset, database tests, lint/advisors, and type-generation workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14 calculates team capacities; PR15 persists random teams; PR16 configures temporary DTs; and PR17 implements the synchronized player draft. Settlement calculations and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset, database tests, lint/advisors, and type-generation workflow.
