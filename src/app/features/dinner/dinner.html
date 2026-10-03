@@ -1,1 +1,181 @@
-<app-current-attendance-page activity="dinner" />
+<app-page-container>
+  <div class="dinner-page">
+    @if (loading()) {
+      <header class="dinner-page__heading">
+        <span class="dinner-page__icon" aria-hidden="true">🥩</span>
+        <div>
+          <h1 class="ds-page-title">Cena</h1>
+          <p class="ds-body" role="status">Preparando la planificación…</p>
+        </div>
+      </header>
+    } @else if (errorMessage() && !view()) {
+      <h1 class="ds-page-title">Cena</h1>
+      <app-card
+        ><div class="dinner-page__feedback" role="alert">
+          <p>{{ errorMessage() }}</p>
+          <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+        </div></app-card
+      >
+    } @else if (currentEvent(); as event) {
+      @if (view(); as planningView) {
+        <header class="dinner-page__heading">
+          <span class="dinner-page__icon" aria-hidden="true">🥩</span>
+          <div>
+            <p class="dinner-page__eyebrow">Cena</p>
+            <h1 class="ds-page-title">{{ eventDateLabel(event.startsAt) }}</h1>
+            <p class="dinner-page__confirmed">
+              {{ planningView.confirmedDinerCount }}
+              {{ planningView.confirmedDinerCount === 1 ? 'confirmado' : 'confirmados' }}
+            </p>
+          </div>
+        </header>
+        @if (feedback(); as message) {
+          <p class="dinner-page__success" role="status">{{ message }}</p>
+        }
+        @if (errorMessage(); as error) {
+          <p class="dinner-page__error" role="alert">{{ error }}</p>
+        }
+
+        @if (editing()) {
+          <app-card variant="elevated">
+            <form class="dinner-form" (submit)="$event.preventDefault(); save()">
+              <div class="dinner-form__field">
+                <label for="dinner-menu">Menú</label
+                ><input
+                  id="dinner-menu"
+                  type="text"
+                  maxlength="500"
+                  placeholder="Ej. Asado"
+                  [value]="draft().menu"
+                  (input)="updateMenu($any($event.target).value)"
+                />
+              </div>
+              <fieldset class="dinner-form__purchases">
+                <legend>Compras previstas</legend>
+                @for (item of draft().plannedPurchases; track purchaseTrack($index, item)) {
+                  <div class="dinner-form__purchase">
+                    <label class="ds-visually-hidden" [for]="'purchase-' + item.id"
+                      >Compra prevista {{ $index + 1 }}</label
+                    >
+                    <input
+                      [id]="'purchase-' + item.id"
+                      type="text"
+                      maxlength="120"
+                      placeholder="Ej. Carne"
+                      [value]="item.name"
+                      (input)="updatePurchase(item.id, $any($event.target).value)"
+                    />
+                    <button
+                      type="button"
+                      class="dinner-form__remove"
+                      [attr.aria-label]="'Eliminar ' + (item.name || 'compra')"
+                      (click)="removePurchase(item.id)"
+                    >
+                      ×
+                    </button>
+                  </div>
+                }
+                <app-button type="button" variant="ghost" (click)="addPurchase()"
+                  >+ Agregar compra</app-button
+                >
+              </fieldset>
+              <div class="dinner-form__field">
+                <label for="purchase-owner">Encargado de compra</label>
+                <select
+                  id="purchase-owner"
+                  [value]="draft().purchaseOwnerGroupMemberId ?? ''"
+                  (change)="updateOwner($any($event.target).value)"
+                >
+                  <option value="">Sin asignar</option>
+                  @for (member of eligibleOwners(); track member.id) {
+                    <option [value]="member.id">{{ member.displayName }}</option>
+                  }
+                </select>
+              </div>
+              <p class="dinner-form__note">
+                Esto organiza la compra. No registra gastos, pagos ni deudas.
+              </p>
+              <div class="dinner-form__actions">
+                <app-button
+                  type="button"
+                  variant="secondary"
+                  [disabled]="saving()"
+                  (click)="cancelEditing()"
+                  >Cancelar</app-button
+                ><app-button type="submit" [disabled]="saving()">{{
+                  saving() ? 'Guardando…' : 'Guardar'
+                }}</app-button>
+              </div>
+            </form>
+          </app-card>
+        } @else {
+          <section class="dinner-plan" aria-label="Planificación de la cena">
+            <app-card variant="elevated"
+              ><section class="dinner-plan__section" aria-labelledby="dinner-menu-title">
+                <p class="dinner-plan__label">Menú</p>
+                <h2 id="dinner-menu-title" class="dinner-plan__menu">
+                  {{ planningView.plan?.menu || 'Menú por definir' }}
+                </h2>
+              </section></app-card
+            >
+            <app-card
+              ><section class="dinner-plan__section" aria-labelledby="planned-purchases-title">
+                <h2 id="planned-purchases-title" class="ds-section-title">Compras previstas</h2>
+                @if (planningView.plan?.plannedPurchases?.length) {
+                  <ul class="dinner-plan__list">
+                    @for (item of planningView.plan.plannedPurchases; track item.id) {
+                      <li><span aria-hidden="true">✓</span> {{ item.name }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <p class="dinner-plan__empty">Todavía no hay compras previstas.</p>
+                }
+              </section></app-card
+            >
+            <app-card
+              ><section class="dinner-plan__section" aria-labelledby="purchase-owner-title">
+                <p class="dinner-plan__label">Encargado de compra</p>
+                <h2 id="purchase-owner-title" class="ds-section-title">
+                  @if (planningView.plan?.purchaseOwner; as owner) {
+                    <span class="dinner-plan__owner"
+                      ><app-avatar [name]="owner.displayName" [src]="owner.avatarUrl" /><span
+                        >{{ owner.displayName }}
+                        @if (!owner.active) {
+                          <small>Miembro inactivo</small>
+                        }
+                      </span></span
+                    >
+                  } @else {
+                    Sin asignar
+                  }
+                </h2>
+              </section></app-card
+            >
+          </section>
+          @if (planningView.canEdit) {
+            <app-button size="large" [fullWidth]="true" (click)="startEditing()">{{
+              planningView.plan ? 'Editar planificación' : 'Crear planificación'
+            }}</app-button>
+          } @else if (event.status === 'SETTLEMENT' || event.status === 'CLOSED') {
+            <p class="dinner-page__readonly" role="status">
+              La planificación es histórica y ya no puede modificarse.
+            </p>
+          }
+        }
+        <app-attendance-manager
+          activity="dinner"
+          mode="dinner"
+          [eventId]="event.id"
+          [eventStatus]="event.status"
+        />
+      }
+    } @else {
+      <h1 class="ds-page-title">Cena</h1>
+      <app-card
+        ><app-empty-state
+          title="Todavía no hay un miércoles programado."
+          description="La planificación de la cena aparecerá cuando exista un evento."
+      /></app-card>
+    }
+  </div>
+</app-page-container>

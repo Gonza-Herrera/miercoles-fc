@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, and final Team Lineup UI. Dinner, settlement and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, final Team Lineup UI, and Dinner Planning. Actual dinner attendance, expenses, settlement and payment workflows remain on the roadmap.
 
 ## Current status
 
-**PR18 — Team Lineup UI**
+**PR19 — Dinner Planning**
 
-PR01–PR17 established the secure application, weekly-event flow, actual attendance, deterministic capacities, random teams, temporary DT assignments and synchronized draft. PR18 adds the original mobile pitch, dynamic Team navigation and safe atomic swaps.
+PR01–PR18 established the secure application, weekly-event flow, football-team tooling and final lineup. PR19 adds an event-owned menu, planned purchases, purchase responsibility, ADMIN editing and Dashboard integration without creating expenses, payments or debt. PR20 — Dinner Attendance & Expenses is next.
 
 ## Tech stack
 
@@ -54,26 +54,26 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 
 ## Application routes
 
-| Route                    | Purpose                                           |
-| ------------------------ | ------------------------------------------------- |
-| `/auth`                  | Passwordless sign-in                              |
-| `/auth/callback`         | Magic Link and OAuth callback                     |
-| `/invite/:token`         | Public invitation preview and explicit acceptance |
-| `/`                      | Current-event dashboard for the selected group    |
-| `/match`                 | Football attendance for the current event         |
-| `/dinner`                | Dinner attendance for the current event           |
-| `/payments`              | Protected Payments placeholder                    |
-| `/invitations`           | Minimal protected ADMIN invitation surface        |
-| `/groups`                | Protected group selection and administration      |
-| `/groups/new`            | Atomic group creation                             |
-| `/groups/:id`            | Group detail, members, lifecycle and invitations  |
-| `/groups/:id/events`     | Event list and history for one group              |
-| `/groups/:id/events/new` | ADMIN event creation                              |
-| `/events/:id`            | Stable event detail and lifecycle actions         |
-| `/events/:id/edit`       | Lifecycle-aware ADMIN editing                     |
-| `/events/:id/draft`      | Synchronized Managers-mode player draft           |
-| `/events/:id/lineup`     | Final mobile football-pitch Team view             |
-| `/design-system`         | Development showcase outside primary navigation   |
+| Route                    | Purpose                                            |
+| ------------------------ | -------------------------------------------------- |
+| `/auth`                  | Passwordless sign-in                               |
+| `/auth/callback`         | Magic Link and OAuth callback                      |
+| `/invite/:token`         | Public invitation preview and explicit acceptance  |
+| `/`                      | Current-event dashboard for the selected group     |
+| `/match`                 | Football attendance for the current event          |
+| `/dinner`                | Dinner confirmation and planning for current event |
+| `/payments`              | Protected Payments placeholder                     |
+| `/invitations`           | Minimal protected ADMIN invitation surface         |
+| `/groups`                | Protected group selection and administration       |
+| `/groups/new`            | Atomic group creation                              |
+| `/groups/:id`            | Group detail, members, lifecycle and invitations   |
+| `/groups/:id/events`     | Event list and history for one group               |
+| `/groups/:id/events/new` | ADMIN event creation                               |
+| `/events/:id`            | Stable event detail and lifecycle actions          |
+| `/events/:id/edit`       | Lifecycle-aware ADMIN editing                      |
+| `/events/:id/draft`      | Synchronized Managers-mode player draft            |
+| `/events/:id/lineup`     | Final mobile football-pitch Team view              |
+| `/design-system`         | Development showcase outside primary navigation    |
 
 Unknown routes redirect safely to `/`. All feature pages remain lazy loaded.
 

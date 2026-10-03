@@ -63,42 +63,77 @@ export type Database = {
           },
         ];
       };
-      event_managers: {
+      dinner_planned_purchases: {
+        Row: {
+          created_at: string;
+          dinner_plan_id: string;
+          id: string;
+          name: string;
+          sort_order: number;
+        };
+        Insert: {
+          created_at?: string;
+          dinner_plan_id: string;
+          id?: string;
+          name: string;
+          sort_order: number;
+        };
+        Update: {
+          created_at?: string;
+          dinner_plan_id?: string;
+          id?: string;
+          name?: string;
+          sort_order?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'dinner_planned_purchases_dinner_plan_id_fkey';
+            columns: ['dinner_plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'dinner_plans';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      dinner_plans: {
         Row: {
           created_at: string;
           event_id: string;
-          group_member_id: string;
           id: string;
-          team_id: string;
+          menu: string | null;
+          purchase_owner_group_member_id: string | null;
+          updated_at: string;
         };
         Insert: {
           created_at?: string;
           event_id: string;
-          group_member_id: string;
           id?: string;
-          team_id: string;
+          menu?: string | null;
+          purchase_owner_group_member_id?: string | null;
+          updated_at?: string;
         };
         Update: {
           created_at?: string;
           event_id?: string;
-          group_member_id?: string;
           id?: string;
-          team_id?: string;
+          menu?: string | null;
+          purchase_owner_group_member_id?: string | null;
+          updated_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'event_managers_group_member_id_fkey';
-            columns: ['group_member_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
+            foreignKeyName: 'dinner_plans_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'events';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'event_managers_team_event_fk';
-            columns: ['team_id', 'event_id'];
+            foreignKeyName: 'dinner_plans_purchase_owner_group_member_id_fkey';
+            columns: ['purchase_owner_group_member_id'];
             isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id', 'event_id'];
+            referencedRelation: 'group_members';
+            referencedColumns: ['id'];
           },
         ];
       };
@@ -150,6 +185,45 @@ export type Database = {
             isOneToOne: true;
             referencedRelation: 'events';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      event_managers: {
+        Row: {
+          created_at: string;
+          event_id: string;
+          group_member_id: string;
+          id: string;
+          team_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          event_id: string;
+          group_member_id: string;
+          id?: string;
+          team_id: string;
+        };
+        Update: {
+          created_at?: string;
+          event_id?: string;
+          group_member_id?: string;
+          id?: string;
+          team_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'event_managers_group_member_id_fkey';
+            columns: ['group_member_id'];
+            isOneToOne: false;
+            referencedRelation: 'group_members';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'event_managers_team_event_fk';
+            columns: ['team_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id', 'event_id'];
           },
         ];
       };
@@ -667,6 +741,10 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      configure_event_team_managers: {
+        Args: { p_assignments: Json; p_event_id: string };
+        Returns: undefined;
+      };
       create_event: {
         Args: {
           p_court_price_minor: number;
@@ -735,6 +813,56 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      get_dinner_planning: { Args: { p_event_id: string }; Returns: Json };
+      get_event_attendance: {
+        Args: { p_event_id: string };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          avatar_path: string;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          display_name: string;
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string;
+          is_current_user: boolean;
+          is_guest: boolean;
+          membership_active: boolean;
+          participant_id: string;
+        }[];
+      };
+      get_event_player_draft: { Args: { p_event_id: string }; Returns: Json };
+      get_event_team_lineup: { Args: { p_event_id: string }; Returns: Json };
+      get_event_team_manager_configuration: {
+        Args: { p_event_id: string };
+        Returns: {
+          event_status: Database['public']['Enums']['event_status'];
+          formation_mode: Database['public']['Enums']['team_formation_mode'];
+          manager_avatar_path: string;
+          manager_display_name: string;
+          manager_group_member_id: string;
+          manager_nickname: string;
+          team_id: string;
+          team_name: string;
+          team_position: number;
+        }[];
+      };
+      get_event_teams: {
+        Args: { p_event_id: string };
+        Returns: {
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          avatar_path: string;
+          display_name: string;
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string;
+          is_guest: boolean;
+          participant_id: string;
+          position: number;
+          team_id: string;
+          team_name: string;
+        }[];
+      };
       get_group_invitation_preview: {
         Args: { p_raw_token: string };
         Returns: {
@@ -743,81 +871,6 @@ export type Database = {
           member_display_name: string;
           status: string;
         }[];
-      };
-      get_event_attendance: {
-        Args: { p_event_id: string };
-        Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          avatar_path: string | null;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          display_name: string;
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string | null;
-          is_current_user: boolean;
-          is_guest: boolean;
-          membership_active: boolean;
-          participant_id: string | null;
-        }[];
-      };
-      get_event_player_draft: {
-        Args: { p_event_id: string };
-        Returns: Json;
-      };
-      get_event_team_lineup: {
-        Args: { p_event_id: string };
-        Returns: Json;
-      };
-      get_event_teams: {
-        Args: { p_event_id: string };
-        Returns: {
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          avatar_path: string | null;
-          display_name: string;
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string | null;
-          is_guest: boolean;
-          participant_id: string;
-          position: number;
-          team_id: string;
-          team_name: string;
-        }[];
-      };
-      record_match_attendance: {
-        Args: {
-          p_attendances: Json;
-          p_event_id: string;
-        };
-        Returns: undefined;
-      };
-      save_event_teams: {
-        Args: {
-          p_event_id: string;
-          p_teams: Json;
-        };
-        Returns: undefined;
-      };
-      select_draft_player: {
-        Args: {
-          p_event_id: string;
-          p_event_participant_id: string;
-          p_expected_version: number;
-        };
-        Returns: undefined;
-      };
-      start_event_player_draft: {
-        Args: { p_event_id: string };
-        Returns: undefined;
-      };
-      swap_event_team_players: {
-        Args: {
-          p_event_id: string;
-          p_first_participant_id: string;
-          p_second_participant_id: string;
-        };
-        Returns: undefined;
       };
       list_invitable_group_members: {
         Args: never;
@@ -849,9 +902,43 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      record_match_attendance: {
+        Args: { p_attendances: Json; p_event_id: string };
+        Returns: undefined;
+      };
       revoke_group_invitation: {
         Args: { p_group_member_id: string };
         Returns: boolean;
+      };
+      save_dinner_plan: {
+        Args: {
+          p_event_id: string;
+          p_expected_updated_at?: string;
+          p_menu: string;
+          p_planned_purchases: Json;
+          p_purchase_owner_group_member_id: string;
+        };
+        Returns: Json;
+      };
+      save_event_teams: {
+        Args: { p_event_id: string; p_teams: Json };
+        Returns: undefined;
+      };
+      select_draft_player: {
+        Args: {
+          p_event_id: string;
+          p_event_participant_id: string;
+          p_expected_version: number;
+        };
+        Returns: undefined;
+      };
+      set_event_team_formation_mode: {
+        Args: {
+          p_event_id: string;
+          p_mode: Database['public']['Enums']['team_formation_mode'];
+          p_team_count?: number;
+        };
+        Returns: undefined;
       };
       set_group_avatar: {
         Args: { p_avatar_path: string; p_group_id: string };
@@ -860,6 +947,70 @@ export type Database = {
       set_group_member_avatar: {
         Args: { p_avatar_path: string; p_group_member_id: string };
         Returns: string;
+      };
+      set_my_dinner_confirmation: {
+        Args: {
+          p_event_id: string;
+          p_response: Database['public']['Enums']['attendance_response'];
+        };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string | null;
+          guest_display_name: string | null;
+          id: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'event_participants';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      set_my_football_confirmation: {
+        Args: {
+          p_event_id: string;
+          p_response: Database['public']['Enums']['attendance_response'];
+        };
+        Returns: {
+          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
+          actual_football: Database['public']['Enums']['actual_attendance_status'];
+          cancelled_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          dinner_response: Database['public']['Enums']['attendance_response'];
+          event_id: string;
+          football_response: Database['public']['Enums']['attendance_response'];
+          group_member_id: string | null;
+          guest_display_name: string | null;
+          id: string;
+          updated_at: string;
+        };
+        SetofOptions: {
+          from: '*';
+          to: 'event_participants';
+          isOneToOne: true;
+          isSetofReturn: false;
+        };
+      };
+      start_event_player_draft: {
+        Args: { p_event_id: string };
+        Returns: undefined;
+      };
+      swap_event_team_players: {
+        Args: {
+          p_event_id: string;
+          p_first_participant_id: string;
+          p_second_participant_id: string;
+        };
+        Returns: undefined;
       };
       transition_event_status: {
         Args: {
@@ -883,32 +1034,6 @@ export type Database = {
         SetofOptions: {
           from: '*';
           to: 'events';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
-      set_my_dinner_confirmation: {
-        Args: {
-          p_event_id: string;
-          p_response: Database['public']['Enums']['attendance_response'];
-        };
-        Returns: Database['public']['Tables']['event_participants']['Row'];
-        SetofOptions: {
-          from: '*';
-          to: 'event_participants';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
-      set_my_football_confirmation: {
-        Args: {
-          p_event_id: string;
-          p_response: Database['public']['Enums']['attendance_response'];
-        };
-        Returns: Database['public']['Tables']['event_participants']['Row'];
-        SetofOptions: {
-          from: '*';
-          to: 'event_participants';
           isOneToOne: true;
           isSetofReturn: false;
         };

@@ -2,6 +2,8 @@
 
 PR11 responde qué planea hacer cada persona este miércoles. Fútbol y cena son decisiones independientes y no representan asistencia real ni generan deuda.
 
+PR19 reutiliza `dinner_response = YES` únicamente para mostrar el conteo planificado. Editar menú, compras previstas o encargado no modifica respuestas; los invitados activos que confirmaron cena cuentan igual que los miembros persistentes.
+
 ## Estados y creación diferida
 
 `football_response` y `dinner_response` usan `attendance_response`: `UNKNOWN`, `YES` o `NO`. `UNKNOWN` significa que la persona todavía no respondió; nunca se interpreta como “No”. Los miembros activos aparecen en la lectura aunque todavía no exista un `event_participants`, y su estado proyectado es `UNKNOWN`.
@@ -39,3 +41,5 @@ Los invitados no necesitan Auth ni `group_members`. Sus respuestas siguen bajo l
 `AttendanceManager` se reutiliza con modo `football`, `dinner` o `both`. `/match` muestra la experiencia de fútbol, `/dinner` la de cena y `/events/:id` ambas. Los botones tienen áreas táctiles amplias, `aria-pressed`, foco visible y estados deshabilitados. La lista distingue `Sin responder`, `Sí` y `No`, identifica invitados y muestra conteos básicos de respuestas `YES`.
 
 PR12 reutiliza `get_event_attendance` en Home para derivar conteos independientes. Su lectura de resumen omite solicitudes de avatar porque no presenta identidades. No se implementan asistencia real, equipos, liquidación, pagos, Realtime ni cola offline. El estimado visual de cancha no modifica `actual_football`, `actual_dinner` ni ninguna fila financiera.
+
+# Asistencia

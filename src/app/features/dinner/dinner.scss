@@ -1,0 +1,132 @@
+:host,
+.dinner-page,
+.dinner-plan,
+.dinner-page__feedback,
+.dinner-form,
+.dinner-form__purchases {
+  display: grid;
+  gap: var(--space-5);
+}
+.dinner-page__heading,
+.dinner-plan__owner,
+.dinner-form__actions,
+.dinner-form__purchase {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.dinner-page__icon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: none;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-coral-50);
+  font-size: var(--font-size-2xl);
+}
+.dinner-page__eyebrow,
+.dinner-plan__label {
+  margin: 0 0 var(--space-1);
+  color: var(--color-social);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+.dinner-page__confirmed,
+.dinner-plan__empty,
+.dinner-form__note,
+.dinner-page__readonly {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-secondary);
+}
+.dinner-plan__section {
+  display: grid;
+  gap: var(--space-3);
+}
+.dinner-plan__menu {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+}
+.dinner-plan__list {
+  display: grid;
+  padding: 0;
+  margin: 0;
+  gap: var(--space-3);
+  list-style: none;
+}
+.dinner-plan__list li {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+.dinner-plan__owner small {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+}
+.dinner-form__field {
+  display: grid;
+  gap: var(--space-2);
+}
+.dinner-form label,
+.dinner-form legend {
+  font-weight: var(--font-weight-semibold);
+}
+.dinner-form input,
+.dinner-form select {
+  min-height: var(--touch-target-min);
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+.dinner-form input:focus-visible,
+.dinner-form select:focus-visible,
+.dinner-form__remove:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.dinner-form__purchases {
+  padding: 0;
+  border: 0;
+}
+.dinner-form__purchase input {
+  min-width: 0;
+}
+.dinner-form__remove {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  flex: none;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+}
+.dinner-form__actions {
+  justify-content: flex-end;
+}
+.dinner-page__success,
+.dinner-page__error,
+.dinner-page__readonly {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+.dinner-page__success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.dinner-page__error {
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+.dinner-page__readonly {
+  background: var(--color-surface-subtle);
+}
