@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
 import { AttendanceService } from '../attendance/attendance.service';
+import { DinnerPlanningService } from '../dinner/dinner-planning.service';
 import { EventStatus, WeeklyEvent } from '../events/event.models';
 import { EventService } from '../events/event.service';
 import { GroupMemberRole } from '../groups/group.models';
@@ -13,6 +14,7 @@ describe('Home', () => {
   const attendance = vi.fn();
   const current = vi.fn();
   const getGroup = vi.fn();
+  const getDinnerPlanning = vi.fn();
   const listGroups = vi.fn();
 
   beforeEach(() => {
@@ -25,6 +27,7 @@ describe('Home', () => {
         attendee('Martín', 'YES', 'YES', true),
       ]);
     current.mockReset().mockResolvedValue(event('OPEN'));
+    getDinnerPlanning.mockReset().mockResolvedValue({ plan: null });
     getGroup.mockReset().mockResolvedValue(group('ADMIN'));
     listGroups
       .mockReset()
@@ -34,6 +37,7 @@ describe('Home', () => {
       providers: [
         provideRouter([]),
         { provide: AttendanceService, useValue: { listForDashboard: attendance } },
+        { provide: DinnerPlanningService, useValue: { get: getDinnerPlanning } },
         { provide: EventService, useValue: { current } },
         { provide: GroupService, useValue: { get: getGroup, list: listGroups } },
       ],
@@ -57,8 +61,16 @@ describe('Home', () => {
     expect(text).toContain('Estimado por jugador');
     expect(links).toContain('/match');
     expect(links).toContain('/dinner');
-    expect(text).toContain('Por definir');
+    expect(text).toContain('Menú por definir');
     expect(text).not.toContain('Asado');
+  });
+
+  it('renders the persisted PR19 menu without changing the PR11 count', async () => {
+    getDinnerPlanning.mockResolvedValue({ plan: { menu: 'Asado' } });
+    const fixture = await createFixture();
+
+    expect(fixture.nativeElement.textContent).toContain('Asado');
+    expect(fixture.nativeElement.textContent).toContain('3 confirmados');
   });
 
   it('shows the safe zero-confirmation estimate state', async () => {

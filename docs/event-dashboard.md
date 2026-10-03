@@ -10,9 +10,10 @@ El dashboard combina:
 
 - el `WeeklyEvent` protegido por las políticas RLS existentes;
 - una lectura de `get_event_attendance` de PR11;
+- una lectura de `get_dinner_planning` de PR19 para el menú;
 - conteos y estimado derivados con funciones puras en Angular.
 
-No hay una RPC, vista ni migración nueva. La lectura de asistencia ya valida que el usuario sea miembro activo del grupo y entrega miembros e invitados en una sola consulta. Home usa una variante que omite la generación de URLs firmadas de avatar porque el resumen no muestra identidades, evitando solicitudes Storage innecesarias.
+Los conteos siguen proviniendo de asistencia y no del plan. `get_dinner_planning` agrega únicamente el menú real persistido de PR19; ambos RPC validan acceso al evento. Home omite URLs firmadas de asistencia porque el resumen no muestra identidades.
 
 ## Conteos
 
@@ -40,7 +41,7 @@ El valor se etiqueta visiblemente como “Estimado por jugador” y aclara que p
 
 ## Cena y navegación
 
-El esquema actual no contiene un menú legítimo. La tarjeta muestra “Menú: Por definir” y no inventa “Asado”; PR19 será responsable de edición y planificación de cena. “Ver partido” y “Ver cena” navegan con Angular Router a `/match` y `/dinner`, donde se reutiliza PR11.
+La tarjeta muestra el menú persistido por PR19 o “Menú por definir”; nunca inventa “Asado”. El conteo continúa derivado de `dinner_response = YES`, incluyendo invitados. “Ver cena” navega a `/dinner`, donde la confirmación PR11 y la planificación PR19 permanecen visual y conceptualmente separadas. No se muestran gastos, deuda ni costo por persona.
 
 ## Actualización, errores y PWA
 

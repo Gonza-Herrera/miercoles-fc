@@ -28,6 +28,9 @@ erDiagram
   EVENTS ||--o{ EVENT_MANAGERS : appoints
   TEAMS ||--o| EVENT_MANAGERS : managed-by
   GROUP_MEMBERS ||--o{ EVENT_MANAGERS : serves-as
+  EVENTS ||--o| DINNER_PLANS : plans
+  DINNER_PLANS ||--o{ DINNER_PLANNED_PURCHASES : lists
+  GROUP_MEMBERS o|--o{ DINNER_PLANS : organizes
   EVENTS ||--o{ DINNER_EXPENSES : incurs
   EVENTS ||--o{ PAYMENTS : settles
   EVENT_PARTICIPANTS ||--o{ PAYMENTS : owes
@@ -108,6 +111,8 @@ The private `group-assets` Storage bucket limits objects to JPEG, PNG or WebP an
 
 ## Money and payments
 
+PR19 planning is deliberately outside this financial model. `dinner_plans` stores at most one menu and optional purchase owner per event; `dinner_planned_purchases` stores ordered, stable, non-financial items. Neither table has amounts, payers, debt or payment state, and `save_dinner_plan` never writes `dinner_expenses` or `payments`.
+
 Money uses signed PostgreSQL `bigint` minor units, never floating point. For ARS, `5000000` represents ARS 50,000.00. Each event carries a three-letter `currency_code` (default `ARS`), and all of its court price, expenses, and payments use that currency.
 
 Dinner total is derived from `sum(dinner_expenses.amount_minor)` and is not duplicated. The nullable dinner payer currently references only a group member; recording a guest as the direct purchaser is intentionally deferred until there is a concrete product requirement.
@@ -143,6 +148,7 @@ Unique constraints provide indexes for most invariants and common event lookups.
 - `event_participants(group_member_id)`, guest creator, active event participants, and `event_managers(group_member_id)`;
 - `team_members(team_id)` and `team_members(event_participant_id)`;
 - `dinner_expenses(event_id)` and its optional payer;
+- the unique `dinner_plans(event_id)` relation, optional owner, and ordered planned purchases;
 - `payments(event_participant_id)`.
 
 Composite indexes follow the exact column order of the foreign keys that connect invitations, managers, payments, and team assignments to their parent records. This keeps referential checks and parent updates efficient and satisfies the hosted Supabase database advisor.
@@ -176,6 +182,8 @@ PR18 reuses those read policies and direct-write revocations. Active linked memb
 may obtain the focused lineup snapshot; only an active group ADMIN in `OPEN` or
 `IN_PROGRESS` may invoke the swap successfully. See
 [Team Lineup UI documentation](team-lineup-ui.md).
+
+PR19 grants active group members read access to the event-owned dinner plan and its planned purchases. Browser writes remain revoked. An active ADMIN may save the complete plan only through `save_dinner_plan`, which validates lifecycle, same-group active owner, text limits and optimistic `updated_at` before committing atomically. See [Dinner Planning documentation](dinner-planning.md).
 
 ## Browser configuration
 

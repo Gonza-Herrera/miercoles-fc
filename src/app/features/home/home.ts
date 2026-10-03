@@ -12,6 +12,7 @@ import { PageContainer } from '../../shared/layout';
 import { Button, Card, EmptyState } from '../../shared/ui';
 import { AttendanceRecord } from '../attendance/attendance.models';
 import { AttendanceService } from '../attendance/attendance.service';
+import { DinnerPlanningService } from '../dinner/dinner-planning.service';
 import { EventContextService } from '../events/event-context.service';
 import { WeeklyEvent } from '../events/event.models';
 import { EventService } from '../events/event.service';
@@ -42,6 +43,7 @@ import { buildEventDashboard } from './event-dashboard.models';
 export class Home implements OnInit {
   private readonly attendance = inject(AttendanceService);
   private readonly context = inject(GroupContextService);
+  private readonly dinnerPlanning = inject(DinnerPlanningService);
   private readonly eventContext = inject(EventContextService);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
@@ -49,6 +51,7 @@ export class Home implements OnInit {
   protected readonly attendanceError = signal(false);
   protected readonly attendanceRecords = signal<readonly AttendanceRecord[]>([]);
   protected readonly currentEvent = signal<WeeklyEvent | null>(null);
+  protected readonly dinnerMenu = signal<string | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly group = signal<GroupDetail | null>(null);
   protected readonly loading = signal(true);
@@ -67,6 +70,7 @@ export class Home implements OnInit {
     this.errorMessage.set(null);
     this.attendanceError.set(false);
     this.attendanceRecords.set([]);
+    this.dinnerMenu.set(null);
     try {
       const summaries = await this.groups.list();
       const selectedId =
@@ -92,6 +96,12 @@ export class Home implements OnInit {
           this.attendanceRecords.set(await this.attendance.listForDashboard(event.id));
         } catch {
           this.attendanceError.set(true);
+        }
+        try {
+          const dinner = await this.dinnerPlanning.get(event.id);
+          this.dinnerMenu.set(dinner.plan?.menu ?? null);
+        } catch {
+          this.dinnerMenu.set(null);
         }
       } else {
         this.eventContext.clear();
