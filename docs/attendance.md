@@ -40,6 +40,10 @@ Los invitados no necesitan Auth ni `group_members`. Sus respuestas siguen bajo l
 
 `AttendanceManager` se reutiliza con modo `football`, `dinner` o `both`. `/match` muestra la experiencia de fútbol, `/dinner` la de cena y `/events/:id` ambas. Los botones tienen áreas táctiles amplias, `aria-pressed`, foco visible y estados deshabilitados. La lista distingue `Sin responder`, `Sí` y `No`, identifica invitados y muestra conteos básicos de respuestas `YES`.
 
-PR12 reutiliza `get_event_attendance` en Home para derivar conteos independientes. Su lectura de resumen omite solicitudes de avatar porque no presenta identidades. No se implementan asistencia real, equipos, liquidación, pagos, Realtime ni cola offline. El estimado visual de cancha no modifica `actual_football`, `actual_dinner` ni ninguna fila financiera.
+PR12 reutiliza `get_event_attendance` en Home para derivar conteos independientes. Su lectura de resumen omite solicitudes de avatar porque no presenta identidades. El estimado visual de cancha no modifica `actual_football`, `actual_dinner` ni ninguna fila financiera. Liquidación, pagos, Realtime y cola offline continúan fuera de este flujo.
+
+## Asistencia real de cena
+
+PR20 reutiliza `actual_dinner = UNSET | YES | NO` y nunca sobrescribe `dinner_response`. Los metadatos `events.dinner_attendance_recorded_at/by` distinguen una revisión no realizada de una revisión explícita con cero comensales. Todos los miembros activos y los invitados activos son candidatos, sin importar si confirmaron `YES`, `NO` o `UNKNOWN`; el guardado ADMIN es completo y transaccional. Ver [Asistencia y gastos reales de cena](dinner-attendance-expenses.md).
 
 # Asistencia

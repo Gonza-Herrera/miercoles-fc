@@ -113,6 +113,10 @@ The private `group-assets` Storage bucket limits objects to JPEG, PNG or WebP an
 
 PR19 planning is deliberately outside this financial model. `dinner_plans` stores at most one menu and optional purchase owner per event; `dinner_planned_purchases` stores ordered, stable, non-financial items. Neither table has amounts, payers, debt or payment state, and `save_dinner_plan` never writes `dinner_expenses` or `payments`.
 
+PR20 keeps actual dinner truth on the shared event model. `event_participants.actual_dinner` remains `UNSET | YES | NO`, while paired event metadata records whether an ADMIN completed a review even when the result is zero diners. `record_dinner_attendance` validates the complete active member/guest candidate set, rejects foreign or omitted identities atomically, and uses the recorded timestamp for optimistic concurrency.
+
+Actual costs reuse `dinner_expenses`; descriptions are trimmed and limited to 120 characters, amounts are positive exact minor-unit `bigint` values bounded to JavaScript's safe integer range, and the total remains a derived `sum`. Focused create/update/delete RPCs require ADMIN and lock event before expense. Updates and deletes compare `updated_at`, reject cross-event IDs, and never write `payments`. The optional payer remains null in PR20 because purchase ownership is not proof of payment.
+
 Money uses signed PostgreSQL `bigint` minor units, never floating point. For ARS, `5000000` represents ARS 50,000.00. Each event carries a three-letter `currency_code` (default `ARS`), and all of its court price, expenses, and payments use that currency.
 
 Dinner total is derived from `sum(dinner_expenses.amount_minor)` and is not duplicated. The nullable dinner payer currently references only a group member; recording a guest as the direct purchaser is intentionally deferred until there is a concrete product requirement.
@@ -185,6 +189,8 @@ may obtain the focused lineup snapshot; only an active group ADMIN in `OPEN` or
 
 PR19 grants active group members read access to the event-owned dinner plan and its planned purchases. Browser writes remain revoked. An active ADMIN may save the complete plan only through `save_dinner_plan`, which validates lifecycle, same-group active owner, text limits and optimistic `updated_at` before committing atomically. See [Dinner Planning documentation](dinner-planning.md).
 
+PR20 grants the same group members focused read access through `get_dinner_reality`. Only an active ADMIN may invoke attendance or expense mutations, and only in `IN_PROGRESS` or `SETTLEMENT`; `DRAFT`/`OPEN` are pre-reality and `CLOSED` is immutable. Direct browser writes remain revoked. See [Dinner Attendance & Expenses documentation](dinner-attendance-expenses.md).
+
 ## Browser configuration
 
 Copy the example file and replace only the public values:
@@ -235,4 +241,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14 calculates team capacities; PR15 persists random teams; PR16 configures temporary DTs; and PR17 implements the synchronized player draft. Settlement calculations and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset, database tests, lint/advisors, and type-generation workflow.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14–PR18 deliver team formation through final lineup; and PR19–PR20 complete dinner planning and reality. Settlement calculations, payments and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset and local database tests.

@@ -6,7 +6,7 @@ PR19 responde qué se planea comer, qué se prevé comprar y quién organiza la 
 
 - `event_participants.dinner_response` (PR11) expresa quién confirmó que planea cenar. El conteo incluye miembros e invitados activos con `YES`.
 - `dinner_plans` y `dinner_planned_purchases` (PR19) guardan organización previa.
-- `actual_dinner` y `dinner_expenses` pertenecen a PR20.
+- `actual_dinner`, los metadatos de revisión y `dinner_expenses` pertenecen a PR20.
 - pagos, deuda y liquidación pertenecen a PR22 y flujos posteriores.
 
 Guardar un plan no crea ni modifica `dinner_expenses`, `payments`, asistencia real o deuda. Una compra prevista puede no realizarse y un gasto real futuro puede no haber sido previsto.
@@ -32,6 +32,8 @@ Miembros activos pueden leer planes de eventos de su grupo. Sólo un ADMIN activ
 
 La pantalla `/dinner` conserva la confirmación independiente de PR11 y añade la planificación mobile-first. Home combina el conteo de PR11 con el menú de PR19 sin mezclar sus fuentes. No hay Realtime ni cola offline de mutaciones; un guardado sólo se considera exitoso después de la confirmación del backend.
 
-## Frontera futura
+## Transición a realidad
 
-PR20 podrá usar compras previstas como sugerencias, pero deberá registrar asistencia y gastos reales por separado. Nunca debe convertirlas automáticamente. PR22 calculará liquidaciones exclusivamente desde asistencia y gastos reales.
+PR20 mantiene esta planificación visible como contexto y agrega debajo una sección “Realidad”. Las confirmaciones pueden sugerir la selección local inicial, pero el ADMIN revisa y guarda asistencia real explícitamente. Las compras previstas nunca se convierten automáticamente: gastos no previstos son válidos y compras que no ocurrieron no generan gastos. Ver [Asistencia y gastos reales de cena](dinner-attendance-expenses.md).
+
+PR22 calculará liquidaciones exclusivamente desde asistencia y gastos reales; ni PR19 ni PR20 muestran importes por persona.
