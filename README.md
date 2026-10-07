@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, final Team Lineup UI, Dinner Planning, and actual dinner attendance and expenses. Settlement and payment workflows remain on the roadmap.
+This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, final Team Lineup UI, the complete Dinner reality milestone, and Match Settlement. Dinner settlement and payment tracking remain on the roadmap.
 
 ## Current status
 
-**PR20 — Dinner Attendance & Expenses**
+**PR21 — Match Settlement**
 
-PR01–PR19 established the secure application, weekly-event flow, football-team tooling and dinner planning. PR20 records actual diners and exact actual expenses with ADMIN-only atomic attendance and focused expense CRUD, without calculating per-person debt or creating payments. Milestone 5 — Cena is complete; PR21 — Match Settlement is next.
+PR21 creates exact, immutable court obligations from the Event price and PR13 actual players. It supports guests, deterministic remainder allocation, ADMIN-only idempotent finalization and member reads without creating or updating Payments. PR22 — Dinner Settlement is next.
 
 ## Tech stack
 
@@ -62,7 +62,7 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | `/`                      | Current-event dashboard for the selected group    |
 | `/match`                 | Football attendance for the current event         |
 | `/dinner`                | Dinner confirmation, planning and reality         |
-| `/payments`              | Protected Payments placeholder                    |
+| `/payments`              | Match Settlement preview and final obligations    |
 | `/invitations`           | Minimal protected ADMIN invitation surface        |
 | `/groups`                | Protected group selection and administration      |
 | `/groups/new`            | Atomic group creation                             |
@@ -155,6 +155,8 @@ Team Lineup UI renders persisted Random or Managers rosters on an original respo
 
 Dinner Planning preserves menu, planned purchases and purchase responsibility as non-financial context. Dinner Reality independently records actual diners and actual expense CRUD in exact minor units; it creates no debts, payments or per-person calculation. See [Dinner Planning](docs/dinner-planning.md) and [Dinner Attendance & Expenses](docs/dinner-attendance-expenses.md).
 
+Match Settlement divides the event-specific court price only among actual PR13 players, snapshots one exact obligation per EventParticipant and remains separate from payment state. See [Match Settlement](docs/match-settlement.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -177,6 +179,7 @@ Dinner Planning preserves menu, planned purchases and purchase responsibility as
 - Completed: **PR18 — Team Lineup UI**
 - Completed: **PR19 — Dinner Planning**
 - Completed: **PR20 — Dinner Attendance & Expenses**
-- Next: **PR21 — Match Settlement**
+- Completed: **PR21 — Match Settlement**
+- Next: **PR22 — Dinner Settlement**
 
-PR20 completes Milestone 5 — Cena. PR21 begins Milestone 6 — Liquidación y pagos; PR22 will consume PR20's actual diner and expense sources to calculate dinner settlement.
+PR21 begins Milestone 6 — Liquidación y pagos with court obligations. PR22 will consume PR20's actual diner and expense sources to calculate Dinner Settlement; PR23 will add payment tracking.

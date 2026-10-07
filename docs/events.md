@@ -10,7 +10,7 @@ Todo evento pertenece a un grupo mediante `group_id` y conserva un UUID estable 
 DRAFT → OPEN → IN_PROGRESS → SETTLEMENT → CLOSED
 ```
 
-Sólo se permite avanzar un paso. Un trigger de PostgreSQL impide saltos, retrocesos y cualquier mutación funcional después de `CLOSED`. En `DRAFT` y `OPEN` se editan fecha, hora, lugar y precio; en `IN_PROGRESS` y `SETTLEMENT`, sólo el precio; en `CLOSED`, nada.
+Sólo se permite avanzar un paso. Un trigger de PostgreSQL impide saltos, retrocesos y cualquier mutación funcional después de `CLOSED`. En `DRAFT` y `OPEN` se editan fecha, hora, lugar y precio; en `IN_PROGRESS` y `SETTLEMENT`, sólo el precio; en `CLOSED`, nada. PR21 bloquea además el precio en cuanto se finaliza la liquidación de cancha, preservando el snapshot financiero.
 
 ## Seguridad y concurrencia
 
@@ -34,4 +34,4 @@ Los estados de carga, vacío, error y permisos tienen mensajes en español. Los 
 
 ## Relaciones futuras
 
-`event_participants`, `teams`, `dinner_expenses` y `payments` ya referencian el UUID del evento en el modelo de base. PR10 no crea participantes automáticamente ni implementa asistencia, equipos, cena o liquidación; únicamente establece el contexto estable al que esos flujos se conectarán desde PR11 en adelante.
+`event_participants`, `teams`, `dinner_expenses`, liquidaciones y `payments` referencian el UUID del evento. PR21 usa el precio de esta fila como única fuente de cancha y lo copia al snapshot final; nunca utiliza un precio global.

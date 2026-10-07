@@ -1,0 +1,137 @@
+:host,
+.payments-page,
+.payments-page__feedback,
+.settlement-summary,
+.allocations {
+  display: grid;
+  gap: var(--space-5);
+}
+.payments-page__header,
+.settlement-summary__heading,
+.payments-page__error,
+.allocations__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.payments-page__header {
+  justify-content: flex-start;
+}
+.payments-page__header p,
+.payments-page__success,
+.payments-page__error,
+.payments-page__note,
+.payments-page__readonly {
+  margin: 0;
+}
+.payments-page__icon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  flex: none;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  font-size: var(--font-size-2xl);
+}
+.payments-page__eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+.settlement-summary__facts {
+  display: grid;
+  margin: 0;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, 1fr);
+}
+.settlement-summary__facts div {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+.settlement-summary__facts dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+.settlement-summary__facts dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+.settlement-summary__facts .settlement-summary__average {
+  grid-column: 1 / -1;
+  background: var(--color-primary-soft);
+  text-align: center;
+  text-transform: uppercase;
+}
+.settlement-summary__average dd {
+  color: var(--color-primary);
+  font-size: var(--font-size-3xl);
+}
+.allocations ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.allocations li {
+  display: flex;
+  min-height: var(--touch-target-min);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.allocations li small,
+.payments-page__note {
+  color: var(--color-text-secondary);
+}
+.allocations__total {
+  padding-top: var(--space-2);
+  font-size: var(--font-size-xl);
+  text-transform: uppercase;
+}
+.allocations__total strong {
+  font-size: var(--font-size-2xl);
+}
+.payments-page__success,
+.payments-page__error,
+.payments-page__readonly {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+.payments-page__success {
+  background: var(--color-success-surface);
+  color: var(--color-success);
+}
+.payments-page__error {
+  background: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+.payments-page__error button {
+  min-height: var(--touch-target-min);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+}
+.payments-page__readonly {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+@media (max-width: 390px) {
+  .settlement-summary__facts {
+    grid-template-columns: 1fr;
+  }
+  .settlement-summary__facts .settlement-summary__average {
+    grid-column: auto;
+  }
+}

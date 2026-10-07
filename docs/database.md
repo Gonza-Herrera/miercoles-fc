@@ -123,6 +123,8 @@ Dinner total is derived from `sum(dinner_expenses.amount_minor)` and is not dupl
 
 Payments reference event participants, supporting members and guests equally. `COURT` and `DINNER` are independent categories. A unique constraint permits only one row per event/participant/category. `PENDING` requires `paid_at = null`; `PAID` requires a timestamp. Partial payments are outside v1.
 
+PR21 separates court obligations from payment state. `match_settlements` snapshots one canonical court settlement per event; `match_settlement_items` references the same event's `EventParticipant` and stores one exact allocation per actual player. The authoritative RPC derives `court_price_minor` and `actual_football = YES` server-side, allocates remainders by `created_at, id`, and verifies that item count and sum match the snapshot. It inserts no `payments` rows.
+
 ## Concurrency and integrity
 
 PostgreSQL, rather than a prior client-side `SELECT`, protects:
@@ -154,6 +156,7 @@ Unique constraints provide indexes for most invariants and common event lookups.
 - `dinner_expenses(event_id)` and its optional payer;
 - the unique `dinner_plans(event_id)` relation, optional owner, and ordered planned purchases;
 - `payments(event_participant_id)`.
+- unique `match_settlements(event_id)`, settlement author, item participant and item event lookups.
 
 Composite indexes follow the exact column order of the foreign keys that connect invitations, managers, payments, and team assignments to their parent records. This keeps referential checks and parent updates efficient and satisfies the hosted Supabase database advisor.
 
@@ -190,6 +193,8 @@ may obtain the focused lineup snapshot; only an active group ADMIN in `OPEN` or
 PR19 grants active group members read access to the event-owned dinner plan and its planned purchases. Browser writes remain revoked. An active ADMIN may save the complete plan only through `save_dinner_plan`, which validates lifecycle, same-group active owner, text limits and optimistic `updated_at` before committing atomically. See [Dinner Planning documentation](dinner-planning.md).
 
 PR20 grants the same group members focused read access through `get_dinner_reality`. Only an active ADMIN may invoke attendance or expense mutations, and only in `IN_PROGRESS` or `SETTLEMENT`; `DRAFT`/`OPEN` are pre-reality and `CLOSED` is immutable. Direct browser writes remain revoked. See [Dinner Attendance & Expenses documentation](dinner-attendance-expenses.md).
+
+PR21 allows active group members to read court previews and finalized obligations. Only an active ADMIN may finalize in `SETTLEMENT` through `finalize_match_settlement`; direct settlement writes are revoked. Event locking plus a unique event constraint makes the operation concurrent-safe and idempotent. Finalization locks financially relevant price and actual-player changes. See [Match Settlement documentation](match-settlement.md).
 
 ## Browser configuration
 
@@ -241,4 +246,4 @@ Before merging a schema change, reset from scratch, run database lint/advisors, 
 
 ## Current limits
 
-PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14–PR18 deliver team formation through final lineup; and PR19–PR20 complete dinner planning and reality. Settlement calculations, payments and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset and local database tests.
+PR05 provides the schema and access foundation; PR06 adds passwordless identity; PR07 adds invitations; PR08 adds group/member administration; PR09 adds event-scoped guests; PR10–PR13 cover events and attendance; PR14–PR18 deliver team formation through final lineup; PR19–PR20 complete dinner planning and reality; and PR21 persists exact court obligations. Dinner settlement, payment tracking and remaining business UI are deferred. A Docker-compatible runtime is required to execute the local reset and local database tests.

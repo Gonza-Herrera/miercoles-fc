@@ -32,6 +32,7 @@ export type EventOperation =
   | 'NOT_FOUND'
   | 'PERMISSION'
   | 'SCHEDULE_LOCKED'
+  | 'SETTLEMENT_LOCKED'
   | 'TRANSITION'
   | 'UPDATE'
   | 'VALIDATION';
@@ -75,7 +76,10 @@ export const EVENT_TRANSITION_LABELS: Readonly<Partial<Record<EventStatus, strin
 
 type EventSummaryRow = Omit<
   EventRow,
-  'dinner_attendance_recorded_at' | 'dinner_attendance_recorded_by'
+  | 'dinner_attendance_recorded_at'
+  | 'dinner_attendance_recorded_by'
+  | 'match_attendance_recorded_at'
+  | 'match_attendance_recorded_by'
 >;
 
 export function mapEvent(row: EventSummaryRow): WeeklyEvent {

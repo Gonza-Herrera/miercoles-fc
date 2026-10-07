@@ -305,6 +305,8 @@ export type Database = {
           group_id: string;
           id: string;
           location: string;
+          match_attendance_recorded_at: string | null;
+          match_attendance_recorded_by: string | null;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
           team_formation_mode: Database['public']['Enums']['team_formation_mode'];
@@ -321,6 +323,8 @@ export type Database = {
           group_id: string;
           id?: string;
           location: string;
+          match_attendance_recorded_at?: string | null;
+          match_attendance_recorded_by?: string | null;
           starts_at: string;
           status?: Database['public']['Enums']['event_status'];
           team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
@@ -337,6 +341,8 @@ export type Database = {
           group_id?: string;
           id?: string;
           location?: string;
+          match_attendance_recorded_at?: string | null;
+          match_attendance_recorded_by?: string | null;
           starts_at?: string;
           status?: Database['public']['Enums']['event_status'];
           team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
@@ -363,6 +369,13 @@ export type Database = {
             columns: ['group_id'];
             isOneToOne: false;
             referencedRelation: 'groups';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'events_match_attendance_recorded_by_fkey';
+            columns: ['match_attendance_recorded_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
             referencedColumns: ['id'];
           },
         ];
@@ -504,6 +517,105 @@ export type Database = {
           {
             foreignKeyName: 'groups_created_by_fkey';
             columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      match_settlement_items: {
+        Row: {
+          allocation_order: number;
+          amount_minor: number;
+          created_at: string;
+          event_id: string;
+          event_participant_id: string;
+          id: string;
+          is_guest: boolean;
+          match_settlement_id: string;
+          participant_display_name: string;
+        };
+        Insert: {
+          allocation_order: number;
+          amount_minor: number;
+          created_at?: string;
+          event_id: string;
+          event_participant_id: string;
+          id?: string;
+          is_guest: boolean;
+          match_settlement_id: string;
+          participant_display_name: string;
+        };
+        Update: {
+          allocation_order?: number;
+          amount_minor?: number;
+          created_at?: string;
+          event_id?: string;
+          event_participant_id?: string;
+          id?: string;
+          is_guest?: boolean;
+          match_settlement_id?: string;
+          participant_display_name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'match_settlement_items_participant_event_fk';
+            columns: ['event_participant_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'event_participants';
+            referencedColumns: ['id', 'event_id'];
+          },
+          {
+            foreignKeyName: 'match_settlement_items_settlement_event_fk';
+            columns: ['match_settlement_id', 'event_id'];
+            isOneToOne: false;
+            referencedRelation: 'match_settlements';
+            referencedColumns: ['id', 'event_id'];
+          },
+        ];
+      };
+      match_settlements: {
+        Row: {
+          actual_player_count: number;
+          court_amount_minor: number;
+          currency_code: string;
+          event_id: string;
+          finalized_at: string;
+          finalized_by: string;
+          id: string;
+          total_allocated_minor: number;
+        };
+        Insert: {
+          actual_player_count: number;
+          court_amount_minor: number;
+          currency_code: string;
+          event_id: string;
+          finalized_at?: string;
+          finalized_by: string;
+          id?: string;
+          total_allocated_minor: number;
+        };
+        Update: {
+          actual_player_count?: number;
+          court_amount_minor?: number;
+          currency_code?: string;
+          event_id?: string;
+          finalized_at?: string;
+          finalized_by?: string;
+          id?: string;
+          total_allocated_minor?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'match_settlements_event_id_fkey';
+            columns: ['event_id'];
+            isOneToOne: true;
+            referencedRelation: 'events';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'match_settlements_finalized_by_fkey';
+            columns: ['finalized_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -783,6 +895,8 @@ export type Database = {
           group_id: string;
           id: string;
           location: string;
+          match_attendance_recorded_at: string | null;
+          match_attendance_recorded_by: string | null;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
           team_formation_mode: Database['public']['Enums']['team_formation_mode'];
@@ -844,6 +958,7 @@ export type Database = {
         };
         Returns: Json;
       };
+      finalize_match_settlement: { Args: { p_event_id: string }; Returns: Json };
       get_dinner_planning: { Args: { p_event_id: string }; Returns: Json };
       get_dinner_reality: { Args: { p_event_id: string }; Returns: Json };
       get_event_attendance: {
@@ -904,6 +1019,7 @@ export type Database = {
           status: string;
         }[];
       };
+      get_match_settlement: { Args: { p_event_id: string }; Returns: Json };
       list_invitable_group_members: {
         Args: never;
         Returns: {
@@ -1067,6 +1183,8 @@ export type Database = {
           group_id: string;
           id: string;
           location: string;
+          match_attendance_recorded_at: string | null;
+          match_attendance_recorded_by: string | null;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
           team_formation_mode: Database['public']['Enums']['team_formation_mode'];
@@ -1107,6 +1225,8 @@ export type Database = {
           group_id: string;
           id: string;
           location: string;
+          match_attendance_recorded_at: string | null;
+          match_attendance_recorded_by: string | null;
           starts_at: string;
           status: Database['public']['Enums']['event_status'];
           team_formation_mode: Database['public']['Enums']['team_formation_mode'];

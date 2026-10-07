@@ -102,6 +102,9 @@ export class EventFormPage implements OnInit {
     if (error.operation === 'SCHEDULE_LOCKED') {
       return 'En esta etapa sólo se puede actualizar el precio de la cancha.';
     }
+    if (error.operation === 'SETTLEMENT_LOCKED') {
+      return 'La cancha ya fue liquidada y su precio quedó bloqueado.';
+    }
     if (error.operation === 'VALIDATION') return 'Revisá la fecha, la hora, el lugar y el precio.';
     return 'No pudimos guardar el evento.';
   }

@@ -35,7 +35,14 @@ export interface SavedAttendance {
 }
 
 export type AttendanceOperation =
-  'CLOSED' | 'LOAD' | 'NOT_FOUND' | 'NOT_OPEN' | 'PERMISSION' | 'SAVE' | 'VALIDATION';
+  | 'CLOSED'
+  | 'LOAD'
+  | 'NOT_FOUND'
+  | 'NOT_OPEN'
+  | 'PERMISSION'
+  | 'SAVE'
+  | 'SETTLEMENT_LOCKED'
+  | 'VALIDATION';
 
 export class AttendanceOperationError extends Error {
   constructor(readonly operation: AttendanceOperation) {
