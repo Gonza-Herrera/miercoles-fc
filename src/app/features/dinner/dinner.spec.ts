@@ -6,6 +6,7 @@ import { EventService } from '../events/event.service';
 import { GroupService } from '../groups/group.service';
 import { DinnerPlanningView } from './dinner-planning.models';
 import { DinnerPlanningService } from './dinner-planning.service';
+import { DinnerRealityService } from './dinner-reality.service';
 import { Dinner } from './dinner';
 
 describe('Dinner', () => {
@@ -84,6 +85,10 @@ describe('Dinner', () => {
         {
           provide: DinnerPlanningService,
           useValue: { get: getPlanning, save: savePlanning },
+        },
+        {
+          provide: DinnerRealityService,
+          useValue: { get: vi.fn().mockResolvedValue(realityView()) },
         },
         {
           provide: EventService,
@@ -195,5 +200,20 @@ function planningView(overrides: Partial<DinnerPlanningView> = {}): DinnerPlanni
       updatedAt: '2026-10-03T18:00:00Z',
     },
     ...overrides,
+  };
+}
+
+function realityView() {
+  return {
+    actualDinerCount: 0,
+    attendanceRecorded: false,
+    attendanceRecordedAt: null,
+    canEdit: false,
+    currencyCode: 'ARS',
+    eventId: 'event-1',
+    eventStatus: 'OPEN',
+    expenses: [],
+    participants: [],
+    totalExpenseMinor: 0,
   };
 }

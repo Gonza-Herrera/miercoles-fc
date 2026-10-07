@@ -23,10 +23,11 @@ import {
   emptyDinnerPlanDraft,
 } from './dinner-planning.models';
 import { DinnerPlanningService } from './dinner-planning.service';
+import { DinnerReality } from './components/dinner-reality/dinner-reality';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AttendanceManager, Avatar, Button, Card, EmptyState, PageContainer],
+  imports: [AttendanceManager, Avatar, Button, Card, DinnerReality, EmptyState, PageContainer],
   selector: 'app-dinner',
   styleUrl: './dinner.scss',
   templateUrl: './dinner.html',

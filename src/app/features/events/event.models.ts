@@ -73,7 +73,12 @@ export const EVENT_TRANSITION_LABELS: Readonly<Partial<Record<EventStatus, strin
   SETTLEMENT: 'Cerrar miércoles',
 };
 
-export function mapEvent(row: EventRow): WeeklyEvent {
+type EventSummaryRow = Omit<
+  EventRow,
+  'dinner_attendance_recorded_at' | 'dinner_attendance_recorded_by'
+>;
+
+export function mapEvent(row: EventSummaryRow): WeeklyEvent {
   return {
     courtPriceMinor: row.court_price_minor,
     createdAt: row.created_at,

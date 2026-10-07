@@ -300,6 +300,8 @@ export type Database = {
           created_at: string;
           created_by: string;
           currency_code: string;
+          dinner_attendance_recorded_at: string | null;
+          dinner_attendance_recorded_by: string | null;
           group_id: string;
           id: string;
           location: string;
@@ -314,6 +316,8 @@ export type Database = {
           created_at?: string;
           created_by: string;
           currency_code?: string;
+          dinner_attendance_recorded_at?: string | null;
+          dinner_attendance_recorded_by?: string | null;
           group_id: string;
           id?: string;
           location: string;
@@ -328,6 +332,8 @@ export type Database = {
           created_at?: string;
           created_by?: string;
           currency_code?: string;
+          dinner_attendance_recorded_at?: string | null;
+          dinner_attendance_recorded_by?: string | null;
           group_id?: string;
           id?: string;
           location?: string;
@@ -341,6 +347,13 @@ export type Database = {
           {
             foreignKeyName: 'events_created_by_fkey';
             columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'events_dinner_attendance_recorded_by_fkey';
+            columns: ['dinner_attendance_recorded_by'];
             isOneToOne: false;
             referencedRelation: 'profiles';
             referencedColumns: ['id'];
@@ -745,6 +758,14 @@ export type Database = {
         Args: { p_assignments: Json; p_event_id: string };
         Returns: undefined;
       };
+      create_dinner_expense: {
+        Args: {
+          p_amount_minor: number;
+          p_description: string;
+          p_event_id: string;
+        };
+        Returns: Json;
+      };
       create_event: {
         Args: {
           p_court_price_minor: number;
@@ -757,6 +778,8 @@ export type Database = {
           created_at: string;
           created_by: string;
           currency_code: string;
+          dinner_attendance_recorded_at: string | null;
+          dinner_attendance_recorded_by: string | null;
           group_id: string;
           id: string;
           location: string;
@@ -813,7 +836,16 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      delete_dinner_expense: {
+        Args: {
+          p_event_id: string;
+          p_expected_updated_at: string;
+          p_expense_id: string;
+        };
+        Returns: Json;
+      };
       get_dinner_planning: { Args: { p_event_id: string }; Returns: Json };
+      get_dinner_reality: { Args: { p_event_id: string }; Returns: Json };
       get_event_attendance: {
         Args: { p_event_id: string };
         Returns: {
@@ -901,6 +933,14 @@ export type Database = {
           isOneToOne: true;
           isSetofReturn: false;
         };
+      };
+      record_dinner_attendance: {
+        Args: {
+          p_attendances: Json;
+          p_event_id: string;
+          p_expected_recorded_at?: string;
+        };
+        Returns: Json;
       };
       record_match_attendance: {
         Args: { p_attendances: Json; p_event_id: string };
@@ -1022,6 +1062,8 @@ export type Database = {
           created_at: string;
           created_by: string;
           currency_code: string;
+          dinner_attendance_recorded_at: string | null;
+          dinner_attendance_recorded_by: string | null;
           group_id: string;
           id: string;
           location: string;
@@ -1038,6 +1080,16 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      update_dinner_expense: {
+        Args: {
+          p_amount_minor: number;
+          p_description: string;
+          p_event_id: string;
+          p_expected_updated_at: string;
+          p_expense_id: string;
+        };
+        Returns: Json;
+      };
       update_event_details: {
         Args: {
           p_court_price_minor: number;
@@ -1050,6 +1102,8 @@ export type Database = {
           created_at: string;
           created_by: string;
           currency_code: string;
+          dinner_attendance_recorded_at: string | null;
+          dinner_attendance_recorded_by: string | null;
           group_id: string;
           id: string;
           location: string;

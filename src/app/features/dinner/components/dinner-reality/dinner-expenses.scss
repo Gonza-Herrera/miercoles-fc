@@ -1,0 +1,137 @@
+.expense-form {
+  display: grid;
+  padding: var(--space-4);
+  gap: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-coral-50);
+}
+
+.expense-form h4 {
+  margin: 0;
+}
+
+.expense-form__field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.expense-form__field label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.expense-form input {
+  min-height: var(--touch-target-min);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.expense-form input:focus-visible,
+.expenses__actions button:focus-visible {
+  outline: 3px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.expense-form__amount,
+.expense-form__actions,
+.expenses__detail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.expense-form__amount span {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.expense-form__validation {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.expense-form__actions {
+  justify-content: flex-end;
+}
+
+.expenses__list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.expenses__list li {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.expenses__detail {
+  min-width: 0;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.expenses__detail strong {
+  overflow-wrap: anywhere;
+}
+
+.expenses__actions {
+  display: flex;
+}
+
+.expenses__actions button {
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+}
+
+.expenses__actions .expenses__delete {
+  color: var(--color-danger);
+}
+
+.expenses__total {
+  padding-top: var(--space-2);
+  font-size: var(--font-size-xl);
+  text-transform: uppercase;
+}
+
+.expenses__total strong {
+  font-size: var(--font-size-2xl);
+}
+
+.expenses__boundary {
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+@media (max-width: 390px) {
+  .expense-form__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .expense-form__actions app-button,
+  .expenses__detail {
+    width: 100%;
+  }
+
+  .expenses__list li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

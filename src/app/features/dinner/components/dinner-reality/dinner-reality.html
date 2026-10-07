@@ -1,0 +1,257 @@
+<section class="dinner-reality" aria-labelledby="dinner-reality-title">
+  <header class="dinner-reality__heading">
+    <div>
+      <p class="dinner-reality__eyebrow">Realidad</p>
+      <h2 id="dinner-reality-title" class="ds-section-title">Lo que pasó en la cena</h2>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <app-card><p class="ds-body" role="status">Cargando asistencia y gastos reales…</p></app-card>
+  } @else if (errorMessage() && !view()) {
+    <app-card>
+      <div class="dinner-reality__feedback" role="alert">
+        <p>{{ errorMessage() }}</p>
+        <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+      </div>
+    </app-card>
+  } @else if (view(); as reality) {
+    @if (feedback(); as message) {
+      <p class="dinner-reality__success" role="status">{{ message }}</p>
+    }
+    @if (errorMessage(); as error) {
+      <div class="dinner-reality__error" role="alert">
+        <span>{{ error }}</span>
+        @if (error.includes('Actualizá')) {
+          <button type="button" (click)="load()">Actualizar</button>
+        }
+      </div>
+    }
+
+    <app-card variant="elevated">
+      <section class="attendance" aria-labelledby="actual-attendance-title">
+        <header class="attendance__header">
+          <div>
+            <p class="dinner-reality__eyebrow">Asistencia real</p>
+            <h3 id="actual-attendance-title" class="ds-card-title">¿Quiénes realmente comieron?</h3>
+          </div>
+          @if (reality.attendanceRecorded) {
+            <app-badge variant="success">
+              {{ reality.actualDinerCount }}
+              {{ reality.actualDinerCount === 1 ? 'comió' : 'comieron' }}
+            </app-badge>
+          } @else {
+            <app-badge variant="warning">Sin registrar</app-badge>
+          }
+        </header>
+
+        @if (!reality.attendanceRecorded) {
+          <p class="attendance__notice">
+            Asistencia de la cena sin registrar. La selección sugerida usa las confirmaciones;
+            revisala antes de guardar.
+          </p>
+        }
+
+        <div class="attendance__list" role="group" aria-label="Comensales reales">
+          @for (participant of reality.participants; track participantKey(participant)) {
+            <button
+              type="button"
+              class="attendance__person"
+              [class.attendance__person--selected]="selectedKeys().has(participantKey(participant))"
+              role="checkbox"
+              [attr.aria-checked]="selectedKeys().has(participantKey(participant))"
+              [disabled]="!reality.canEdit || attendanceSaving()"
+              [attr.aria-label]="
+                participant.displayName +
+                (selectedKeys().has(participantKey(participant))
+                  ? ', comió realmente'
+                  : ', no comió realmente')
+              "
+              (click)="toggle(participant)"
+            >
+              <span class="attendance__identity">
+                <app-avatar
+                  [name]="participant.displayName"
+                  [src]="participant.avatarUrl"
+                  size="small"
+                />
+                <span>
+                  <strong>{{ participant.displayName }}</strong>
+                  <small>
+                    {{ confirmationLabel(participant) }}
+                    @if (participant.isGuest) {
+                      · Invitado
+                    }
+                  </small>
+                </span>
+              </span>
+              <span class="attendance__checkbox" aria-hidden="true">
+                @if (selectedKeys().has(participantKey(participant))) {
+                  ✓
+                }
+              </span>
+            </button>
+          } @empty {
+            <p class="dinner-reality__empty">No hay participantes disponibles.</p>
+          }
+        </div>
+
+        @if (reality.canEdit) {
+          <div class="attendance__save">
+            <span aria-live="polite">{{ localDinerCount() }} seleccionados</span>
+            <app-button
+              [disabled]="attendanceSaving() || !attendanceDirty()"
+              (click)="saveAttendance()"
+            >
+              {{ attendanceSaving() ? 'Guardando…' : 'Guardar asistencia' }}
+            </app-button>
+          </div>
+        } @else {
+          <p class="dinner-reality__readonly">
+            @if (reality.eventStatus === 'CLOSED') {
+              Este miércoles está cerrado. La realidad es histórica y de solo lectura.
+            } @else if (reality.eventStatus === 'DRAFT' || reality.eventStatus === 'OPEN') {
+              La asistencia real se registra cuando comienza el miércoles.
+            } @else {
+              Solo un administrador puede corregir esta asistencia.
+            }
+          </p>
+        }
+      </section>
+    </app-card>
+
+    <app-card variant="elevated">
+      <section class="expenses" aria-labelledby="actual-expenses-title">
+        <header class="expenses__header">
+          <div>
+            <p class="dinner-reality__eyebrow">Gastos reales</p>
+            <h3 id="actual-expenses-title" class="ds-card-title">Lo que realmente gastamos</h3>
+          </div>
+        </header>
+
+        @if (expenseEditing(); as editing) {
+          <form class="expense-form" (submit)="$event.preventDefault(); saveExpense()">
+            <h4>{{ editing === 'new' ? 'Nuevo gasto' : 'Editar gasto' }}</h4>
+            <div class="expense-form__field">
+              <label for="expense-description">Concepto</label>
+              <input
+                id="expense-description"
+                type="text"
+                maxlength="120"
+                placeholder="Ej. Carne"
+                [value]="expenseDescription()"
+                [attr.aria-invalid]="expenseValidation() ? true : null"
+                [attr.aria-describedby]="expenseValidation() ? 'expense-validation' : null"
+                (input)="updateExpenseDescription($any($event.target).value)"
+              />
+            </div>
+            <div class="expense-form__field">
+              <label for="expense-amount">Importe</label>
+              <div class="expense-form__amount">
+                <span>$</span
+                ><input
+                  id="expense-amount"
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="50.000"
+                  [value]="expenseAmount()"
+                  [attr.aria-invalid]="expenseValidation() ? true : null"
+                  [attr.aria-describedby]="expenseValidation() ? 'expense-validation' : null"
+                  (input)="updateExpenseAmount($any($event.target).value)"
+                />
+              </div>
+            </div>
+            @if (expenseValidation(); as validation) {
+              <p id="expense-validation" class="expense-form__validation" role="alert">
+                {{ validation }}
+              </p>
+            }
+            <div class="expense-form__actions">
+              <app-button
+                type="button"
+                variant="secondary"
+                [disabled]="expenseSaving()"
+                (click)="cancelExpense()"
+                >Cancelar</app-button
+              >
+              <app-button type="submit" [disabled]="expenseSaving()">
+                {{ expenseSaving() ? 'Guardando…' : 'Guardar gasto' }}
+              </app-button>
+            </div>
+          </form>
+        }
+
+        <ul class="expenses__list">
+          @for (expense of reality.expenses; track expense.id) {
+            <li>
+              <span class="expenses__detail">
+                <strong>{{ expense.description }}</strong>
+                <span>{{ formatMoney(expense.amountMinor, reality.currencyCode) }}</span>
+              </span>
+              @if (reality.canEdit && !expenseEditing()) {
+                <span class="expenses__actions">
+                  <button
+                    type="button"
+                    [attr.aria-label]="'Editar gasto ' + expense.description"
+                    (click)="openEditExpense(expense)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="expenses__delete"
+                    [attr.aria-label]="'Eliminar gasto ' + expense.description"
+                    (click)="requestDelete(expense)"
+                  >
+                    Eliminar
+                  </button>
+                </span>
+              }
+            </li>
+          } @empty {
+            <li class="dinner-reality__empty">Todavía no hay gastos cargados.</li>
+          }
+        </ul>
+
+        <div class="expenses__total">
+          <span>Total</span>
+          <strong>{{ formatMoney(computedExpenseTotal(), reality.currencyCode) }}</strong>
+        </div>
+
+        @if (reality.canEdit && !expenseEditing()) {
+          <app-button variant="secondary" [fullWidth]="true" (click)="openNewExpense()">
+            + Agregar gasto
+          </app-button>
+        } @else if (!reality.canEdit) {
+          <p class="dinner-reality__readonly">
+            @if (reality.eventStatus === 'CLOSED') {
+              Los gastos están cerrados y son de solo lectura.
+            } @else if (reality.eventStatus === 'DRAFT' || reality.eventStatus === 'OPEN') {
+              Los gastos reales se cargan cuando comienza el miércoles.
+            } @else {
+              Solo un administrador puede modificar gastos.
+            }
+          </p>
+        }
+        <p class="expenses__boundary">La división por persona se realizará en la liquidación.</p>
+      </section>
+    </app-card>
+
+    @if (expenseToDelete(); as expense) {
+      <app-confirm-dialog
+        [open]="true"
+        title="Eliminar gasto"
+        [description]="
+          expense.description +
+          ' · ' +
+          formatMoney(expense.amountMinor, reality.currencyCode) +
+          '. ¿Querés eliminar este gasto?'
+        "
+        confirmLabel="Eliminar"
+        (cancelled)="cancelDelete()"
+        (confirmed)="confirmDelete()"
+      />
+    }
+  }
+</section>
