@@ -99,6 +99,9 @@ export class EventService {
     }
     if (message.includes('EVENT_NOT_FOUND')) return new EventOperationError('NOT_FOUND');
     if (message.includes('EVENT_CLOSED')) return new EventOperationError('CLOSED');
+    if (message.includes('MATCH_SETTLEMENT_SOURCE_LOCKED')) {
+      return new EventOperationError('SETTLEMENT_LOCKED');
+    }
     if (message.includes('EVENT_SCHEDULE_LOCKED')) {
       return new EventOperationError('SCHEDULE_LOCKED');
     }

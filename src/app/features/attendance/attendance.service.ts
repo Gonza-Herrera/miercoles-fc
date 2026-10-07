@@ -130,6 +130,9 @@ export class AttendanceService {
     if (message.includes('ATTENDANCE_EVENT_CLOSED')) {
       return new AttendanceOperationError('CLOSED');
     }
+    if (message.includes('MATCH_SETTLEMENT_SOURCE_LOCKED')) {
+      return new AttendanceOperationError('SETTLEMENT_LOCKED');
+    }
     if (message.includes('ATTENDANCE_EVENT_NOT_FOUND')) {
       return new AttendanceOperationError('NOT_FOUND');
     }

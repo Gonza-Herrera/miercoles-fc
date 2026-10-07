@@ -10,7 +10,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
 import { Avatar, Badge, Button, Card } from '../../../../shared/ui';
-import { AttendanceRecord, MatchAttendanceItemInput } from '../../../attendance/attendance.models';
+import {
+  AttendanceOperationError,
+  AttendanceRecord,
+  MatchAttendanceItemInput,
+} from '../../../attendance/attendance.models';
 import { AttendanceService } from '../../../attendance/attendance.service';
 import { GroupDetail } from '../../../groups/group.models';
 import { GroupService } from '../../../groups/group.service';
@@ -156,9 +160,11 @@ export class MatchAttendancePage implements OnInit {
           eventFeedback: `Se guardó la lista de presentes (${this.presentCount()} jugadores).`,
         },
       });
-    } catch {
+    } catch (error) {
       this.saveError.set(
-        'No pudimos guardar los presentes. Revisá tu conexión e intentá de nuevo.',
+        error instanceof AttendanceOperationError && error.operation === 'SETTLEMENT_LOCKED'
+          ? 'La cancha ya fue liquidada y la asistencia quedó bloqueada.'
+          : 'No pudimos guardar los presentes. Revisá tu conexión e intentá de nuevo.',
       );
       this.saving.set(false);
     }
