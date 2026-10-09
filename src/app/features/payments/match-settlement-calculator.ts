@@ -1,7 +1,9 @@
-export interface MatchSettlementPlayerInput {
-  readonly createdAt: string;
-  readonly eventParticipantId: string;
-}
+import {
+  allocateAmountExactly,
+  ExactAllocationParticipant,
+} from './exact-allocation';
+
+export type MatchSettlementPlayerInput = ExactAllocationParticipant;
 
 export type MatchSettlementCalculationResult =
   | {
@@ -34,28 +36,15 @@ export function calculateMatchSettlement(input: {
   }
   if (input.players.length === 0) return { valid: false, reason: 'NO_ACTUAL_PLAYERS' };
 
-  const ordered = [...input.players].sort(
-    (left, right) =>
-      left.createdAt.localeCompare(right.createdAt) ||
-      left.eventParticipantId.localeCompare(right.eventParticipantId),
-  );
-  if (
-    ordered.some((player) => !player.eventParticipantId || !player.createdAt) ||
-    new Set(ordered.map((player) => player.eventParticipantId)).size !== ordered.length
-  ) {
+  const allocation = allocateAmountExactly(input.courtAmountMinor, input.players);
+  if (!allocation.valid) {
     return { valid: false, reason: 'INVALID_PARTICIPANTS' };
   }
-
-  const baseAmount = Math.floor(input.courtAmountMinor / ordered.length);
-  const remainder = input.courtAmountMinor % ordered.length;
   return {
     valid: true,
-    actualPlayerCount: ordered.length,
-    allocations: ordered.map((player, index) => ({
-      amountMinor: baseAmount + (index < remainder ? 1 : 0),
-      eventParticipantId: player.eventParticipantId,
-    })),
+    actualPlayerCount: input.players.length,
+    allocations: allocation.allocations,
     courtAmountMinor: input.courtAmountMinor,
-    displayAverageMinor: baseAmount + (remainder * 2 >= ordered.length ? 1 : 0),
+    displayAverageMinor: allocation.displayAverageMinor,
   };
 }

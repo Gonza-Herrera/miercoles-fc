@@ -59,6 +59,7 @@ export type DinnerRealityOperation =
   | 'READ_ONLY'
   | 'SAVE_ATTENDANCE'
   | 'SAVE_EXPENSE'
+  | 'SETTLEMENT_LOCKED'
   | 'VALIDATION';
 
 export class DinnerRealityOperationError extends Error {

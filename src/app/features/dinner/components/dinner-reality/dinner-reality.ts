@@ -254,6 +254,9 @@ export class DinnerReality implements OnInit {
       if (error.operation === 'READ_ONLY') {
         return 'Este miércoles no permite registrar quiénes comieron.';
       }
+      if (error.operation === 'SETTLEMENT_LOCKED') {
+        return 'La cena ya fue liquidada y su asistencia no puede modificarse.';
+      }
       if (error.operation === 'ATTENDANCE_INVALID') {
         return 'La lista cambió. Actualizá e intentá nuevamente.';
       }
@@ -268,6 +271,9 @@ export class DinnerReality implements OnInit {
       }
       if (error.operation === 'PERMISSION') return 'No tenés permisos para modificar gastos.';
       if (error.operation === 'READ_ONLY') return 'Este miércoles ya no permite modificar gastos.';
+      if (error.operation === 'SETTLEMENT_LOCKED') {
+        return 'La cena ya fue liquidada y sus gastos no pueden modificarse.';
+      }
       if (error.operation === 'VALIDATION') return 'Revisá el concepto y el importe.';
     }
     return action === 'eliminar' ? 'No pudimos eliminar el gasto.' : 'No pudimos guardar el gasto.';
