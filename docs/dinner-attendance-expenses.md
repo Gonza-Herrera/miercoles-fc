@@ -33,6 +33,10 @@ Los miembros activos pueden leer la realidad de eventos de su grupo. Sólo un AD
 
 Las funciones privadas son `SECURITY DEFINER`, fijan `search_path = ''`, califican relaciones y verifican `auth.uid()` y ADMIN. No hay Realtime ni cola offline: cada mutación sólo se confirma tras la respuesta del backend.
 
-## Frontera financiera y PR22
+## Fuente financiera de PR22
 
-PR20 entrega a PR22 dos fuentes autoritativas: comensales con `actual_dinner = YES` y suma de gastos reales. Se detiene ahí. Crear asistencia o gastos produce cero filas en `payments`, cero deudas individuales y cero Dinner Settlements. La pantalla no muestra `$X c/u`, estado de pago ni quién debe cuánto.
+PR20 entrega a PR22 dos fuentes autoritativas: comensales con `actual_dinner = YES` y suma de gastos reales. Confirmaciones, compras previstas, encargado y fútbol no tienen autoridad financiera.
+
+Antes de finalizar Dinner Settlement, ambas fuentes pueden corregirse y el preview se recalcula. Después de finalizar, PR22 bloquea cambios de asistencia real y altas, ediciones o bajas de gastos para preservar el snapshot histórico. No hay recálculo automático ni reset en esta versión.
+
+Crear asistencia o gastos sigue produciendo cero filas en `payments`. PR22 crea obligaciones, pero no estado de pago. Véase [Liquidación de cena](dinner-settlement.md).

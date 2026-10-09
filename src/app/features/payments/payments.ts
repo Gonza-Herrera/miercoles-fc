@@ -7,6 +7,12 @@ import { EventService } from '../events/event.service';
 import { GroupContextService } from '../groups/group-context.service';
 import { GroupService } from '../groups/group.service';
 import {
+  DinnerSettlementOperationError,
+  DinnerSettlementUnavailableReason,
+  DinnerSettlementView,
+} from './dinner-settlement.models';
+import { DinnerSettlementService } from './dinner-settlement.service';
+import {
   MatchSettlementOperationError,
   MatchSettlementUnavailableReason,
   MatchSettlementView,
@@ -24,13 +30,15 @@ export class Payments implements OnInit {
   private readonly context = inject(GroupContextService);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
-  private readonly settlements = inject(MatchSettlementService);
+  private readonly dinnerSettlements = inject(DinnerSettlementService);
+  private readonly matchSettlements = inject(MatchSettlementService);
 
   protected readonly event = signal<WeeklyEvent | null>(null);
-  protected readonly view = signal<MatchSettlementView | null>(null);
+  protected readonly matchView = signal<MatchSettlementView | null>(null);
+  protected readonly dinnerView = signal<DinnerSettlementView | null>(null);
   protected readonly loading = signal(true);
-  protected readonly finalizing = signal(false);
-  protected readonly confirmationOpen = signal(false);
+  protected readonly finalizing = signal<'DINNER' | 'MATCH' | null>(null);
+  protected readonly confirmationOpen = signal<'DINNER' | 'MATCH' | null>(null);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly feedback = signal<string | null>(null);
   protected readonly eventDateLabel = eventDateLabel;
@@ -51,43 +59,62 @@ export class Payments implements OnInit {
         summaries[0]?.id;
       if (!groupId) {
         this.event.set(null);
-        this.view.set(null);
+        this.matchView.set(null);
+        this.dinnerView.set(null);
         return;
       }
       const event = await this.events.current(groupId);
       this.event.set(event);
-      this.view.set(event ? await this.settlements.get(event.id) : null);
+      if (!event) {
+        this.matchView.set(null);
+        this.dinnerView.set(null);
+        return;
+      }
+      const [matchView, dinnerView] = await Promise.all([
+        this.matchSettlements.get(event.id),
+        this.dinnerSettlements.get(event.id),
+      ]);
+      this.matchView.set(matchView);
+      this.dinnerView.set(dinnerView);
     } catch {
-      this.errorMessage.set('No pudimos cargar la liquidación de cancha.');
+      this.errorMessage.set('No pudimos cargar las liquidaciones.');
     } finally {
       this.loading.set(false);
     }
   }
 
-  protected requestFinalize(): void {
-    if (this.view()?.canFinalize) this.confirmationOpen.set(true);
+  protected requestFinalize(kind: 'DINNER' | 'MATCH'): void {
+    const canFinalize = kind === 'MATCH' ? this.matchView()?.canFinalize : this.dinnerView()?.canFinalize;
+    if (canFinalize) this.confirmationOpen.set(kind);
   }
   protected cancelFinalize(): void {
-    this.confirmationOpen.set(false);
+    this.confirmationOpen.set(null);
   }
 
-  protected async finalize(): Promise<void> {
-    const view = this.view();
+  protected async finalize(kind: 'DINNER' | 'MATCH'): Promise<void> {
+    const view = kind === 'MATCH' ? this.matchView() : this.dinnerView();
     if (!view?.canFinalize || this.finalizing()) return;
-    this.confirmationOpen.set(false);
-    this.finalizing.set(true);
+    this.confirmationOpen.set(null);
+    this.finalizing.set(kind);
     this.errorMessage.set(null);
     try {
-      this.view.set(await this.settlements.finalize(view.eventId));
-      this.feedback.set('Liquidación de cancha generada.');
+      if (kind === 'MATCH') {
+        this.matchView.set(await this.matchSettlements.finalize(view.eventId));
+        this.feedback.set('Liquidación de cancha generada.');
+      } else {
+        this.dinnerView.set(await this.dinnerSettlements.finalize(view.eventId));
+        this.feedback.set('Liquidación de cena generada.');
+      }
     } catch (error) {
-      this.errorMessage.set(this.finalizeError(error));
+      this.errorMessage.set(
+        kind === 'MATCH' ? this.matchFinalizeError(error) : this.dinnerFinalizeError(error),
+      );
     } finally {
-      this.finalizing.set(false);
+      this.finalizing.set(null);
     }
   }
 
-  protected unavailableCopy(reason: MatchSettlementUnavailableReason | null): string {
+  protected matchUnavailableCopy(reason: MatchSettlementUnavailableReason | null): string {
     if (reason === 'ATTENDANCE_NOT_RECORDED') return 'Primero registrá quiénes jugaron realmente.';
     if (reason === 'NO_ACTUAL_PLAYERS') return 'No hay jugadores reales para liquidar la cancha.';
     if (reason === 'INVALID_COURT_PRICE') return 'Falta definir el precio de la cancha.';
@@ -96,7 +123,17 @@ export class Payments implements OnInit {
     return 'La liquidación todavía no está disponible.';
   }
 
-  private finalizeError(error: unknown): string {
+  protected dinnerUnavailableCopy(reason: DinnerSettlementUnavailableReason | null): string {
+    if (reason === 'ATTENDANCE_NOT_RECORDED') return 'Primero registrá quiénes cenaron realmente.';
+    if (reason === 'NO_ACTUAL_DINERS') return 'No hay comensales reales para liquidar la cena.';
+    if (reason === 'NO_DINNER_EXPENSES') return 'Todavía no hay gastos reales para liquidar.';
+    if (reason === 'INVALID_EXPENSE_DATA') return 'Los gastos reales no permiten generar una liquidación válida.';
+    if (reason === 'WRONG_LIFECYCLE')
+      return 'La liquidación se genera cuando el miércoles pasa a liquidación.';
+    return 'La liquidación todavía no está disponible.';
+  }
+
+  private matchFinalizeError(error: unknown): string {
     if (error instanceof MatchSettlementOperationError) {
       if (error.operation === 'ATTENDANCE_NOT_RECORDED')
         return 'Primero registrá quiénes jugaron realmente.';
@@ -110,5 +147,24 @@ export class Payments implements OnInit {
         return 'La información del partido cambió. Actualizá e intentá nuevamente.';
     }
     return 'No pudimos generar la liquidación.';
+  }
+
+  private dinnerFinalizeError(error: unknown): string {
+    if (error instanceof DinnerSettlementOperationError) {
+      if (error.operation === 'ATTENDANCE_NOT_RECORDED')
+        return 'Primero registrá quiénes cenaron realmente.';
+      if (error.operation === 'NO_ACTUAL_DINERS')
+        return 'No hay comensales reales para liquidar la cena.';
+      if (error.operation === 'NO_DINNER_EXPENSES')
+        return 'Todavía no hay gastos reales para liquidar.';
+      if (error.operation === 'INVALID_EXPENSE_DATA')
+        return 'Los gastos cambiaron. Actualizá e intentá nuevamente.';
+      if (error.operation === 'CLOSED') return 'Este miércoles ya está cerrado.';
+      if (error.operation === 'PERMISSION')
+        return 'No tenés permisos para generar esta liquidación.';
+      if (error.operation === 'CONFLICT' || error.operation === 'ALREADY_FINALIZED')
+        return 'La información de la cena cambió. Actualizá e intentá nuevamente.';
+    }
+    return 'No pudimos generar la liquidación de la cena.';
   }
 }

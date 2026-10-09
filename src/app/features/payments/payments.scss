@@ -1,12 +1,14 @@
 :host,
 .payments-page,
 .payments-page__feedback,
+.settlement-domain,
 .settlement-summary,
 .allocations {
   display: grid;
   gap: var(--space-5);
 }
 .payments-page__header,
+.settlement-domain__title,
 .settlement-summary__heading,
 .payments-page__error,
 .allocations__total {
@@ -17,6 +19,23 @@
 }
 .payments-page__header {
   justify-content: flex-start;
+}
+.settlement-domain {
+  padding-top: var(--space-3);
+}
+.settlement-domain + .settlement-domain {
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--color-border);
+}
+.settlement-domain__title {
+  justify-content: flex-start;
+}
+.settlement-domain__title > span {
+  font-size: var(--font-size-2xl);
+}
+.settlement-domain__title h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
 }
 .payments-page__header p,
 .payments-page__success,
@@ -72,6 +91,13 @@
 .settlement-summary__average dd {
   color: var(--color-primary);
   font-size: var(--font-size-3xl);
+}
+.settlement-domain--dinner .payments-page__eyebrow,
+.settlement-domain--dinner .settlement-summary__average dd {
+  color: var(--color-coral-500);
+}
+.settlement-domain--dinner .settlement-summary__average {
+  background: var(--color-coral-50);
 }
 .allocations ul {
   padding: 0;

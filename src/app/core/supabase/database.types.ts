@@ -1,1448 +1,1564 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.5';
-  };
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
       dinner_expenses: {
         Row: {
-          amount_minor: number;
-          created_at: string;
-          created_by: string;
-          description: string;
-          event_id: string;
-          id: string;
-          paid_by_group_member_id: string | null;
-          updated_at: string;
-        };
+          amount_minor: number
+          created_at: string
+          created_by: string
+          description: string
+          event_id: string
+          id: string
+          paid_by_group_member_id: string | null
+          updated_at: string
+        }
         Insert: {
-          amount_minor: number;
-          created_at?: string;
-          created_by: string;
-          description: string;
-          event_id: string;
-          id?: string;
-          paid_by_group_member_id?: string | null;
-          updated_at?: string;
-        };
+          amount_minor: number
+          created_at?: string
+          created_by: string
+          description: string
+          event_id: string
+          id?: string
+          paid_by_group_member_id?: string | null
+          updated_at?: string
+        }
         Update: {
-          amount_minor?: number;
-          created_at?: string;
-          created_by?: string;
-          description?: string;
-          event_id?: string;
-          id?: string;
-          paid_by_group_member_id?: string | null;
-          updated_at?: string;
-        };
+          amount_minor?: number
+          created_at?: string
+          created_by?: string
+          description?: string
+          event_id?: string
+          id?: string
+          paid_by_group_member_id?: string | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'dinner_expenses_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'dinner_expenses_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: false;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_expenses_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'dinner_expenses_paid_by_group_member_id_fkey';
-            columns: ['paid_by_group_member_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_expenses_paid_by_group_member_id_fkey"
+            columns: ["paid_by_group_member_id"]
+            isOneToOne: false
+            referencedRelation: "group_members"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       dinner_planned_purchases: {
         Row: {
-          created_at: string;
-          dinner_plan_id: string;
-          id: string;
-          name: string;
-          sort_order: number;
-        };
+          created_at: string
+          dinner_plan_id: string
+          id: string
+          name: string
+          sort_order: number
+        }
         Insert: {
-          created_at?: string;
-          dinner_plan_id: string;
-          id?: string;
-          name: string;
-          sort_order: number;
-        };
+          created_at?: string
+          dinner_plan_id: string
+          id?: string
+          name: string
+          sort_order: number
+        }
         Update: {
-          created_at?: string;
-          dinner_plan_id?: string;
-          id?: string;
-          name?: string;
-          sort_order?: number;
-        };
+          created_at?: string
+          dinner_plan_id?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
         Relationships: [
           {
-            foreignKeyName: 'dinner_planned_purchases_dinner_plan_id_fkey';
-            columns: ['dinner_plan_id'];
-            isOneToOne: false;
-            referencedRelation: 'dinner_plans';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_planned_purchases_dinner_plan_id_fkey"
+            columns: ["dinner_plan_id"]
+            isOneToOne: false
+            referencedRelation: "dinner_plans"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       dinner_plans: {
         Row: {
-          created_at: string;
-          event_id: string;
-          id: string;
-          menu: string | null;
-          purchase_owner_group_member_id: string | null;
-          updated_at: string;
-        };
+          created_at: string
+          event_id: string
+          id: string
+          menu: string | null
+          purchase_owner_group_member_id: string | null
+          updated_at: string
+        }
         Insert: {
-          created_at?: string;
-          event_id: string;
-          id?: string;
-          menu?: string | null;
-          purchase_owner_group_member_id?: string | null;
-          updated_at?: string;
-        };
+          created_at?: string
+          event_id: string
+          id?: string
+          menu?: string | null
+          purchase_owner_group_member_id?: string | null
+          updated_at?: string
+        }
         Update: {
-          created_at?: string;
-          event_id?: string;
-          id?: string;
-          menu?: string | null;
-          purchase_owner_group_member_id?: string | null;
-          updated_at?: string;
-        };
+          created_at?: string
+          event_id?: string
+          id?: string
+          menu?: string | null
+          purchase_owner_group_member_id?: string | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'dinner_plans_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: true;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_plans_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'dinner_plans_purchase_owner_group_member_id_fkey';
-            columns: ['purchase_owner_group_member_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
-            referencedColumns: ['id'];
+            foreignKeyName: "dinner_plans_purchase_owner_group_member_id_fkey"
+            columns: ["purchase_owner_group_member_id"]
+            isOneToOne: false
+            referencedRelation: "group_members"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      dinner_settlement_items: {
+        Row: {
+          allocation_order: number
+          amount_minor: number
+          created_at: string
+          dinner_settlement_id: string
+          event_id: string
+          event_participant_id: string
+          id: string
+          is_guest: boolean
+          participant_display_name: string
+        }
+        Insert: {
+          allocation_order: number
+          amount_minor: number
+          created_at?: string
+          dinner_settlement_id: string
+          event_id: string
+          event_participant_id: string
+          id?: string
+          is_guest: boolean
+          participant_display_name: string
+        }
+        Update: {
+          allocation_order?: number
+          amount_minor?: number
+          created_at?: string
+          dinner_settlement_id?: string
+          event_id?: string
+          event_participant_id?: string
+          id?: string
+          is_guest?: boolean
+          participant_display_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dinner_settlement_items_participant_event_fk"
+            columns: ["event_participant_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id", "event_id"]
+          },
+          {
+            foreignKeyName: "dinner_settlement_items_settlement_event_fk"
+            columns: ["dinner_settlement_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "dinner_settlements"
+            referencedColumns: ["id", "event_id"]
+          },
+        ]
+      }
+      dinner_settlements: {
+        Row: {
+          actual_diner_count: number
+          currency_code: string
+          event_id: string
+          expense_total_minor: number
+          finalized_at: string
+          finalized_by: string
+          id: string
+          total_allocated_minor: number
+        }
+        Insert: {
+          actual_diner_count: number
+          currency_code: string
+          event_id: string
+          expense_total_minor: number
+          finalized_at?: string
+          finalized_by: string
+          id?: string
+          total_allocated_minor: number
+        }
+        Update: {
+          actual_diner_count?: number
+          currency_code?: string
+          event_id?: string
+          expense_total_minor?: number
+          finalized_at?: string
+          finalized_by?: string
+          id?: string
+          total_allocated_minor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dinner_settlements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dinner_settlements_finalized_by_fkey"
+            columns: ["finalized_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_drafts: {
         Row: {
-          completed_at: string | null;
-          current_team_id: string | null;
-          event_id: string;
-          pick_number: number;
-          started_at: string | null;
-          status: Database['public']['Enums']['player_draft_status'];
-          team_capacities: number[];
-          updated_at: string;
-          version: number;
-        };
+          completed_at: string | null
+          current_team_id: string | null
+          event_id: string
+          pick_number: number
+          started_at: string | null
+          status: Database["public"]["Enums"]["player_draft_status"]
+          team_capacities: number[]
+          updated_at: string
+          version: number
+        }
         Insert: {
-          completed_at?: string | null;
-          current_team_id?: string | null;
-          event_id: string;
-          pick_number?: number;
-          started_at?: string | null;
-          status?: Database['public']['Enums']['player_draft_status'];
-          team_capacities: number[];
-          updated_at?: string;
-          version?: number;
-        };
+          completed_at?: string | null
+          current_team_id?: string | null
+          event_id: string
+          pick_number?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["player_draft_status"]
+          team_capacities: number[]
+          updated_at?: string
+          version?: number
+        }
         Update: {
-          completed_at?: string | null;
-          current_team_id?: string | null;
-          event_id?: string;
-          pick_number?: number;
-          started_at?: string | null;
-          status?: Database['public']['Enums']['player_draft_status'];
-          team_capacities?: number[];
-          updated_at?: string;
-          version?: number;
-        };
+          completed_at?: string | null
+          current_team_id?: string | null
+          event_id?: string
+          pick_number?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["player_draft_status"]
+          team_capacities?: number[]
+          updated_at?: string
+          version?: number
+        }
         Relationships: [
           {
-            foreignKeyName: 'event_drafts_current_team_fk';
-            columns: ['current_team_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "event_drafts_current_team_fk"
+            columns: ["current_team_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id", "event_id"]
           },
           {
-            foreignKeyName: 'event_drafts_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: true;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "event_drafts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       event_managers: {
         Row: {
-          created_at: string;
-          event_id: string;
-          group_member_id: string;
-          id: string;
-          team_id: string;
-        };
+          created_at: string
+          event_id: string
+          group_member_id: string
+          id: string
+          team_id: string
+        }
         Insert: {
-          created_at?: string;
-          event_id: string;
-          group_member_id: string;
-          id?: string;
-          team_id: string;
-        };
+          created_at?: string
+          event_id: string
+          group_member_id: string
+          id?: string
+          team_id: string
+        }
         Update: {
-          created_at?: string;
-          event_id?: string;
-          group_member_id?: string;
-          id?: string;
-          team_id?: string;
-        };
+          created_at?: string
+          event_id?: string
+          group_member_id?: string
+          id?: string
+          team_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'event_managers_group_member_id_fkey';
-            columns: ['group_member_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
-            referencedColumns: ['id'];
+            foreignKeyName: "event_managers_group_member_id_fkey"
+            columns: ["group_member_id"]
+            isOneToOne: false
+            referencedRelation: "group_members"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'event_managers_team_event_fk';
-            columns: ['team_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "event_managers_team_event_fk"
+            columns: ["team_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id", "event_id"]
           },
-        ];
-      };
+        ]
+      }
       event_participants: {
         Row: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string | null;
-          created_at: string;
-          created_by: string | null;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string | null;
-          guest_display_name: string | null;
-          id: string;
-          updated_at: string;
-        };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string | null
+          guest_display_name: string | null
+          id: string
+          updated_at: string
+        }
         Insert: {
-          actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
-          actual_football?: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          dinner_response?: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response?: Database['public']['Enums']['attendance_response'];
-          group_member_id?: string | null;
-          guest_display_name?: string | null;
-          id?: string;
-          updated_at?: string;
-        };
+          actual_dinner?: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football?: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          dinner_response?: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response?: Database["public"]["Enums"]["attendance_response"]
+          group_member_id?: string | null
+          guest_display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
         Update: {
-          actual_dinner?: Database['public']['Enums']['actual_attendance_status'];
-          actual_football?: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at?: string | null;
-          created_at?: string;
-          created_by?: string | null;
-          dinner_response?: Database['public']['Enums']['attendance_response'];
-          event_id?: string;
-          football_response?: Database['public']['Enums']['attendance_response'];
-          group_member_id?: string | null;
-          guest_display_name?: string | null;
-          id?: string;
-          updated_at?: string;
-        };
+          actual_dinner?: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football?: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          dinner_response?: Database["public"]["Enums"]["attendance_response"]
+          event_id?: string
+          football_response?: Database["public"]["Enums"]["attendance_response"]
+          group_member_id?: string | null
+          guest_display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'event_participants_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "event_participants_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'event_participants_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: false;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'event_participants_group_member_id_fkey';
-            columns: ['group_member_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
-            referencedColumns: ['id'];
+            foreignKeyName: "event_participants_group_member_id_fkey"
+            columns: ["group_member_id"]
+            isOneToOne: false
+            referencedRelation: "group_members"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       events: {
         Row: {
-          court_price_minor: number;
-          created_at: string;
-          created_by: string;
-          currency_code: string;
-          dinner_attendance_recorded_at: string | null;
-          dinner_attendance_recorded_by: string | null;
-          group_id: string;
-          id: string;
-          location: string;
-          match_attendance_recorded_at: string | null;
-          match_attendance_recorded_by: string | null;
-          starts_at: string;
-          status: Database['public']['Enums']['event_status'];
-          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
-          title: string | null;
-          updated_at: string;
-        };
+          court_price_minor: number
+          created_at: string
+          created_by: string
+          currency_code: string
+          dinner_attendance_recorded_at: string | null
+          dinner_attendance_recorded_by: string | null
+          group_id: string
+          id: string
+          location: string
+          match_attendance_recorded_at: string | null
+          match_attendance_recorded_by: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_formation_mode: Database["public"]["Enums"]["team_formation_mode"]
+          title: string | null
+          updated_at: string
+        }
         Insert: {
-          court_price_minor: number;
-          created_at?: string;
-          created_by: string;
-          currency_code?: string;
-          dinner_attendance_recorded_at?: string | null;
-          dinner_attendance_recorded_by?: string | null;
-          group_id: string;
-          id?: string;
-          location: string;
-          match_attendance_recorded_at?: string | null;
-          match_attendance_recorded_by?: string | null;
-          starts_at: string;
-          status?: Database['public']['Enums']['event_status'];
-          team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
-          title?: string | null;
-          updated_at?: string;
-        };
+          court_price_minor: number
+          created_at?: string
+          created_by: string
+          currency_code?: string
+          dinner_attendance_recorded_at?: string | null
+          dinner_attendance_recorded_by?: string | null
+          group_id: string
+          id?: string
+          location: string
+          match_attendance_recorded_at?: string | null
+          match_attendance_recorded_by?: string | null
+          starts_at: string
+          status?: Database["public"]["Enums"]["event_status"]
+          team_formation_mode?: Database["public"]["Enums"]["team_formation_mode"]
+          title?: string | null
+          updated_at?: string
+        }
         Update: {
-          court_price_minor?: number;
-          created_at?: string;
-          created_by?: string;
-          currency_code?: string;
-          dinner_attendance_recorded_at?: string | null;
-          dinner_attendance_recorded_by?: string | null;
-          group_id?: string;
-          id?: string;
-          location?: string;
-          match_attendance_recorded_at?: string | null;
-          match_attendance_recorded_by?: string | null;
-          starts_at?: string;
-          status?: Database['public']['Enums']['event_status'];
-          team_formation_mode?: Database['public']['Enums']['team_formation_mode'];
-          title?: string | null;
-          updated_at?: string;
-        };
+          court_price_minor?: number
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          dinner_attendance_recorded_at?: string | null
+          dinner_attendance_recorded_by?: string | null
+          group_id?: string
+          id?: string
+          location?: string
+          match_attendance_recorded_at?: string | null
+          match_attendance_recorded_by?: string | null
+          starts_at?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          team_formation_mode?: Database["public"]["Enums"]["team_formation_mode"]
+          title?: string | null
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'events_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "events_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'events_dinner_attendance_recorded_by_fkey';
-            columns: ['dinner_attendance_recorded_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "events_dinner_attendance_recorded_by_fkey"
+            columns: ["dinner_attendance_recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'events_group_id_fkey';
-            columns: ['group_id'];
-            isOneToOne: false;
-            referencedRelation: 'groups';
-            referencedColumns: ['id'];
+            foreignKeyName: "events_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'events_match_attendance_recorded_by_fkey';
-            columns: ['match_attendance_recorded_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "events_match_attendance_recorded_by_fkey"
+            columns: ["match_attendance_recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       group_invitations: {
         Row: {
-          accepted_at: string | null;
-          created_at: string;
-          created_by: string;
-          expires_at: string | null;
-          group_id: string;
-          group_member_id: string;
-          id: string;
-          revoked_at: string | null;
-          token_hash: string;
-        };
+          accepted_at: string | null
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          group_id: string
+          group_member_id: string
+          id: string
+          revoked_at: string | null
+          token_hash: string
+        }
         Insert: {
-          accepted_at?: string | null;
-          created_at?: string;
-          created_by: string;
-          expires_at?: string | null;
-          group_id: string;
-          group_member_id: string;
-          id?: string;
-          revoked_at?: string | null;
-          token_hash: string;
-        };
+          accepted_at?: string | null
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          group_id: string
+          group_member_id: string
+          id?: string
+          revoked_at?: string | null
+          token_hash: string
+        }
         Update: {
-          accepted_at?: string | null;
-          created_at?: string;
-          created_by?: string;
-          expires_at?: string | null;
-          group_id?: string;
-          group_member_id?: string;
-          id?: string;
-          revoked_at?: string | null;
-          token_hash?: string;
-        };
+          accepted_at?: string | null
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          group_id?: string
+          group_member_id?: string
+          id?: string
+          revoked_at?: string | null
+          token_hash?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'group_invitations_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "group_invitations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'group_invitations_member_group_fk';
-            columns: ['group_member_id', 'group_id'];
-            isOneToOne: false;
-            referencedRelation: 'group_members';
-            referencedColumns: ['id', 'group_id'];
+            foreignKeyName: "group_invitations_member_group_fk"
+            columns: ["group_member_id", "group_id"]
+            isOneToOne: false
+            referencedRelation: "group_members"
+            referencedColumns: ["id", "group_id"]
           },
-        ];
-      };
+        ]
+      }
       group_members: {
         Row: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         Insert: {
-          avatar_url?: string | null;
-          created_at?: string;
-          deactivated_at?: string | null;
-          display_name: string;
-          group_id: string;
-          id?: string;
-          nickname?: string | null;
-          profile_id?: string | null;
-          role?: Database['public']['Enums']['group_member_role'];
-          updated_at?: string;
-        };
+          avatar_url?: string | null
+          created_at?: string
+          deactivated_at?: string | null
+          display_name: string
+          group_id: string
+          id?: string
+          nickname?: string | null
+          profile_id?: string | null
+          role?: Database["public"]["Enums"]["group_member_role"]
+          updated_at?: string
+        }
         Update: {
-          avatar_url?: string | null;
-          created_at?: string;
-          deactivated_at?: string | null;
-          display_name?: string;
-          group_id?: string;
-          id?: string;
-          nickname?: string | null;
-          profile_id?: string | null;
-          role?: Database['public']['Enums']['group_member_role'];
-          updated_at?: string;
-        };
+          avatar_url?: string | null
+          created_at?: string
+          deactivated_at?: string | null
+          display_name?: string
+          group_id?: string
+          id?: string
+          nickname?: string | null
+          profile_id?: string | null
+          role?: Database["public"]["Enums"]["group_member_role"]
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'group_members_group_id_fkey';
-            columns: ['group_id'];
-            isOneToOne: false;
-            referencedRelation: 'groups';
-            referencedColumns: ['id'];
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'group_members_profile_id_fkey';
-            columns: ['profile_id'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "group_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       groups: {
         Row: {
-          avatar_url: string | null;
-          created_at: string;
-          created_by: string;
-          description: string | null;
-          id: string;
-          name: string;
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
         Insert: {
-          avatar_url?: string | null;
-          created_at?: string;
-          created_by: string;
-          description?: string | null;
-          id?: string;
-          name: string;
-          updated_at?: string;
-        };
+          avatar_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
         Update: {
-          avatar_url?: string | null;
-          created_at?: string;
-          created_by?: string;
-          description?: string | null;
-          id?: string;
-          name?: string;
-          updated_at?: string;
-        };
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'groups_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "groups_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       match_settlement_items: {
         Row: {
-          allocation_order: number;
-          amount_minor: number;
-          created_at: string;
-          event_id: string;
-          event_participant_id: string;
-          id: string;
-          is_guest: boolean;
-          match_settlement_id: string;
-          participant_display_name: string;
-        };
+          allocation_order: number
+          amount_minor: number
+          created_at: string
+          event_id: string
+          event_participant_id: string
+          id: string
+          is_guest: boolean
+          match_settlement_id: string
+          participant_display_name: string
+        }
         Insert: {
-          allocation_order: number;
-          amount_minor: number;
-          created_at?: string;
-          event_id: string;
-          event_participant_id: string;
-          id?: string;
-          is_guest: boolean;
-          match_settlement_id: string;
-          participant_display_name: string;
-        };
+          allocation_order: number
+          amount_minor: number
+          created_at?: string
+          event_id: string
+          event_participant_id: string
+          id?: string
+          is_guest: boolean
+          match_settlement_id: string
+          participant_display_name: string
+        }
         Update: {
-          allocation_order?: number;
-          amount_minor?: number;
-          created_at?: string;
-          event_id?: string;
-          event_participant_id?: string;
-          id?: string;
-          is_guest?: boolean;
-          match_settlement_id?: string;
-          participant_display_name?: string;
-        };
+          allocation_order?: number
+          amount_minor?: number
+          created_at?: string
+          event_id?: string
+          event_participant_id?: string
+          id?: string
+          is_guest?: boolean
+          match_settlement_id?: string
+          participant_display_name?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'match_settlement_items_participant_event_fk';
-            columns: ['event_participant_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'event_participants';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "match_settlement_items_participant_event_fk"
+            columns: ["event_participant_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id", "event_id"]
           },
           {
-            foreignKeyName: 'match_settlement_items_settlement_event_fk';
-            columns: ['match_settlement_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'match_settlements';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "match_settlement_items_settlement_event_fk"
+            columns: ["match_settlement_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "match_settlements"
+            referencedColumns: ["id", "event_id"]
           },
-        ];
-      };
+        ]
+      }
       match_settlements: {
         Row: {
-          actual_player_count: number;
-          court_amount_minor: number;
-          currency_code: string;
-          event_id: string;
-          finalized_at: string;
-          finalized_by: string;
-          id: string;
-          total_allocated_minor: number;
-        };
+          actual_player_count: number
+          court_amount_minor: number
+          currency_code: string
+          event_id: string
+          finalized_at: string
+          finalized_by: string
+          id: string
+          total_allocated_minor: number
+        }
         Insert: {
-          actual_player_count: number;
-          court_amount_minor: number;
-          currency_code: string;
-          event_id: string;
-          finalized_at?: string;
-          finalized_by: string;
-          id?: string;
-          total_allocated_minor: number;
-        };
+          actual_player_count: number
+          court_amount_minor: number
+          currency_code: string
+          event_id: string
+          finalized_at?: string
+          finalized_by: string
+          id?: string
+          total_allocated_minor: number
+        }
         Update: {
-          actual_player_count?: number;
-          court_amount_minor?: number;
-          currency_code?: string;
-          event_id?: string;
-          finalized_at?: string;
-          finalized_by?: string;
-          id?: string;
-          total_allocated_minor?: number;
-        };
+          actual_player_count?: number
+          court_amount_minor?: number
+          currency_code?: string
+          event_id?: string
+          finalized_at?: string
+          finalized_by?: string
+          id?: string
+          total_allocated_minor?: number
+        }
         Relationships: [
           {
-            foreignKeyName: 'match_settlements_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: true;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "match_settlements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: 'match_settlements_finalized_by_fkey';
-            columns: ['finalized_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
+            foreignKeyName: "match_settlements_finalized_by_fkey"
+            columns: ["finalized_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       payments: {
         Row: {
-          amount_minor: number;
-          category: Database['public']['Enums']['payment_category'];
-          created_at: string;
-          event_id: string;
-          event_participant_id: string;
-          id: string;
-          paid_at: string | null;
-          status: Database['public']['Enums']['payment_status'];
-          updated_at: string;
-        };
+          amount_minor: number
+          category: Database["public"]["Enums"]["payment_category"]
+          created_at: string
+          event_id: string
+          event_participant_id: string
+          id: string
+          paid_at: string | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+        }
         Insert: {
-          amount_minor: number;
-          category: Database['public']['Enums']['payment_category'];
-          created_at?: string;
-          event_id: string;
-          event_participant_id: string;
-          id?: string;
-          paid_at?: string | null;
-          status?: Database['public']['Enums']['payment_status'];
-          updated_at?: string;
-        };
+          amount_minor: number
+          category: Database["public"]["Enums"]["payment_category"]
+          created_at?: string
+          event_id: string
+          event_participant_id: string
+          id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
         Update: {
-          amount_minor?: number;
-          category?: Database['public']['Enums']['payment_category'];
-          created_at?: string;
-          event_id?: string;
-          event_participant_id?: string;
-          id?: string;
-          paid_at?: string | null;
-          status?: Database['public']['Enums']['payment_status'];
-          updated_at?: string;
-        };
+          amount_minor?: number
+          category?: Database["public"]["Enums"]["payment_category"]
+          created_at?: string
+          event_id?: string
+          event_participant_id?: string
+          id?: string
+          paid_at?: string | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'payments_participant_event_fk';
-            columns: ['event_participant_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'event_participants';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "payments_participant_event_fk"
+            columns: ["event_participant_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id", "event_id"]
           },
-        ];
-      };
+        ]
+      }
       profiles: {
         Row: {
-          avatar_url: string | null;
-          created_at: string;
-          display_name: string;
-          id: string;
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          updated_at: string
+        }
         Insert: {
-          avatar_url?: string | null;
-          created_at?: string;
-          display_name: string;
-          id: string;
-          updated_at?: string;
-        };
+          avatar_url?: string | null
+          created_at?: string
+          display_name: string
+          id: string
+          updated_at?: string
+        }
         Update: {
-          avatar_url?: string | null;
-          created_at?: string;
-          display_name?: string;
-          id?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
-          created_at: string;
-          event_id: string;
-          event_participant_id: string;
-          id: string;
-          team_id: string;
-        };
+          created_at: string
+          event_id: string
+          event_participant_id: string
+          id: string
+          team_id: string
+        }
         Insert: {
-          created_at?: string;
-          event_id: string;
-          event_participant_id: string;
-          id?: string;
-          team_id: string;
-        };
+          created_at?: string
+          event_id: string
+          event_participant_id: string
+          id?: string
+          team_id: string
+        }
         Update: {
-          created_at?: string;
-          event_id?: string;
-          event_participant_id?: string;
-          id?: string;
-          team_id?: string;
-        };
+          created_at?: string
+          event_id?: string
+          event_participant_id?: string
+          id?: string
+          team_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'team_members_participant_event_fk';
-            columns: ['event_participant_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'event_participants';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "team_members_participant_event_fk"
+            columns: ["event_participant_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "event_participants"
+            referencedColumns: ["id", "event_id"]
           },
           {
-            foreignKeyName: 'team_members_team_event_fk';
-            columns: ['team_id', 'event_id'];
-            isOneToOne: false;
-            referencedRelation: 'teams';
-            referencedColumns: ['id', 'event_id'];
+            foreignKeyName: "team_members_team_event_fk"
+            columns: ["team_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id", "event_id"]
           },
-        ];
-      };
+        ]
+      }
       teams: {
         Row: {
-          created_at: string;
-          event_id: string;
-          id: string;
-          name: string;
-          position: number;
-          updated_at: string;
-        };
+          created_at: string
+          event_id: string
+          id: string
+          name: string
+          position: number
+          updated_at: string
+        }
         Insert: {
-          created_at?: string;
-          event_id: string;
-          id?: string;
-          name: string;
-          position: number;
-          updated_at?: string;
-        };
+          created_at?: string
+          event_id: string
+          id?: string
+          name: string
+          position: number
+          updated_at?: string
+        }
         Update: {
-          created_at?: string;
-          event_id?: string;
-          id?: string;
-          name?: string;
-          position?: number;
-          updated_at?: string;
-        };
+          created_at?: string
+          event_id?: string
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+        }
         Relationships: [
           {
-            foreignKeyName: 'teams_event_id_fkey';
-            columns: ['event_id'];
-            isOneToOne: false;
-            referencedRelation: 'events';
-            referencedColumns: ['id'];
+            foreignKeyName: "teams_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
+        ]
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
       accept_group_invitation: {
-        Args: { p_raw_token: string };
+        Args: { p_raw_token: string }
         Returns: {
-          group_id: string;
-          group_member_id: string;
-          group_name: string;
-          member_display_name: string;
-          status: string;
-        }[];
-      };
+          group_id: string
+          group_member_id: string
+          group_name: string
+          member_display_name: string
+          status: string
+        }[]
+      }
       add_group_member: {
         Args: {
-          p_display_name: string;
-          p_group_id: string;
-          p_nickname?: string;
-          p_role?: Database['public']['Enums']['group_member_role'];
-        };
+          p_display_name: string
+          p_group_id: string
+          p_nickname?: string
+          p_role?: Database["public"]["Enums"]["group_member_role"]
+        }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'group_members';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       add_guest_participant: {
         Args: {
-          p_dines: boolean;
-          p_display_name: string;
-          p_event_id: string;
-          p_plays: boolean;
-        };
+          p_dines: boolean
+          p_display_name: string
+          p_event_id: string
+          p_plays: boolean
+        }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string;
-          created_at: string;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string;
-          guest_display_name: string;
-          id: string;
-          updated_at: string;
-        }[];
-      };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string
+          created_at: string
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string
+          guest_display_name: string
+          id: string
+          updated_at: string
+        }[]
+      }
       cancel_guest_participant: {
-        Args: { p_event_participant_id: string };
+        Args: { p_event_participant_id: string }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string;
-          created_at: string;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string;
-          guest_display_name: string;
-          id: string;
-          updated_at: string;
-        }[];
-      };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string
+          created_at: string
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string
+          guest_display_name: string
+          id: string
+          updated_at: string
+        }[]
+      }
       change_group_member_role: {
         Args: {
-          p_group_member_id: string;
-          p_role: Database['public']['Enums']['group_member_role'];
-        };
+          p_group_member_id: string
+          p_role: Database["public"]["Enums"]["group_member_role"]
+        }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'group_members';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       configure_event_team_managers: {
-        Args: { p_assignments: Json; p_event_id: string };
-        Returns: undefined;
-      };
+        Args: { p_assignments: Json; p_event_id: string }
+        Returns: undefined
+      }
       create_dinner_expense: {
         Args: {
-          p_amount_minor: number;
-          p_description: string;
-          p_event_id: string;
-        };
-        Returns: Json;
-      };
+          p_amount_minor: number
+          p_description: string
+          p_event_id: string
+        }
+        Returns: Json
+      }
       create_event: {
         Args: {
-          p_court_price_minor: number;
-          p_group_id: string;
-          p_location: string;
-          p_starts_at: string;
-        };
+          p_court_price_minor: number
+          p_group_id: string
+          p_location: string
+          p_starts_at: string
+        }
         Returns: {
-          court_price_minor: number;
-          created_at: string;
-          created_by: string;
-          currency_code: string;
-          dinner_attendance_recorded_at: string | null;
-          dinner_attendance_recorded_by: string | null;
-          group_id: string;
-          id: string;
-          location: string;
-          match_attendance_recorded_at: string | null;
-          match_attendance_recorded_by: string | null;
-          starts_at: string;
-          status: Database['public']['Enums']['event_status'];
-          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
-          title: string | null;
-          updated_at: string;
-        };
+          court_price_minor: number
+          created_at: string
+          created_by: string
+          currency_code: string
+          dinner_attendance_recorded_at: string | null
+          dinner_attendance_recorded_by: string | null
+          group_id: string
+          id: string
+          location: string
+          match_attendance_recorded_at: string | null
+          match_attendance_recorded_by: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_formation_mode: Database["public"]["Enums"]["team_formation_mode"]
+          title: string | null
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'events';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_group: {
-        Args: { p_description?: string; p_name: string };
+        Args: { p_description?: string; p_name: string }
         Returns: {
-          group_id: string;
-          group_name: string;
-          membership_id: string;
-        }[];
-      };
+          group_id: string
+          group_name: string
+          membership_id: string
+        }[]
+      }
       create_group_invitation: {
-        Args: { p_group_member_id: string };
+        Args: { p_group_member_id: string }
         Returns: {
-          expires_at: string;
-          group_id: string;
-          group_member_id: string;
-          group_name: string;
-          member_display_name: string;
-          raw_token: string;
-        }[];
-      };
+          expires_at: string
+          group_id: string
+          group_member_id: string
+          group_name: string
+          member_display_name: string
+          raw_token: string
+        }[]
+      }
       deactivate_group_member: {
-        Args: { p_group_member_id: string };
+        Args: { p_group_member_id: string }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'group_members';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       delete_dinner_expense: {
         Args: {
-          p_event_id: string;
-          p_expected_updated_at: string;
-          p_expense_id: string;
-        };
-        Returns: Json;
-      };
-      finalize_match_settlement: { Args: { p_event_id: string }; Returns: Json };
-      get_dinner_planning: { Args: { p_event_id: string }; Returns: Json };
-      get_dinner_reality: { Args: { p_event_id: string }; Returns: Json };
+          p_event_id: string
+          p_expected_updated_at: string
+          p_expense_id: string
+        }
+        Returns: Json
+      }
+      finalize_dinner_settlement: {
+        Args: { p_event_id: string }
+        Returns: Json
+      }
+      finalize_match_settlement: { Args: { p_event_id: string }; Returns: Json }
+      get_dinner_planning: { Args: { p_event_id: string }; Returns: Json }
+      get_dinner_reality: { Args: { p_event_id: string }; Returns: Json }
+      get_dinner_settlement: { Args: { p_event_id: string }; Returns: Json }
       get_event_attendance: {
-        Args: { p_event_id: string };
+        Args: { p_event_id: string }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          avatar_path: string;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          display_name: string;
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string;
-          is_current_user: boolean;
-          is_guest: boolean;
-          membership_active: boolean;
-          participant_id: string;
-        }[];
-      };
-      get_event_player_draft: { Args: { p_event_id: string }; Returns: Json };
-      get_event_team_lineup: { Args: { p_event_id: string }; Returns: Json };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          avatar_path: string
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          display_name: string
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string
+          is_current_user: boolean
+          is_guest: boolean
+          membership_active: boolean
+          participant_id: string
+        }[]
+      }
+      get_event_player_draft: { Args: { p_event_id: string }; Returns: Json }
+      get_event_team_lineup: { Args: { p_event_id: string }; Returns: Json }
       get_event_team_manager_configuration: {
-        Args: { p_event_id: string };
+        Args: { p_event_id: string }
         Returns: {
-          event_status: Database['public']['Enums']['event_status'];
-          formation_mode: Database['public']['Enums']['team_formation_mode'];
-          manager_avatar_path: string;
-          manager_display_name: string;
-          manager_group_member_id: string;
-          manager_nickname: string;
-          team_id: string;
-          team_name: string;
-          team_position: number;
-        }[];
-      };
+          event_status: Database["public"]["Enums"]["event_status"]
+          formation_mode: Database["public"]["Enums"]["team_formation_mode"]
+          manager_avatar_path: string
+          manager_display_name: string
+          manager_group_member_id: string
+          manager_nickname: string
+          team_id: string
+          team_name: string
+          team_position: number
+        }[]
+      }
       get_event_teams: {
-        Args: { p_event_id: string };
+        Args: { p_event_id: string }
         Returns: {
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          avatar_path: string;
-          display_name: string;
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string;
-          is_guest: boolean;
-          participant_id: string;
-          position: number;
-          team_id: string;
-          team_name: string;
-        }[];
-      };
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          avatar_path: string
+          display_name: string
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string
+          is_guest: boolean
+          participant_id: string
+          position: number
+          team_id: string
+          team_name: string
+        }[]
+      }
       get_group_invitation_preview: {
-        Args: { p_raw_token: string };
+        Args: { p_raw_token: string }
         Returns: {
-          expires_at: string;
-          group_name: string;
-          member_display_name: string;
-          status: string;
-        }[];
-      };
-      get_match_settlement: { Args: { p_event_id: string }; Returns: Json };
+          expires_at: string
+          group_name: string
+          member_display_name: string
+          status: string
+        }[]
+      }
+      get_match_settlement: { Args: { p_event_id: string }; Returns: Json }
       list_invitable_group_members: {
-        Args: never;
+        Args: never
         Returns: {
-          group_id: string;
-          group_member_id: string;
-          group_name: string;
-          member_display_name: string;
-        }[];
-      };
+          group_id: string
+          group_member_id: string
+          group_name: string
+          member_display_name: string
+        }[]
+      }
       reactivate_group_member: {
-        Args: { p_group_member_id: string };
+        Args: { p_group_member_id: string }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'group_members';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_dinner_attendance: {
         Args: {
-          p_attendances: Json;
-          p_event_id: string;
-          p_expected_recorded_at?: string;
-        };
-        Returns: Json;
-      };
+          p_attendances: Json
+          p_event_id: string
+          p_expected_recorded_at?: string
+        }
+        Returns: Json
+      }
       record_match_attendance: {
-        Args: { p_attendances: Json; p_event_id: string };
-        Returns: undefined;
-      };
+        Args: { p_attendances: Json; p_event_id: string }
+        Returns: undefined
+      }
       revoke_group_invitation: {
-        Args: { p_group_member_id: string };
-        Returns: boolean;
-      };
+        Args: { p_group_member_id: string }
+        Returns: boolean
+      }
       save_dinner_plan: {
         Args: {
-          p_event_id: string;
-          p_expected_updated_at?: string;
-          p_menu: string;
-          p_planned_purchases: Json;
-          p_purchase_owner_group_member_id: string;
-        };
-        Returns: Json;
-      };
+          p_event_id: string
+          p_expected_updated_at?: string
+          p_menu: string
+          p_planned_purchases: Json
+          p_purchase_owner_group_member_id: string
+        }
+        Returns: Json
+      }
       save_event_teams: {
-        Args: { p_event_id: string; p_teams: Json };
-        Returns: undefined;
-      };
+        Args: { p_event_id: string; p_teams: Json }
+        Returns: undefined
+      }
       select_draft_player: {
         Args: {
-          p_event_id: string;
-          p_event_participant_id: string;
-          p_expected_version: number;
-        };
-        Returns: undefined;
-      };
+          p_event_id: string
+          p_event_participant_id: string
+          p_expected_version: number
+        }
+        Returns: undefined
+      }
       set_event_team_formation_mode: {
         Args: {
-          p_event_id: string;
-          p_mode: Database['public']['Enums']['team_formation_mode'];
-          p_team_count?: number;
-        };
-        Returns: undefined;
-      };
+          p_event_id: string
+          p_mode: Database["public"]["Enums"]["team_formation_mode"]
+          p_team_count?: number
+        }
+        Returns: undefined
+      }
       set_group_avatar: {
-        Args: { p_avatar_path: string; p_group_id: string };
-        Returns: string;
-      };
+        Args: { p_avatar_path: string; p_group_id: string }
+        Returns: string
+      }
       set_group_member_avatar: {
-        Args: { p_avatar_path: string; p_group_member_id: string };
-        Returns: string;
-      };
+        Args: { p_avatar_path: string; p_group_member_id: string }
+        Returns: string
+      }
       set_my_dinner_confirmation: {
         Args: {
-          p_event_id: string;
-          p_response: Database['public']['Enums']['attendance_response'];
-        };
+          p_event_id: string
+          p_response: Database["public"]["Enums"]["attendance_response"]
+        }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string | null;
-          created_at: string;
-          created_by: string | null;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string | null;
-          guest_display_name: string | null;
-          id: string;
-          updated_at: string;
-        };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string | null
+          guest_display_name: string | null
+          id: string
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'event_participants';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "event_participants"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_my_football_confirmation: {
         Args: {
-          p_event_id: string;
-          p_response: Database['public']['Enums']['attendance_response'];
-        };
+          p_event_id: string
+          p_response: Database["public"]["Enums"]["attendance_response"]
+        }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string | null;
-          created_at: string;
-          created_by: string | null;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string | null;
-          guest_display_name: string | null;
-          id: string;
-          updated_at: string;
-        };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string | null
+          created_at: string
+          created_by: string | null
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string | null
+          guest_display_name: string | null
+          id: string
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'event_participants';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "event_participants"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       start_event_player_draft: {
-        Args: { p_event_id: string };
-        Returns: undefined;
-      };
+        Args: { p_event_id: string }
+        Returns: undefined
+      }
       swap_event_team_players: {
         Args: {
-          p_event_id: string;
-          p_first_participant_id: string;
-          p_second_participant_id: string;
-        };
-        Returns: undefined;
-      };
+          p_event_id: string
+          p_first_participant_id: string
+          p_second_participant_id: string
+        }
+        Returns: undefined
+      }
       transition_event_status: {
         Args: {
-          p_event_id: string;
-          p_target_status: Database['public']['Enums']['event_status'];
-        };
+          p_event_id: string
+          p_target_status: Database["public"]["Enums"]["event_status"]
+        }
         Returns: {
-          court_price_minor: number;
-          created_at: string;
-          created_by: string;
-          currency_code: string;
-          dinner_attendance_recorded_at: string | null;
-          dinner_attendance_recorded_by: string | null;
-          group_id: string;
-          id: string;
-          location: string;
-          match_attendance_recorded_at: string | null;
-          match_attendance_recorded_by: string | null;
-          starts_at: string;
-          status: Database['public']['Enums']['event_status'];
-          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
-          title: string | null;
-          updated_at: string;
-        };
+          court_price_minor: number
+          created_at: string
+          created_by: string
+          currency_code: string
+          dinner_attendance_recorded_at: string | null
+          dinner_attendance_recorded_by: string | null
+          group_id: string
+          id: string
+          location: string
+          match_attendance_recorded_at: string | null
+          match_attendance_recorded_by: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_formation_mode: Database["public"]["Enums"]["team_formation_mode"]
+          title: string | null
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'events';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_dinner_expense: {
         Args: {
-          p_amount_minor: number;
-          p_description: string;
-          p_event_id: string;
-          p_expected_updated_at: string;
-          p_expense_id: string;
-        };
-        Returns: Json;
-      };
+          p_amount_minor: number
+          p_description: string
+          p_event_id: string
+          p_expected_updated_at: string
+          p_expense_id: string
+        }
+        Returns: Json
+      }
       update_event_details: {
         Args: {
-          p_court_price_minor: number;
-          p_event_id: string;
-          p_location: string;
-          p_starts_at: string;
-        };
+          p_court_price_minor: number
+          p_event_id: string
+          p_location: string
+          p_starts_at: string
+        }
         Returns: {
-          court_price_minor: number;
-          created_at: string;
-          created_by: string;
-          currency_code: string;
-          dinner_attendance_recorded_at: string | null;
-          dinner_attendance_recorded_by: string | null;
-          group_id: string;
-          id: string;
-          location: string;
-          match_attendance_recorded_at: string | null;
-          match_attendance_recorded_by: string | null;
-          starts_at: string;
-          status: Database['public']['Enums']['event_status'];
-          team_formation_mode: Database['public']['Enums']['team_formation_mode'];
-          title: string | null;
-          updated_at: string;
-        };
+          court_price_minor: number
+          created_at: string
+          created_by: string
+          currency_code: string
+          dinner_attendance_recorded_at: string | null
+          dinner_attendance_recorded_by: string | null
+          group_id: string
+          id: string
+          location: string
+          match_attendance_recorded_at: string | null
+          match_attendance_recorded_by: string | null
+          starts_at: string
+          status: Database["public"]["Enums"]["event_status"]
+          team_formation_mode: Database["public"]["Enums"]["team_formation_mode"]
+          title: string | null
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'events';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "events"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_group: {
-        Args: { p_description?: string; p_group_id: string; p_name: string };
+        Args: { p_description?: string; p_group_id: string; p_name: string }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          created_by: string;
-          description: string | null;
-          id: string;
-          name: string;
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'groups';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "groups"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_group_member: {
         Args: {
-          p_display_name: string;
-          p_group_member_id: string;
-          p_nickname?: string;
-        };
+          p_display_name: string
+          p_group_member_id: string
+          p_nickname?: string
+        }
         Returns: {
-          avatar_url: string | null;
-          created_at: string;
-          deactivated_at: string | null;
-          display_name: string;
-          group_id: string;
-          id: string;
-          nickname: string | null;
-          profile_id: string | null;
-          role: Database['public']['Enums']['group_member_role'];
-          updated_at: string;
-        };
+          avatar_url: string | null
+          created_at: string
+          deactivated_at: string | null
+          display_name: string
+          group_id: string
+          id: string
+          nickname: string | null
+          profile_id: string | null
+          role: Database["public"]["Enums"]["group_member_role"]
+          updated_at: string
+        }
         SetofOptions: {
-          from: '*';
-          to: 'group_members';
-          isOneToOne: true;
-          isSetofReturn: false;
-        };
-      };
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       update_guest_participant: {
         Args: {
-          p_dines: boolean;
-          p_display_name: string;
-          p_event_participant_id: string;
-          p_plays: boolean;
-        };
+          p_dines: boolean
+          p_display_name: string
+          p_event_participant_id: string
+          p_plays: boolean
+        }
         Returns: {
-          actual_dinner: Database['public']['Enums']['actual_attendance_status'];
-          actual_football: Database['public']['Enums']['actual_attendance_status'];
-          cancelled_at: string;
-          created_at: string;
-          dinner_response: Database['public']['Enums']['attendance_response'];
-          event_id: string;
-          football_response: Database['public']['Enums']['attendance_response'];
-          group_member_id: string;
-          guest_display_name: string;
-          id: string;
-          updated_at: string;
-        }[];
-      };
-    };
+          actual_dinner: Database["public"]["Enums"]["actual_attendance_status"]
+          actual_football: Database["public"]["Enums"]["actual_attendance_status"]
+          cancelled_at: string
+          created_at: string
+          dinner_response: Database["public"]["Enums"]["attendance_response"]
+          event_id: string
+          football_response: Database["public"]["Enums"]["attendance_response"]
+          group_member_id: string
+          guest_display_name: string
+          id: string
+          updated_at: string
+        }[]
+      }
+    }
     Enums: {
-      actual_attendance_status: 'UNSET' | 'YES' | 'NO';
-      attendance_response: 'UNKNOWN' | 'YES' | 'NO';
-      event_status: 'DRAFT' | 'OPEN' | 'IN_PROGRESS' | 'SETTLEMENT' | 'CLOSED';
-      group_member_role: 'ADMIN' | 'MEMBER';
-      payment_category: 'COURT' | 'DINNER';
-      payment_status: 'PENDING' | 'PAID';
-      player_draft_status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
-      team_formation_mode: 'RANDOM' | 'MANAGERS';
-    };
+      actual_attendance_status: "UNSET" | "YES" | "NO"
+      attendance_response: "UNKNOWN" | "YES" | "NO"
+      event_status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "SETTLEMENT" | "CLOSED"
+      group_member_role: "ADMIN" | "MEMBER"
+      payment_category: "COURT" | "DINNER"
+      payment_status: "PENDING" | "PAID"
+      player_draft_status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
+      team_formation_mode: "RANDOM" | "MANAGERS"
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
-      Row: infer R;
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R;
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
       }
       ? R
       : never
-    : never;
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Insert: infer I;
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I;
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
       }
       ? I
       : never
-    : never;
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends (DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Update: infer U;
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U;
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
       }
       ? U
       : never
-    : never;
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends (DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
-    : never;
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    keyof DefaultSchema['CompositeTypes'] | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
+  schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-    : never;
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
     Enums: {
-      actual_attendance_status: ['UNSET', 'YES', 'NO'],
-      attendance_response: ['UNKNOWN', 'YES', 'NO'],
-      event_status: ['DRAFT', 'OPEN', 'IN_PROGRESS', 'SETTLEMENT', 'CLOSED'],
-      group_member_role: ['ADMIN', 'MEMBER'],
-      payment_category: ['COURT', 'DINNER'],
-      payment_status: ['PENDING', 'PAID'],
-      player_draft_status: ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'],
-      team_formation_mode: ['RANDOM', 'MANAGERS'],
+      actual_attendance_status: ["UNSET", "YES", "NO"],
+      attendance_response: ["UNKNOWN", "YES", "NO"],
+      event_status: ["DRAFT", "OPEN", "IN_PROGRESS", "SETTLEMENT", "CLOSED"],
+      group_member_role: ["ADMIN", "MEMBER"],
+      payment_category: ["COURT", "DINNER"],
+      payment_status: ["PENDING", "PAID"],
+      player_draft_status: ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"],
+      team_formation_mode: ["RANDOM", "MANAGERS"],
     },
   },
-} as const;
+} as const

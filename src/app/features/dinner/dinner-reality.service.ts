@@ -105,6 +105,7 @@ export class DinnerRealityService {
   ): DinnerRealityOperationError {
     const message = error?.message ?? '';
     const mappings: readonly [string, DinnerRealityOperation][] = [
+      ['DINNER_SETTLEMENT_SOURCE_LOCKED', 'SETTLEMENT_LOCKED'],
       ['DINNER_REALITY_ATTENDANCE_CONFLICT', 'ATTENDANCE_CONFLICT'],
       ['DINNER_REALITY_ATTENDANCE_', 'ATTENDANCE_INVALID'],
       ['DINNER_REALITY_PARTICIPANT_INVALID', 'ATTENDANCE_INVALID'],
