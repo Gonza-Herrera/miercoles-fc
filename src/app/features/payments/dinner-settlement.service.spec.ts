@@ -13,7 +13,9 @@ describe('DinnerSettlementService', () => {
   beforeEach(() => {
     rpc.mockReset();
     TestBed.configureTestingModule({
-      providers: [{ provide: SUPABASE_CLIENT, useValue: { rpc } as unknown as SupabaseClient<Database> }],
+      providers: [
+        { provide: SUPABASE_CLIENT, useValue: { rpc } as unknown as SupabaseClient<Database> },
+      ],
     });
   });
 
@@ -31,7 +33,10 @@ describe('DinnerSettlementService', () => {
   });
 
   it('maps Dinner domain failures without exposing PostgreSQL messages', async () => {
-    rpc.mockResolvedValue({ data: null, error: { message: 'DINNER_SETTLEMENT_NO_EXPENSES detail' } });
+    rpc.mockResolvedValue({
+      data: null,
+      error: { message: 'DINNER_SETTLEMENT_NO_EXPENSES detail' },
+    });
     await expect(TestBed.inject(DinnerSettlementService).finalize('event-1')).rejects.toEqual(
       new DinnerSettlementOperationError('NO_DINNER_EXPENSES'),
     );

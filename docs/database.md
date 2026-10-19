@@ -121,9 +121,15 @@ Money uses signed PostgreSQL `bigint` minor units, never floating point. For ARS
 
 Dinner total is derived from `sum(dinner_expenses.amount_minor)` and is not duplicated. The nullable dinner payer currently references only a group member; recording a guest as the direct purchaser is intentionally deferred until there is a concrete product requirement.
 
-Payments reference event participants, supporting members and guests equally. `COURT` and `DINNER` are independent categories. A unique constraint permits only one row per event/participant/category. `PENDING` requires `paid_at = null`; `PAID` requires a timestamp. Partial payments are outside v1.
+Payments reference event participants and exactly one immutable settlement item, supporting members and guests equally. Composite foreign keys prove that obligation, participant and event match. `COURT` points only to a Match item and `DINNER` only to a Dinner item; XOR and partial unique constraints prevent ambiguous or duplicate markers.
+
+No row means `PENDING`; one canonical row means `PAID`. This lets every existing or newly finalized obligation begin pending without bulk inserts. A paid row copies the exact persisted obligation amount, receives `paid_at` from `clock_timestamp()` and `recorded_by` from `auth.uid()`. Reverting to pending deletes that marker. There is no combined participant status and no partial amount.
+
+`payments_assert_obligation_amount` validates that the copied amount still equals the referenced Match or Dinner item for every insert or identity/amount update. Public payment RPC wrappers use invoker privileges; the narrowly granted helpers in `private` perform the privileged reads/writes after explicit authentication, group-role and lifecycle checks.
 
 PR21 separates court obligations from payment state. `match_settlements` snapshots one canonical court settlement per event; `match_settlement_items` references the same event's `EventParticipant` and stores one exact allocation per actual player. The authoritative RPC derives `court_price_minor` and `actual_football = YES` server-side, allocates remainders by `created_at, id`, and verifies that item count and sum match the snapshot. It inserts no `payments` rows.
+
+PR22 does the same independently for actual Dinner costs and diners. PR23 reads both item tables without recalculating allocations. Summary totals are exact `sum(item.amount_minor)` partitions: collected for rows with a payment marker and outstanding for rows without one.
 
 ## Concurrency and integrity
 
@@ -137,7 +143,7 @@ PostgreSQL, rather than a prior client-side `SELECT`, protects:
 - one manager per team and one managed team per member/event;
 - one atomic current-DT pick and one capacity-bounded draft roster;
 - active, linked, same-group Manager eligibility for mutable events;
-- one payment per participant/event/category;
+- one payment marker per immutable Match or Dinner obligation;
 - participant/team/event and manager/member/group consistency;
 - valid attendance, status, role, currency, amount, and paid timestamp states.
 

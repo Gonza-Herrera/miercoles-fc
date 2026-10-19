@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation, Design System, mobile application shell, installable PWA infrastructure, Supabase/PostgreSQL backend contract, passwordless identity, secure invitations, group/member administration, weekly event management, attendance, the current-event dashboard, team formation, random team generation, temporary event DT assignments, synchronized player draft, final Team Lineup UI, the complete Dinner reality milestone, and Match Settlement. Dinner settlement and payment tracking remain on the roadmap.
+This repository currently contains the application foundation through independent Match and Dinner settlement plus payment tracking.
 
 ## Current status
 
-**PR21 — Match Settlement**
+**PR23 — Payments**
 
-PR21 creates exact, immutable court obligations from the Event price and PR13 actual players. It supports guests, deterministic remainder allocation, ADMIN-only idempotent finalization and member reads without creating or updating Payments. PR22 — Dinner Settlement is next.
+PR23 tracks `PENDING`/`PAID` independently for each immutable Match or Dinner obligation. ADMINs confirm and correct receipts atomically; members have read-only visibility. PR24 — Event Closure & Summary is next.
 
 ## Tech stack
 
@@ -62,7 +62,7 @@ Design tokens and global foundations live in `src/styles/`. See [Design System d
 | `/`                      | Current-event dashboard for the selected group    |
 | `/match`                 | Football attendance for the current event         |
 | `/dinner`                | Dinner confirmation, planning and reality         |
-| `/payments`              | Match Settlement preview and final obligations    |
+| `/payments`              | Settlements and independent payment tracking      |
 | `/invitations`           | Minimal protected ADMIN invitation surface        |
 | `/groups`                | Protected group selection and administration      |
 | `/groups/new`            | Atomic group creation                             |
@@ -157,6 +157,8 @@ Dinner Planning preserves menu, planned purchases and purchase responsibility as
 
 Match Settlement divides the event-specific court price only among actual PR13 players, snapshots one exact obligation per EventParticipant and remains separate from payment state. See [Match Settlement](docs/match-settlement.md).
 
+Dinner Settlement snapshots exact obligations from PR20 actual diners and expenses. Payments then reference those immutable Match/Dinner items without recalculating either allocation. See [Dinner Settlement](docs/dinner-settlement.md) and [Payments](docs/payments.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -180,6 +182,8 @@ Match Settlement divides the event-specific court price only among actual PR13 p
 - Completed: **PR19 — Dinner Planning**
 - Completed: **PR20 — Dinner Attendance & Expenses**
 - Completed: **PR21 — Match Settlement**
-- Next: **PR22 — Dinner Settlement**
+- Completed: **PR22 — Dinner Settlement**
+- Current: **PR23 — Payments**
+- Next: **PR24 — Event Closure & Summary**
 
-PR21 begins Milestone 6 — Liquidación y pagos with court obligations. PR22 will consume PR20's actual diner and expense sources to calculate Dinner Settlement; PR23 will add payment tracking.
+PR21 and PR22 establish immutable financial obligations. PR23 records whether each independent obligation was received. PR24 will close and summarize the event.

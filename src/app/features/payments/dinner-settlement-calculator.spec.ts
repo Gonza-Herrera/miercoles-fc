@@ -13,7 +13,9 @@ describe('calculateDinnerSettlement', () => {
     expect(result.valid).toBe(true);
     if (!result.valid) return;
     expect(result.allocations).toHaveLength(10);
-    expect(result.allocations.every((allocation) => allocation.amountMinor === 1_000_000)).toBe(true);
+    expect(result.allocations.every((allocation) => allocation.amountMinor === 1_000_000)).toBe(
+      true,
+    );
     expect(sum(result.allocations)).toBe(10_000_000);
   });
 
@@ -45,23 +47,51 @@ describe('calculateDinnerSettlement', () => {
     });
     expect(result.valid).toBe(true);
     if (!result.valid) return;
-    expect(result.allocations.map((item) => item.amountMinor)).toEqual([1_666_667, 1_666_667, 1_666_666]);
+    expect(result.allocations.map((item) => item.amountMinor)).toEqual([
+      1_666_667, 1_666_667, 1_666_666,
+    ]);
     expect(sum(result.allocations)).toBe(5_000_000);
   });
 
   it('rejects unrecorded, zero diners, zero expenses, too-small totals and duplicates', () => {
-    expect(calculateDinnerSettlement({ attendanceRecorded: false, diners: [], expenseTotalMinor: 0 })).toEqual({ valid: false, reason: 'ATTENDANCE_NOT_RECORDED' });
-    expect(calculateDinnerSettlement({ attendanceRecorded: true, diners: [], expenseTotalMinor: 1 })).toEqual({ valid: false, reason: 'NO_ACTUAL_DINERS' });
-    expect(calculateDinnerSettlement({ attendanceRecorded: true, diners: diners(1), expenseTotalMinor: 0 })).toEqual({ valid: false, reason: 'NO_DINNER_EXPENSES' });
-    expect(calculateDinnerSettlement({ attendanceRecorded: true, diners: diners(3), expenseTotalMinor: 1 })).toEqual({ valid: false, reason: 'INVALID_PARTICIPANTS' });
+    expect(
+      calculateDinnerSettlement({ attendanceRecorded: false, diners: [], expenseTotalMinor: 0 }),
+    ).toEqual({ valid: false, reason: 'ATTENDANCE_NOT_RECORDED' });
+    expect(
+      calculateDinnerSettlement({ attendanceRecorded: true, diners: [], expenseTotalMinor: 1 }),
+    ).toEqual({ valid: false, reason: 'NO_ACTUAL_DINERS' });
+    expect(
+      calculateDinnerSettlement({
+        attendanceRecorded: true,
+        diners: diners(1),
+        expenseTotalMinor: 0,
+      }),
+    ).toEqual({ valid: false, reason: 'NO_DINNER_EXPENSES' });
+    expect(
+      calculateDinnerSettlement({
+        attendanceRecorded: true,
+        diners: diners(3),
+        expenseTotalMinor: 1,
+      }),
+    ).toEqual({ valid: false, reason: 'INVALID_PARTICIPANTS' });
     const duplicate = [diners(1)[0], diners(1)[0]];
-    expect(calculateDinnerSettlement({ attendanceRecorded: true, diners: duplicate, expenseTotalMinor: 100 })).toEqual({ valid: false, reason: 'INVALID_PARTICIPANTS' });
+    expect(
+      calculateDinnerSettlement({
+        attendanceRecorded: true,
+        diners: duplicate,
+        expenseTotalMinor: 100,
+      }),
+    ).toEqual({ valid: false, reason: 'INVALID_PARTICIPANTS' });
   });
 
   it('preserves exact invariants for representative positive totals and 1..30 diners', () => {
     for (const total of [1, 99, 100, 123_456, 10_000_000, Number.MAX_SAFE_INTEGER]) {
       for (let count = 1; count <= Math.min(30, total); count += 1) {
-        const result = calculateDinnerSettlement({ attendanceRecorded: true, diners: diners(count), expenseTotalMinor: total });
+        const result = calculateDinnerSettlement({
+          attendanceRecorded: true,
+          diners: diners(count),
+          expenseTotalMinor: total,
+        });
         expect(result.valid).toBe(true);
         if (!result.valid) continue;
         const amounts = result.allocations.map((item) => item.amountMinor);

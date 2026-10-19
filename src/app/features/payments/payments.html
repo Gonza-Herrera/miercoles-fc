@@ -4,7 +4,7 @@
       <span class="payments-page__icon" aria-hidden="true">$</span>
       <div>
         <p class="payments-page__eyebrow">Miércoles</p>
-        <h1 class="ds-page-title">Liquidaciones</h1>
+        <h1 class="ds-page-title">Pagos</h1>
         @if (event(); as currentEvent) {
           <p>{{ eventDateLabel(currentEvent.startsAt) }}</p>
         }
@@ -25,7 +25,8 @@
       }
       @if (errorMessage(); as error) {
         <div class="payments-page__error" role="alert">
-          <span>{{ error }}</span><button type="button" (click)="load()">Actualizar</button>
+          <span>{{ error }}</span
+          ><button type="button" (click)="load()">Actualizar</button>
         </div>
       }
 
@@ -49,54 +50,177 @@
               <dl class="settlement-summary__facts">
                 <div>
                   <dt>Precio</dt>
-                  <dd>{{ formatMoney(settlementView.courtAmountMinor, settlementView.currencyCode) }}</dd>
+                  <dd>
+                    {{ formatMoney(settlementView.courtAmountMinor, settlementView.currencyCode) }}
+                  </dd>
                 </div>
-                <div><dt>Jugadores reales</dt><dd>{{ settlementView.actualPlayerCount }}</dd></div>
+                <div>
+                  <dt>Jugadores reales</dt>
+                  <dd>{{ settlementView.actualPlayerCount }}</dd>
+                </div>
                 @if (settlementView.preview; as preview) {
                   <div class="settlement-summary__average">
                     <dt>Por jugador</dt>
-                    <dd>≈ {{ formatMoney(preview.displayAverageMinor, settlementView.currencyCode) }}</dd>
+                    <dd>
+                      ≈ {{ formatMoney(preview.displayAverageMinor, settlementView.currencyCode) }}
+                    </dd>
                   </div>
                 } @else if (settlementView.settlement; as finalized) {
                   <div class="settlement-summary__average">
                     <dt>Total asignado</dt>
-                    <dd>{{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}</dd>
+                    <dd>
+                      {{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}
+                    </dd>
                   </div>
                 }
               </dl>
             </section>
           </app-card>
-          @if (settlementView.settlement; as finalized) {
+          @if (settlementView.settlement && paymentsView(); as paymentView) {
             <app-card>
-              <section class="allocations" aria-labelledby="match-final-title">
-                <header><p class="payments-page__eyebrow">Obligaciones finales</p><h3 id="match-final-title" class="ds-section-title">Cada jugador</h3></header>
-                <ul>
-                  @for (allocation of finalized.allocations; track allocation.eventParticipantId) {
-                    <li><span>{{ allocation.displayName }} @if (allocation.isGuest) { <small>· Invitado</small> }</span><strong>{{ formatMoney(allocation.amountMinor, finalized.currencyCode) }}</strong></li>
+              <section class="payment-tracking" aria-labelledby="match-final-title">
+                <header class="payment-tracking__header">
+                  <div>
+                    <p class="payments-page__eyebrow">Cobros de cancha</p>
+                    <h3 id="match-final-title" class="ds-section-title">Estado por jugador</h3>
+                  </div>
+                  <app-badge
+                    [variant]="paymentView.match.summary.pendingCount === 0 ? 'success' : 'warning'"
+                    >{{ paymentView.match.summary.paidCount }} /
+                    {{ paymentView.match.summary.totalCount }} pagaron</app-badge
+                  >
+                </header>
+                <dl class="payment-summary">
+                  <div>
+                    <dt>Cobrado</dt>
+                    <dd>
+                      {{
+                        formatMoney(
+                          paymentView.match.summary.collectedAmountMinor,
+                          paymentView.currencyCode
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Pendiente</dt>
+                    <dd>
+                      {{
+                        formatMoney(
+                          paymentView.match.summary.outstandingAmountMinor,
+                          paymentView.currencyCode
+                        )
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                @if (paymentView.match.summary.pendingCount === 0) {
+                  <p class="payment-tracking__complete" role="status">Todos pagaron.</p>
+                }
+                <ul class="payment-list">
+                  @for (obligation of paymentView.match.obligations; track obligation.id) {
+                    <li
+                      class="payment-row"
+                      [class.payment-row--paid]="obligation.status === 'PAID'"
+                    >
+                      <div class="payment-row__identity">
+                        <app-avatar
+                          [name]="obligation.displayName"
+                          [src]="obligation.avatarUrl"
+                          size="small"
+                        />
+                        <span
+                          ><strong>{{ obligation.displayName }}</strong>
+                          @if (obligation.isGuest) {
+                            <small>Invitado</small>
+                          } @else if (obligation.isCurrentUser) {
+                            <small>Tu cancha</small>
+                          }
+                        </span>
+                      </div>
+                      <div class="payment-row__action">
+                        <strong>{{
+                          formatMoney(obligation.amountMinor, paymentView.currencyCode)
+                        }}</strong
+                        ><app-badge
+                          [variant]="obligation.status === 'PAID' ? 'success' : 'warning'"
+                          >{{ obligation.status === 'PAID' ? 'Pagado' : 'Pendiente' }}</app-badge
+                        >
+                        @if (paymentView.canManage) {
+                          <app-button
+                            size="small"
+                            [variant]="obligation.status === 'PAID' ? 'secondary' : 'primary'"
+                            [disabled]="updatingObligationId() !== null"
+                            (click)="requestPaymentChange('COURT', obligation)"
+                            >{{
+                              obligation.status === 'PAID' ? 'Marcar pendiente' : 'Marcar pagado'
+                            }}</app-button
+                          >
+                        }
+                      </div>
+                    </li>
                   }
                 </ul>
-                <div class="allocations__total"><span>Total</span><strong>{{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}</strong></div>
+                @if (!paymentView.canManage) {
+                  <p class="payments-page__readonly">
+                    Los pagos son de solo lectura. Solo un administrador puede confirmarlos.
+                  </p>
+                }
               </section>
             </app-card>
           } @else if (settlementView.preview; as preview) {
+            <p class="payments-page__readonly">
+              La cancha todavía no está liquidada. Primero generá la liquidación de la cancha.
+            </p>
             <app-card>
               <section class="allocations" aria-labelledby="match-preview-title">
-                <header><p class="payments-page__eyebrow">Vista previa</p><h3 id="match-preview-title" class="ds-section-title">Distribución exacta</h3></header>
+                <header>
+                  <p class="payments-page__eyebrow">Vista previa</p>
+                  <h3 id="match-preview-title" class="ds-section-title">Distribución exacta</h3>
+                </header>
                 <ul>
                   @for (allocation of preview.allocations; track allocation.eventParticipantId) {
-                    <li><span>{{ allocation.displayName }} @if (allocation.isGuest) { <small>· Invitado</small> }</span><strong>{{ formatMoney(allocation.amountMinor, settlementView.currencyCode) }}</strong></li>
+                    <li>
+                      <span
+                        >{{ allocation.displayName }}
+                        @if (allocation.isGuest) {
+                          <small>· Invitado</small>
+                        }</span
+                      ><strong>{{
+                        formatMoney(allocation.amountMinor, settlementView.currencyCode)
+                      }}</strong>
+                    </li>
                   }
                 </ul>
-                <div class="allocations__total"><span>Total</span><strong>{{ formatMoney(preview.totalAllocatedMinor, settlementView.currencyCode) }}</strong></div>
+                <div class="allocations__total">
+                  <span>Total</span
+                  ><strong>{{
+                    formatMoney(preview.totalAllocatedMinor, settlementView.currencyCode)
+                  }}</strong>
+                </div>
               </section>
             </app-card>
             @if (settlementView.canFinalize) {
-              <app-button size="large" [fullWidth]="true" [disabled]="finalizing() !== null" (click)="requestFinalize('MATCH')">{{ finalizing() === 'MATCH' ? 'Generando…' : 'Generar liquidación de cancha' }}</app-button>
+              <app-button
+                size="large"
+                [fullWidth]="true"
+                [disabled]="finalizing() !== null"
+                (click)="requestFinalize('MATCH')"
+                >{{
+                  finalizing() === 'MATCH' ? 'Generando…' : 'Generar liquidación de cancha'
+                }}</app-button
+              >
             } @else {
-              <p class="payments-page__readonly">Solo un administrador puede generar la liquidación.</p>
+              <p class="payments-page__readonly">
+                Solo un administrador puede generar la liquidación.
+              </p>
             }
           } @else {
-            <app-card><app-empty-state title="Liquidación no disponible" [description]="matchUnavailableCopy(settlementView.unavailableReason)" /></app-card>
+            <app-card
+              ><app-empty-state
+                title="Liquidación no disponible"
+                [description]="matchUnavailableCopy(settlementView.unavailableReason)"
+            /></app-card>
           }
         </section>
       }
@@ -105,70 +229,252 @@
         <section class="settlement-domain settlement-domain--dinner" aria-labelledby="dinner-title">
           <header class="settlement-domain__title">
             <span aria-hidden="true">🥩</span>
-            <div><p class="payments-page__eyebrow">Cena</p><h2 id="dinner-title">Cena</h2></div>
+            <div>
+              <p class="payments-page__eyebrow">Cena</p>
+              <h2 id="dinner-title">Cena</h2>
+            </div>
           </header>
           <app-card variant="elevated">
             <section class="settlement-summary" aria-labelledby="dinner-summary-title">
               <header class="settlement-summary__heading">
                 <h3 id="dinner-summary-title" class="ds-section-title">Resumen de cena</h3>
-                <app-badge [variant]="settlementView.settlement ? 'success' : 'warning'">{{ settlementView.settlement ? 'Liquidada' : 'Por liquidar' }}</app-badge>
+                <app-badge [variant]="settlementView.settlement ? 'success' : 'warning'">{{
+                  settlementView.settlement ? 'Liquidada' : 'Por liquidar'
+                }}</app-badge>
               </header>
               <dl class="settlement-summary__facts">
-                <div><dt>Gastos reales</dt><dd>{{ formatMoney(settlementView.expenseTotalMinor, settlementView.currencyCode) }}</dd></div>
-                <div><dt>Comensales reales</dt><dd>{{ settlementView.actualDinerCount }}</dd></div>
+                <div>
+                  <dt>Gastos reales</dt>
+                  <dd>
+                    {{ formatMoney(settlementView.expenseTotalMinor, settlementView.currencyCode) }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Comensales reales</dt>
+                  <dd>{{ settlementView.actualDinerCount }}</dd>
+                </div>
                 @if (settlementView.preview; as preview) {
-                  <div class="settlement-summary__average"><dt>Por persona</dt><dd>≈ {{ formatMoney(preview.displayAverageMinor, settlementView.currencyCode) }}</dd></div>
+                  <div class="settlement-summary__average">
+                    <dt>Por persona</dt>
+                    <dd>
+                      ≈ {{ formatMoney(preview.displayAverageMinor, settlementView.currencyCode) }}
+                    </dd>
+                  </div>
                 } @else if (settlementView.settlement; as finalized) {
-                  <div class="settlement-summary__average"><dt>Total asignado</dt><dd>{{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}</dd></div>
+                  <div class="settlement-summary__average">
+                    <dt>Total asignado</dt>
+                    <dd>
+                      {{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}
+                    </dd>
+                  </div>
                 }
               </dl>
             </section>
           </app-card>
-          @if (settlementView.settlement; as finalized) {
+          @if (settlementView.settlement && paymentsView(); as paymentView) {
             <app-card>
-              <section class="allocations" aria-labelledby="dinner-final-title">
-                <header><p class="payments-page__eyebrow">Obligaciones finales</p><h3 id="dinner-final-title" class="ds-section-title">Cada comensal</h3></header>
-                <ul>
-                  @for (allocation of finalized.allocations; track allocation.eventParticipantId) {
-                    <li><span>{{ allocation.displayName }} @if (allocation.isGuest) { <small>· Invitado</small> }</span><strong>{{ formatMoney(allocation.amountMinor, finalized.currencyCode) }}</strong></li>
+              <section class="payment-tracking" aria-labelledby="dinner-final-title">
+                <header class="payment-tracking__header">
+                  <div>
+                    <p class="payments-page__eyebrow">Cobros de cena</p>
+                    <h3 id="dinner-final-title" class="ds-section-title">Estado por comensal</h3>
+                  </div>
+                  <app-badge
+                    [variant]="
+                      paymentView.dinner.summary.pendingCount === 0 ? 'success' : 'warning'
+                    "
+                    >{{ paymentView.dinner.summary.paidCount }} /
+                    {{ paymentView.dinner.summary.totalCount }} pagaron</app-badge
+                  >
+                </header>
+                <dl class="payment-summary">
+                  <div>
+                    <dt>Cobrado</dt>
+                    <dd>
+                      {{
+                        formatMoney(
+                          paymentView.dinner.summary.collectedAmountMinor,
+                          paymentView.currencyCode
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Pendiente</dt>
+                    <dd>
+                      {{
+                        formatMoney(
+                          paymentView.dinner.summary.outstandingAmountMinor,
+                          paymentView.currencyCode
+                        )
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+                @if (paymentView.dinner.summary.pendingCount === 0) {
+                  <p class="payment-tracking__complete" role="status">Todos pagaron.</p>
+                }
+                <ul class="payment-list">
+                  @for (obligation of paymentView.dinner.obligations; track obligation.id) {
+                    <li
+                      class="payment-row"
+                      [class.payment-row--paid]="obligation.status === 'PAID'"
+                    >
+                      <div class="payment-row__identity">
+                        <app-avatar
+                          [name]="obligation.displayName"
+                          [src]="obligation.avatarUrl"
+                          size="small"
+                        />
+                        <span
+                          ><strong>{{ obligation.displayName }}</strong>
+                          @if (obligation.isGuest) {
+                            <small>Invitado</small>
+                          } @else if (obligation.isCurrentUser) {
+                            <small>Tu cena</small>
+                          }
+                        </span>
+                      </div>
+                      <div class="payment-row__action">
+                        <strong>{{
+                          formatMoney(obligation.amountMinor, paymentView.currencyCode)
+                        }}</strong
+                        ><app-badge
+                          [variant]="obligation.status === 'PAID' ? 'success' : 'warning'"
+                          >{{ obligation.status === 'PAID' ? 'Pagado' : 'Pendiente' }}</app-badge
+                        >
+                        @if (paymentView.canManage) {
+                          <app-button
+                            size="small"
+                            [variant]="obligation.status === 'PAID' ? 'secondary' : 'primary'"
+                            [disabled]="updatingObligationId() !== null"
+                            (click)="requestPaymentChange('DINNER', obligation)"
+                            >{{
+                              obligation.status === 'PAID' ? 'Marcar pendiente' : 'Marcar pagado'
+                            }}</app-button
+                          >
+                        }
+                      </div>
+                    </li>
                   }
                 </ul>
-                <div class="allocations__total"><span>Total</span><strong>{{ formatMoney(finalized.totalAllocatedMinor, finalized.currencyCode) }}</strong></div>
-                <p class="payments-page__note">Esta liquidación registra obligaciones. No registra pagos.</p>
+                @if (!paymentView.canManage) {
+                  <p class="payments-page__readonly">
+                    Los pagos son de solo lectura. Solo un administrador puede confirmarlos.
+                  </p>
+                }
               </section>
             </app-card>
           } @else if (settlementView.preview; as preview) {
+            <p class="payments-page__readonly">
+              La cena todavía no está liquidada. Primero generá la liquidación de la cena.
+            </p>
             <app-card>
               <section class="allocations" aria-labelledby="dinner-preview-title">
-                <header><p class="payments-page__eyebrow">Vista previa</p><h3 id="dinner-preview-title" class="ds-section-title">Distribución exacta</h3></header>
+                <header>
+                  <p class="payments-page__eyebrow">Vista previa</p>
+                  <h3 id="dinner-preview-title" class="ds-section-title">Distribución exacta</h3>
+                </header>
                 <ul>
                   @for (allocation of preview.allocations; track allocation.eventParticipantId) {
-                    <li><span>{{ allocation.displayName }} @if (allocation.isGuest) { <small>· Invitado</small> }</span><strong>{{ formatMoney(allocation.amountMinor, settlementView.currencyCode) }}</strong></li>
+                    <li>
+                      <span
+                        >{{ allocation.displayName }}
+                        @if (allocation.isGuest) {
+                          <small>· Invitado</small>
+                        }</span
+                      ><strong>{{
+                        formatMoney(allocation.amountMinor, settlementView.currencyCode)
+                      }}</strong>
+                    </li>
                   }
                 </ul>
-                <div class="allocations__total"><span>Total</span><strong>{{ formatMoney(preview.totalAllocatedMinor, settlementView.currencyCode) }}</strong></div>
-                <p class="payments-page__note">Los gastos y comensales provienen exclusivamente de la realidad de la cena.</p>
+                <div class="allocations__total">
+                  <span>Total</span
+                  ><strong>{{
+                    formatMoney(preview.totalAllocatedMinor, settlementView.currencyCode)
+                  }}</strong>
+                </div>
+                <p class="payments-page__note">
+                  Los gastos y comensales provienen exclusivamente de la realidad de la cena.
+                </p>
               </section>
             </app-card>
             @if (settlementView.canFinalize) {
-              <app-button size="large" [fullWidth]="true" [disabled]="finalizing() !== null" (click)="requestFinalize('DINNER')">{{ finalizing() === 'DINNER' ? 'Generando…' : 'Generar liquidación de cena' }}</app-button>
+              <app-button
+                size="large"
+                [fullWidth]="true"
+                [disabled]="finalizing() !== null"
+                (click)="requestFinalize('DINNER')"
+                >{{
+                  finalizing() === 'DINNER' ? 'Generando…' : 'Generar liquidación de cena'
+                }}</app-button
+              >
             } @else {
-              <p class="payments-page__readonly">Solo un administrador puede generar la liquidación.</p>
+              <p class="payments-page__readonly">
+                Solo un administrador puede generar la liquidación.
+              </p>
             }
           } @else {
-            <app-card><app-empty-state title="Liquidación no disponible" [description]="dinnerUnavailableCopy(settlementView.unavailableReason)" /></app-card>
+            <app-card
+              ><app-empty-state
+                title="Liquidación no disponible"
+                [description]="dinnerUnavailableCopy(settlementView.unavailableReason)"
+            /></app-card>
           }
         </section>
       }
 
       @if (confirmationOpen() === 'MATCH' && matchView(); as settlementView) {
-        <app-confirm-dialog [open]="true" title="Generar liquidación de cancha" [description]="'Cancha: ' + formatMoney(settlementView.courtAmountMinor, settlementView.currencyCode) + '. Jugadores reales: ' + settlementView.actualPlayerCount + '. Se generará una obligación para cada jugador real.'" confirmLabel="Generar liquidación" (cancelled)="cancelFinalize()" (confirmed)="finalize('MATCH')" />
+        <app-confirm-dialog
+          [open]="true"
+          title="Generar liquidación de cancha"
+          [description]="
+            'Cancha: ' +
+            formatMoney(settlementView.courtAmountMinor, settlementView.currencyCode) +
+            '. Jugadores reales: ' +
+            settlementView.actualPlayerCount +
+            '. Se generará una obligación para cada jugador real.'
+          "
+          confirmLabel="Generar liquidación"
+          (cancelled)="cancelFinalize()"
+          (confirmed)="finalize('MATCH')"
+        />
       }
       @if (confirmationOpen() === 'DINNER' && dinnerView(); as settlementView) {
-        <app-confirm-dialog [open]="true" title="Generar liquidación de cena" [description]="'Cena: ' + formatMoney(settlementView.expenseTotalMinor, settlementView.currencyCode) + '. Comensales reales: ' + settlementView.actualDinerCount + '. Se generará una obligación para cada persona que realmente cenó.'" confirmLabel="Generar liquidación" (cancelled)="cancelFinalize()" (confirmed)="finalize('DINNER')" />
+        <app-confirm-dialog
+          [open]="true"
+          title="Generar liquidación de cena"
+          [description]="
+            'Cena: ' +
+            formatMoney(settlementView.expenseTotalMinor, settlementView.currencyCode) +
+            '. Comensales reales: ' +
+            settlementView.actualDinerCount +
+            '. Se generará una obligación para cada persona que realmente cenó.'
+          "
+          confirmLabel="Generar liquidación"
+          (cancelled)="cancelFinalize()"
+          (confirmed)="finalize('DINNER')"
+        />
+      }
+      @if (paymentConfirmation(); as confirmation) {
+        <app-confirm-dialog
+          [open]="true"
+          [title]="confirmation.targetStatus === 'PAID' ? 'Confirmar pago' : 'Corregir pago'"
+          [description]="paymentConfirmationDescription(confirmation)"
+          [confirmLabel]="
+            confirmation.targetStatus === 'PAID' ? 'Marcar como pagado' : 'Volver a pendiente'
+          "
+          (cancelled)="cancelPaymentChange()"
+          (confirmed)="confirmPaymentChange()"
+        />
       }
     } @else {
-      <app-card><app-empty-state title="Todavía no hay un miércoles programado" description="Las liquidaciones aparecerán cuando exista un evento." /></app-card>
+      <app-card
+        ><app-empty-state
+          title="Todavía no hay un miércoles programado"
+          description="Las liquidaciones aparecerán cuando exista un evento."
+      /></app-card>
     }
   </div>
 </app-page-container>
