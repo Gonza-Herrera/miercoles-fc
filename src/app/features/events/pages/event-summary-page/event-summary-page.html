@@ -1,0 +1,158 @@
+<app-page-container>
+  <main class="summary-page">
+    <a class="summary-page__back" [routerLink]="['/events', eventId]">← Volver al evento</a>
+    @if (loading()) {
+      <p class="ds-body" role="status" aria-live="polite">Cargando resumen…</p>
+    } @else if (summary(); as view) {
+      <header class="summary-page__header">
+        <div>
+          <app-badge [variant]="isClosed() ? 'success' : 'warning'">{{
+            isClosed() ? 'Evento finalizado' : 'Listo para revisar'
+          }}</app-badge>
+          <h1 class="ds-page-title">Resumen del miércoles</h1>
+          <p class="ds-body">{{ view.event.location }}</p>
+        </div>
+      </header>
+      @if (errorMessage(); as error) {
+        <p class="summary-page__error" role="alert">{{ error }}</p>
+      }
+      @if (!isClosed() && blockerCopy(view.blocker); as blocker) {
+        <app-card
+          ><p class="summary-page__notice" role="status">{{ blocker }}</p></app-card
+        >
+      }
+      <section class="summary-grid" aria-label="Resumen de actividades">
+        <app-card variant="elevated">
+          <article class="activity">
+            <header>
+              <span aria-hidden="true">⚽</span>
+              <h2 class="ds-card-title">Partido</h2>
+            </header>
+            <dl>
+              <div>
+                <dt>Jugadores reales</dt>
+                <dd>{{ view.match.actualCount }}</dd>
+              </div>
+              <div>
+                <dt>Cancha</dt>
+                <dd>{{ money(view.match.courtAmountMinor, view.event.currencyCode) }}</dd>
+              </div>
+              <div>
+                <dt>Pagaron</dt>
+                <dd>{{ view.match.paidCount }} / {{ view.match.totalCount }}</dd>
+              </div>
+              <div>
+                <dt>Pendiente</dt>
+                <dd>{{ money(view.match.outstandingAmountMinor, view.event.currencyCode) }}</dd>
+              </div>
+            </dl>
+            <app-badge
+              [variant]="
+                view.match.settlementFinalized || !view.match.occurred ? 'success' : 'warning'
+              "
+              >{{
+                view.match.occurred
+                  ? view.match.settlementFinalized
+                    ? 'Liquidado'
+                    : 'Por liquidar'
+                  : 'Sin actividad'
+              }}</app-badge
+            >
+          </article>
+        </app-card>
+        <app-card variant="elevated">
+          <article class="activity">
+            <header>
+              <span aria-hidden="true">🍽️</span>
+              <h2 class="ds-card-title">Cena</h2>
+            </header>
+            <dl>
+              <div>
+                <dt>Comensales reales</dt>
+                <dd>{{ view.dinner.actualCount }}</dd>
+              </div>
+              <div>
+                <dt>Gastos</dt>
+                <dd>{{ money(view.dinner.expenseTotalMinor, view.event.currencyCode) }}</dd>
+              </div>
+              <div>
+                <dt>Pagaron</dt>
+                <dd>{{ view.dinner.paidCount }} / {{ view.dinner.totalCount }}</dd>
+              </div>
+              <div>
+                <dt>Pendiente</dt>
+                <dd>{{ money(view.dinner.outstandingAmountMinor, view.event.currencyCode) }}</dd>
+              </div>
+            </dl>
+            <app-badge
+              [variant]="
+                view.dinner.settlementFinalized || view.dinner.expenseTotalMinor === 0
+                  ? 'success'
+                  : 'warning'
+              "
+              >{{
+                view.dinner.expenseTotalMinor === 0
+                  ? 'Sin gastos'
+                  : view.dinner.settlementFinalized
+                    ? 'Liquidada'
+                    : 'Por liquidar'
+              }}</app-badge
+            >
+          </article>
+        </app-card>
+      </section>
+      <app-card variant="elevated">
+        <section class="financial" aria-labelledby="financial-title">
+          <h2 id="financial-title" class="ds-card-title">Balance final</h2>
+          <dl>
+            <div>
+              <dt>Total</dt>
+              <dd>{{ money(view.financial.totalAmountMinor, view.event.currencyCode) }}</dd>
+            </div>
+            <div>
+              <dt>Cobrado</dt>
+              <dd>{{ money(view.financial.collectedAmountMinor, view.event.currencyCode) }}</dd>
+            </div>
+            <div class="financial__outstanding">
+              <dt>Pendiente total</dt>
+              <dd>{{ money(view.financial.outstandingAmountMinor, view.event.currencyCode) }}</dd>
+            </div>
+          </dl>
+          <app-badge [variant]="view.financial.collectionComplete ? 'success' : 'warning'">{{
+            view.financial.collectionComplete ? 'Cobranza completa' : 'Hay pagos pendientes'
+          }}</app-badge>
+          <a [routerLink]="['/payments']" [queryParams]="{ eventId: eventId }"
+            ><app-button variant="secondary" [fullWidth]="true">Ver pagos</app-button></a
+          >
+        </section>
+      </app-card>
+      @if (!isClosed() && view.canClose) {
+        <app-button
+          [fullWidth]="true"
+          variant="danger"
+          [disabled]="closing()"
+          (click)="confirmClose.set(true)"
+          >{{ closing() ? 'Finalizando…' : 'Finalizar miércoles' }}</app-button
+        >
+      }
+      <app-confirm-dialog
+        [open]="confirmClose()"
+        title="Finalizar miércoles"
+        [description]="
+          'Se cerrará este evento. Ya no podrás modificar asistencia, equipos, gastos ni liquidaciones. Los pagos pendientes podrán seguir registrándose. Pendiente total: ' +
+          money(view.financial.outstandingAmountMinor, view.event.currencyCode)
+        "
+        confirmLabel="Finalizar miércoles"
+        (cancelled)="confirmClose.set(false)"
+        (confirmed)="close()"
+      />
+    } @else if (errorMessage(); as error) {
+      <app-card
+        ><div class="summary-page__error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+        </div></app-card
+      >
+    }
+  </main>
+</app-page-container>

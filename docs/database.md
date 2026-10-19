@@ -131,6 +131,8 @@ PR21 separates court obligations from payment state. `match_settlements` snapsho
 
 PR22 does the same independently for actual Dinner costs and diners. PR23 reads both item tables without recalculating allocations. Summary totals are exact `sum(item.amount_minor)` partitions: collected for rows with a payment marker and outstanding for rows without one.
 
+PR24 adds server-derived `events.closed_at`/`closed_by`, a dedicated atomic and idempotent `close_event` command, and a focused `get_event_closure_summary` read model. Closure requires explicit real-attendance records and every applicable immutable settlement, but not completed collection. Closed historical sources remain immutable while ADMIN payment markers may still change; exact Match and Dinner outstanding values remain independent and are summed only for the consolidated display. See [Event Closure & Summary](event-closure-summary.md).
+
 ## Concurrency and integrity
 
 PostgreSQL, rather than a prior client-side `SELECT`, protects:

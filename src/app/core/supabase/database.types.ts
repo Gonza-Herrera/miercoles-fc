@@ -4,7 +4,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '14.5';
+    PostgrestVersion: '14.17';
   };
   public: {
     Tables: {
@@ -395,6 +395,8 @@ export type Database = {
       };
       events: {
         Row: {
+          closed_at: string | null;
+          closed_by: string | null;
           court_price_minor: number;
           created_at: string;
           created_by: string;
@@ -413,6 +415,8 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          closed_at?: string | null;
+          closed_by?: string | null;
           court_price_minor: number;
           created_at?: string;
           created_by: string;
@@ -431,6 +435,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          closed_at?: string | null;
+          closed_by?: string | null;
           court_price_minor?: number;
           created_at?: string;
           created_by?: string;
@@ -449,6 +455,13 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'events_closed_by_fkey';
+            columns: ['closed_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'events_created_by_fkey';
             columns: ['created_by'];
@@ -995,6 +1008,7 @@ export type Database = {
           isSetofReturn: false;
         };
       };
+      close_event: { Args: { p_event_id: string }; Returns: Json };
       configure_event_team_managers: {
         Args: { p_assignments: Json; p_event_id: string };
         Returns: undefined;
@@ -1015,6 +1029,8 @@ export type Database = {
           p_starts_at: string;
         };
         Returns: {
+          closed_at: string | null;
+          closed_by: string | null;
           court_price_minor: number;
           created_at: string;
           created_by: string;
@@ -1112,6 +1128,7 @@ export type Database = {
           participant_id: string;
         }[];
       };
+      get_event_closure_summary: { Args: { p_event_id: string }; Returns: Json };
       get_event_payments: { Args: { p_event_id: string }; Returns: Json };
       get_event_player_draft: { Args: { p_event_id: string }; Returns: Json };
       get_event_team_lineup: { Args: { p_event_id: string }; Returns: Json };
@@ -1318,6 +1335,8 @@ export type Database = {
           p_target_status: Database['public']['Enums']['event_status'];
         };
         Returns: {
+          closed_at: string | null;
+          closed_by: string | null;
           court_price_minor: number;
           created_at: string;
           created_by: string;
@@ -1360,6 +1379,8 @@ export type Database = {
           p_starts_at: string;
         };
         Returns: {
+          closed_at: string | null;
+          closed_by: string | null;
           court_price_minor: number;
           created_at: string;
           created_by: string;

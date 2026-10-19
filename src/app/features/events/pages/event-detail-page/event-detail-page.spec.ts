@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { Router } from '@angular/router';
 import { vi } from 'vitest';
 
 import { AttendanceService } from '../../../attendance/attendance.service';
@@ -29,22 +30,16 @@ describe('EventDetailPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Agregar invitado');
   });
 
-  it('requires confirmation for the final CLOSED transition', async () => {
+  it('routes the final CLOSED transition through the readiness summary', async () => {
     const fixture = await setup('ADMIN', 'SETTLEMENT');
-    for (const dialog of fixture.nativeElement.querySelectorAll(
-      'dialog',
-    ) as NodeListOf<HTMLDialogElement>) {
-      dialog.showModal = vi.fn(() => dialog.setAttribute('open', ''));
-    }
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     const close = [...fixture.nativeElement.querySelectorAll('button')].find(
       (button: HTMLButtonElement) => button.textContent?.includes('Cerrar miércoles'),
     );
 
     close?.click();
-    fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('¿Cerrar este miércoles?');
-    expect(fixture.nativeElement.textContent).toContain('no se podrán editar');
+    expect(navigate).toHaveBeenCalledWith(['/events', 'event-id', 'summary']);
   });
 });
 

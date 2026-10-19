@@ -47,6 +47,14 @@ export const EVENT_ROUTES: Routes = [
     title: 'Formación de equipos · Miércoles FC',
   },
   {
+    path: ':eventId/summary',
+    loadComponent: () =>
+      import('./pages/event-summary-page/event-summary-page').then(
+        ({ EventSummaryPage }) => EventSummaryPage,
+      ),
+    title: 'Resumen del miércoles · Miércoles FC',
+  },
+  {
     path: ':eventId',
     loadComponent: () =>
       import('./pages/event-detail-page/event-detail-page').then(

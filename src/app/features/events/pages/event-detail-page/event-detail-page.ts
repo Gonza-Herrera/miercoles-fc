@@ -9,7 +9,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
-import { Button, Card, ConfirmDialog } from '../../../../shared/ui';
+import { Button, Card } from '../../../../shared/ui';
 import { AttendanceManager } from '../../../attendance';
 import { GroupContextService } from '../../../groups/group-context.service';
 import { GroupDetail } from '../../../groups/group.models';
@@ -32,7 +32,6 @@ import { EventService } from '../../event.service';
   imports: [
     Button,
     Card,
-    ConfirmDialog,
     AttendanceManager,
     EventCard,
     GuestParticipantManager,
@@ -51,7 +50,6 @@ export class EventDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  protected readonly confirmClose = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly event = signal<WeeklyEvent | null>(null);
   protected readonly feedback = signal<string | null>(
@@ -106,7 +104,7 @@ export class EventDetailPage implements OnInit {
 
   protected requestTransition(): void {
     if (this.nextStatus() === 'CLOSED') {
-      this.confirmClose.set(true);
+      void this.router.navigate(['/events', this.eventId, 'summary']);
       return;
     }
     void this.transition();
@@ -114,7 +112,6 @@ export class EventDetailPage implements OnInit {
 
   protected async transition(): Promise<void> {
     const target = this.nextStatus();
-    this.confirmClose.set(false);
     if (!target || this.transitioning() || !this.isAdmin()) return;
     this.transitioning.set(true);
     this.errorMessage.set(null);
