@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -10,6 +11,7 @@ import {
 
 import { Avatar, Badge, Button, Card, ConfirmDialog } from '../../../../shared/ui';
 import { formatMoneyMinor, parseCourtPriceToMinor } from '../../../events/event.models';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import {
   DinnerExpense,
   DinnerRealityOperationError,
@@ -31,6 +33,8 @@ export class DinnerReality implements OnInit {
   readonly eventId = input.required<string>();
 
   private readonly realityService = inject(DinnerRealityService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
 
   protected readonly view = signal<DinnerRealityView | null>(null);
   protected readonly selectedKeys = signal<ReadonlySet<string>>(new Set());
@@ -70,17 +74,19 @@ export class DinnerReality implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId(), () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       this.applyAuthoritative(await this.realityService.get(this.eventId()));
     } catch {
       this.errorMessage.set('No pudimos cargar la realidad de la cena.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

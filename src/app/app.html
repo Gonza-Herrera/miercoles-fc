@@ -1,5 +1,14 @@
 @if (auth.isInitializing()) {
   <app-auth-loading />
 } @else {
+  @if (realtime?.status() === 'CONNECTING' || realtime?.status() === 'RECONNECTING') {
+    <div class="realtime-status" role="status" aria-live="polite">Actualizando información…</div>
+  } @else if (
+    realtime?.active() && realtime.status() === 'DISCONNECTED' && auth.isAuthenticated()
+  ) {
+    <div class="realtime-status realtime-status--offline" role="status" aria-live="polite">
+      Sin conexión en tiempo real. Los datos pueden estar desactualizados.
+    </div>
+  }
   <router-outlet />
 }

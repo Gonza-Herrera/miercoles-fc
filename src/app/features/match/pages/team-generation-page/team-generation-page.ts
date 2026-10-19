@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Avatar, Badge, Button, Card } from '../../../../shared/ui';
 import { AttendanceService } from '../../../attendance/attendance.service';
 import { WeeklyEvent } from '../../../events/event.models';
@@ -40,10 +42,12 @@ import { TeamService } from '../../team.service';
 })
 export class TeamGenerationPage implements OnInit {
   private readonly attendanceService = inject(AttendanceService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly eventService = inject(EventService);
   private readonly groupService = inject(GroupService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly realtime = inject(RealtimeService, { optional: true });
   private readonly teamManagerService = inject(TeamManagerService);
   private readonly teamService = inject(TeamService);
 
@@ -103,9 +107,14 @@ export class TeamGenerationPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const eventId = this.route.snapshot.paramMap.get('eventId');
+    if (eventId) {
+      const unwatch = this.realtime?.watchEvent(eventId, () => void this.load(false));
+      if (unwatch) this.destroyRef.onDestroy(unwatch);
+    }
   }
 
-  protected async load(): Promise<void> {
+  protected async load(showLoading = true): Promise<void> {
     const eventId = this.route.snapshot.paramMap.get('eventId');
     if (!eventId) {
       this.errorMessage.set('Evento no encontrado.');
@@ -113,7 +122,7 @@ export class TeamGenerationPage implements OnInit {
       return;
     }
 
-    this.loading.set(true);
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     this.saveError.set(null);
     this.rosterNotice.set(null);
@@ -173,7 +182,7 @@ export class TeamGenerationPage implements OnInit {
     } catch {
       this.errorMessage.set('No pudimos cargar la información del evento.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

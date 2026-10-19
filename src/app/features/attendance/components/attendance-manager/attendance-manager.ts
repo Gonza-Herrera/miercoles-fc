@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -18,6 +19,7 @@ import {
   AttendanceResponse,
 } from '../../attendance.models';
 import { AttendanceService } from '../../attendance.service';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { AttendanceChoice } from '../attendance-choice/attendance-choice';
 import { AttendanceList } from '../attendance-list/attendance-list';
 
@@ -30,6 +32,8 @@ import { AttendanceList } from '../attendance-list/attendance-list';
 })
 export class AttendanceManager implements OnInit {
   private readonly attendance = inject(AttendanceService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
 
   readonly eventId = input.required<string>();
   readonly eventStatus = input.required<EventStatus>();
@@ -55,17 +59,19 @@ export class AttendanceManager implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId(), () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       this.attendees.set(await this.attendance.list(this.eventId()));
     } catch {
       this.errorMessage.set('No pudimos cargar la asistencia planificada.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

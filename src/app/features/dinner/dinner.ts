@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -8,6 +9,7 @@ import {
 } from '@angular/core';
 
 import { PageContainer } from '../../shared/layout';
+import { RealtimeService } from '../../core/realtime/realtime.service';
 import { Avatar, Button, Card, EmptyState } from '../../shared/ui';
 import { AttendanceManager } from '../attendance/components/attendance-manager/attendance-manager';
 import { WeeklyEvent, eventDateLabel } from '../events/event.models';
@@ -34,9 +36,12 @@ import { DinnerReality } from './components/dinner-reality/dinner-reality';
 })
 export class Dinner implements OnInit {
   private readonly context = inject(GroupContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
   private readonly planning = inject(DinnerPlanningService);
+  private readonly realtime = inject(RealtimeService, { optional: true });
+  private unwatch: (() => void) | null = null;
 
   protected readonly currentEvent = signal<WeeklyEvent | null>(null);
   protected readonly group = signal<GroupDetail | null>(null);
@@ -56,8 +61,8 @@ export class Dinner implements OnInit {
     await this.load();
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       const summaries = await this.groups.list();
@@ -78,10 +83,14 @@ export class Dinner implements OnInit {
       this.group.set(group);
       this.currentEvent.set(event);
       this.view.set(event ? await this.planning.get(event.id) : null);
+      if (event && !this.unwatch) {
+        this.unwatch = this.realtime?.watchEvent(event.id, () => void this.load(false)) ?? null;
+        this.destroyRef.onDestroy(() => this.unwatch?.());
+      }
     } catch {
       this.errorMessage.set('No pudimos cargar la planificación de la cena.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

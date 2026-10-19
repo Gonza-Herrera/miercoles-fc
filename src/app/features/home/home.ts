@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 import { RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../shared/layout';
+import { RealtimeService } from '../../core/realtime/realtime.service';
 import { Button, Card, EmptyState } from '../../shared/ui';
 import { AttendanceRecord } from '../attendance/attendance.models';
 import { AttendanceService } from '../attendance/attendance.service';
@@ -43,10 +45,16 @@ import { buildEventDashboard } from './event-dashboard.models';
 export class Home implements OnInit {
   private readonly attendance = inject(AttendanceService);
   private readonly context = inject(GroupContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly dinnerPlanning = inject(DinnerPlanningService);
   private readonly eventContext = inject(EventContextService);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
+  private readonly realtime = inject(RealtimeService, { optional: true });
+  private unwatchEvent: (() => void) | null = null;
+  private unwatchGroup: (() => void) | null = null;
+  private watchedEventId: string | null = null;
+  private watchedGroupId: string | null = null;
 
   protected readonly attendanceError = signal(false);
   protected readonly attendanceRecords = signal<readonly AttendanceRecord[]>([]);
@@ -65,8 +73,8 @@ export class Home implements OnInit {
     await this.load();
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     this.attendanceError.set(false);
     this.attendanceRecords.set([]);
@@ -90,6 +98,7 @@ export class Home implements OnInit {
       this.group.set(group);
       this.currentEvent.set(event);
       this.context.set(group);
+      this.watch(group.id, event?.id ?? null);
       if (event) {
         this.eventContext.set(event);
         try {
@@ -110,7 +119,29 @@ export class Home implements OnInit {
       this.errorMessage.set('No pudimos cargar tu próximo miércoles.');
       this.eventContext.clear();
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
+  }
+
+  private watch(groupId: string, eventId: string | null): void {
+    if (this.watchedGroupId !== groupId) {
+      this.unwatchGroup?.();
+      this.watchedGroupId = groupId;
+      this.unwatchGroup = this.realtime?.watchGroup(groupId, () => void this.load(false)) ?? null;
+    }
+    if (this.watchedEventId !== eventId) {
+      this.unwatchEvent?.();
+      this.watchedEventId = eventId;
+      this.unwatchEvent = eventId
+        ? (this.realtime?.watchEvent(eventId, () => void this.load(false)) ?? null)
+        : null;
+    }
+  }
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.unwatchEvent?.();
+      this.unwatchGroup?.();
+    });
   }
 }

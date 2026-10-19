@@ -10,9 +10,9 @@ This repository currently contains the application foundation through independen
 
 ## Current status
 
-**PR25 — History**
+**PR26 — Realtime & Multi-device**
 
-PR25 provides Group-scoped, paginated navigation over completed Wednesdays and composes the existing immutable attendance, teams, Dinner and settlement records with current payment state. PR26 — Realtime & Multi-device is next.
+PR26 synchronizes Event, attendance, teams, draft, Dinner, settlements, payments, closure and History across devices through scoped Supabase Realtime invalidation and authoritative refetches. PR27 — PWA, Quality & Production Release is next.
 
 ## Tech stack
 
@@ -189,7 +189,7 @@ History lists only completed Events with actual participation counts, then lazil
 - Completed: **PR22 — Dinner Settlement**
 - Completed: **PR23 — Payments**
 - Completed: **PR24 — Event Closure & Summary**
-- Completed: **PR25 — History**
-- Next: **PR26 — Realtime & Multi-device**
+- Completed: **PR26 — Realtime & Multi-device**
+- Next: **PR27 — PWA, Quality & Production Release**
 
-Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR26 Realtime & Multi-device and PR27 PWA, Quality & Production Release.
+Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR27 PWA, Quality & Production Release.
