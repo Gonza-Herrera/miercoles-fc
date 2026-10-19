@@ -1,7 +1,4 @@
-import {
-  allocateAmountExactly,
-  ExactAllocationParticipant,
-} from './exact-allocation';
+import { allocateAmountExactly, ExactAllocationParticipant } from './exact-allocation';
 
 export type MatchSettlementPlayerInput = ExactAllocationParticipant;
 

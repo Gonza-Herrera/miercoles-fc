@@ -13,6 +13,7 @@ import { GroupService } from './features/groups/group.service';
 import { InvitationService } from './features/invitations/invitation.service';
 import { DinnerSettlementService } from './features/payments/dinner-settlement.service';
 import { MatchSettlementService } from './features/payments/match-settlement.service';
+import { PaymentService } from './features/payments/payment.service';
 
 describe('application routes', () => {
   const authenticated = signal(true);
@@ -47,6 +48,7 @@ describe('application routes', () => {
         { provide: InvitationService, useValue: invitationStub },
         { provide: DinnerSettlementService, useValue: { get: vi.fn() } },
         { provide: MatchSettlementService, useValue: { get: vi.fn() } },
+        { provide: PaymentService, useValue: { get: vi.fn() } },
         { provide: EventService, useValue: { current: vi.fn().mockResolvedValue(null) } },
       ],
     });
@@ -56,7 +58,7 @@ describe('application routes', () => {
     ['/', 'Inicio'],
     ['/match', 'Partido'],
     ['/dinner', 'Cena'],
-    ['/payments', 'Liquidaciones'],
+    ['/payments', 'Pagos'],
     ['/invitations', 'Invitar miembros'],
     ['/groups', 'Mis grupos'],
   ])('loads %s inside the application shell', async (url, heading) => {

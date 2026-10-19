@@ -42,9 +42,7 @@ export function calculateDinnerSettlement(input: {
     return {
       valid: false,
       reason:
-        allocation.reason === 'INVALID_TOTAL'
-          ? 'INVALID_EXPENSE_DATA'
-          : 'INVALID_PARTICIPANTS',
+        allocation.reason === 'INVALID_TOTAL' ? 'INVALID_EXPENSE_DATA' : 'INVALID_PARTICIPANTS',
     };
   }
   return {
