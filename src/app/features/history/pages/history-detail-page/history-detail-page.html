@@ -1,0 +1,289 @@
+<app-page-container>
+  <main class="history-detail">
+    <a class="history-detail__back" [routerLink]="['/groups', groupId, 'history']"
+      >← Volver al historial</a
+    >
+    @if (loading()) {
+      <p class="ds-body" role="status" aria-live="polite">Cargando miércoles…</p>
+    } @else if (detail(); as view) {
+      <header class="history-detail__header">
+        <app-badge variant="success">✓ Evento finalizado</app-badge>
+        <h1 class="ds-page-title">{{ date(view.event.startsAt) }}</h1>
+        <p class="ds-body">{{ view.event.location }}</p>
+      </header>
+
+      <section class="history-section" aria-labelledby="historical-match-title">
+        <div class="history-section__title">
+          <span aria-hidden="true">⚽</span>
+          <h2 id="historical-match-title" class="ds-section-title">Partido</h2>
+        </div>
+        <app-card variant="elevated">
+          <div class="summary-facts">
+            <div>
+              <span>Jugadores reales</span><strong>{{ actualPlayers().length }}</strong>
+            </div>
+            <div>
+              <span>Cancha</span
+              ><strong>{{
+                money(view.closure.match.courtAmountMinor, view.event.currencyCode)
+              }}</strong>
+            </div>
+            <div>
+              <span>Pagaron</span
+              ><strong
+                >{{ view.payments.match.summary.paidCount }} /
+                {{ view.payments.match.summary.totalCount }}</strong
+              >
+            </div>
+            <div>
+              <span>Pendiente</span
+              ><strong>{{
+                money(view.payments.match.summary.outstandingAmountMinor, view.event.currencyCode)
+              }}</strong>
+            </div>
+          </div>
+        </app-card>
+        <app-card>
+          <h3 class="ds-card-title">Jugadores</h3>
+          @if (actualPlayers().length) {
+            <ul class="people-list">
+              @for (player of actualPlayers(); track player.participantId ?? player.groupMemberId) {
+                <li>
+                  <app-avatar [name]="player.displayName" [src]="player.avatarUrl" /><span>{{
+                    player.displayName
+                  }}</span>
+                  @if (player.isGuest) {
+                    <app-badge variant="neutral">Invitado</app-badge>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <app-empty-state
+              title="No se registraron jugadores."
+              description="La asistencia real del partido quedó en cero."
+            />
+          }
+        </app-card>
+      </section>
+
+      <section class="history-section" aria-labelledby="historical-teams-title">
+        <div class="history-section__title">
+          <span aria-hidden="true">👕</span>
+          <h2 id="historical-teams-title" class="ds-section-title">Equipos y DT</h2>
+        </div>
+        @if (view.lineup.teams.length) {
+          <div class="teams-grid">
+            @for (team of view.lineup.teams; track team.teamId) {
+              <app-card>
+                <article class="team-card">
+                  <h3 class="ds-card-title">{{ team.name }}</h3>
+                  @if (team.manager; as manager) {
+                    <p class="team-card__manager">
+                      DT: <strong>{{ manager.nickname || manager.displayName }}</strong>
+                    </p>
+                  }
+                  <ul class="compact-list">
+                    @for (player of team.players; track player.eventParticipantId) {
+                      <li>
+                        {{ player.nickname || player.displayName }}
+                        @if (player.isGuest) {
+                          <span>· Invitado</span>
+                        }
+                      </li>
+                    }
+                  </ul>
+                </article>
+              </app-card>
+            }
+          </div>
+          <a [routerLink]="['/events', eventId, 'lineup']"
+            ><app-button variant="secondary" [fullWidth]="true"
+              >Ver formación en cancha</app-button
+            ></a
+          >
+        } @else {
+          <app-card
+            ><app-empty-state
+              title="No se registraron equipos para este partido."
+              description="El historial no genera ni modifica equipos."
+          /></app-card>
+        }
+      </section>
+
+      <section
+        class="history-section history-section--dinner"
+        aria-labelledby="historical-dinner-title"
+      >
+        <div class="history-section__title">
+          <span aria-hidden="true">🍽️</span>
+          <h2 id="historical-dinner-title" class="ds-section-title">Cena</h2>
+        </div>
+        <app-card variant="elevated">
+          <div class="summary-facts">
+            <div>
+              <span>Comensales reales</span><strong>{{ actualDiners().length }}</strong>
+            </div>
+            <div>
+              <span>Gastos reales</span
+              ><strong>{{
+                money(view.dinnerReality.totalExpenseMinor, view.event.currencyCode)
+              }}</strong>
+            </div>
+            <div>
+              <span>Pagaron</span
+              ><strong
+                >{{ view.payments.dinner.summary.paidCount }} /
+                {{ view.payments.dinner.summary.totalCount }}</strong
+              >
+            </div>
+            <div>
+              <span>Pendiente</span
+              ><strong>{{
+                money(view.payments.dinner.summary.outstandingAmountMinor, view.event.currencyCode)
+              }}</strong>
+            </div>
+          </div>
+        </app-card>
+        @if (view.dinnerPlanning.plan; as plan) {
+          <app-card
+            ><div class="dinner-plan">
+              <h3 class="ds-card-title">Planificación</h3>
+              @if (plan.menu) {
+                <p><strong>Menú:</strong> {{ plan.menu }}</p>
+              }
+              @if (plan.purchaseOwner; as owner) {
+                <p>
+                  <strong>Encargado de compra:</strong> {{ owner.nickname || owner.displayName }}
+                </p>
+              }
+              @if (plan.plannedPurchases.length) {
+                <p class="list-label">Compras previstas</p>
+                <ul class="compact-list">
+                  @for (purchase of plan.plannedPurchases; track purchase.id) {
+                    <li>{{ purchase.name }}</li>
+                  }
+                </ul>
+              }
+            </div></app-card
+          >
+        }
+        <app-card>
+          <h3 class="ds-card-title">Comensales</h3>
+          <ul class="people-list">
+            @for (diner of actualDiners(); track diner.participantId ?? diner.groupMemberId) {
+              <li>
+                <app-avatar [name]="diner.displayName" [src]="diner.avatarUrl" /><span>{{
+                  diner.displayName
+                }}</span>
+                @if (diner.isGuest) {
+                  <app-badge variant="neutral">Invitado</app-badge>
+                }
+              </li>
+            }
+          </ul>
+        </app-card>
+        <app-card>
+          <h3 class="ds-card-title">Gastos reales</h3>
+          @if (view.dinnerReality.expenses.length) {
+            <ul class="expense-list">
+              @for (expense of view.dinnerReality.expenses; track expense.id) {
+                <li>
+                  <span>{{ expense.description }}</span
+                  ><strong>{{ money(expense.amountMinor, view.event.currencyCode) }}</strong>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="ds-body-small">No se registraron gastos reales.</p>
+          }
+        </app-card>
+      </section>
+
+      <section class="history-section" aria-labelledby="historical-settlements-title">
+        <div class="history-section__title">
+          <span aria-hidden="true">💰</span>
+          <h2 id="historical-settlements-title" class="ds-section-title">Liquidaciones y pagos</h2>
+        </div>
+        <div class="settlements-grid">
+          <app-card
+            ><h3 class="ds-card-title">Cancha</h3>
+            @if (view.matchSettlement.settlement; as settlement) {
+              <ul class="obligation-list">
+                @for (obligation of view.payments.match.obligations; track obligation.id) {
+                  <li>
+                    <span
+                      >{{ obligation.displayName }}
+                      @if (obligation.isGuest) {
+                        · Invitado
+                      }</span
+                    ><span class="obligation-list__value"
+                      ><strong>{{ money(obligation.amountMinor, settlement.currencyCode) }}</strong
+                      ><app-badge
+                        [variant]="obligation.status === 'PAID' ? 'success' : 'warning'"
+                        >{{ obligation.status === 'PAID' ? 'Pagó' : 'Pendiente' }}</app-badge
+                      ></span
+                    >
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="ds-body-small">Sin liquidación aplicable.</p>
+            }
+          </app-card>
+          <app-card
+            ><h3 class="ds-card-title">Cena</h3>
+            @if (view.dinnerSettlement.settlement; as settlement) {
+              <ul class="obligation-list">
+                @for (obligation of view.payments.dinner.obligations; track obligation.id) {
+                  <li>
+                    <span
+                      >{{ obligation.displayName }}
+                      @if (obligation.isGuest) {
+                        · Invitado
+                      }</span
+                    ><span class="obligation-list__value"
+                      ><strong>{{ money(obligation.amountMinor, settlement.currencyCode) }}</strong
+                      ><app-badge
+                        [variant]="obligation.status === 'PAID' ? 'success' : 'warning'"
+                        >{{ obligation.status === 'PAID' ? 'Pagó' : 'Pendiente' }}</app-badge
+                      ></span
+                    >
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="ds-body-small">Sin liquidación aplicable.</p>
+            }
+          </app-card>
+        </div>
+        <app-card variant="elevated"
+          ><div class="total-outstanding">
+            <span>Pendiente total</span
+            ><strong>{{
+              money(view.closure.financial.outstandingAmountMinor, view.event.currencyCode)
+            }}</strong
+            ><app-badge
+              [variant]="view.closure.financial.collectionComplete ? 'success' : 'warning'"
+              >{{
+                view.closure.financial.collectionComplete
+                  ? 'Cobranza completa'
+                  : 'Hay pagos pendientes'
+              }}</app-badge
+            >
+          </div></app-card
+        >
+        <a [routerLink]="['/payments']" [queryParams]="{ eventId: eventId }"
+          ><app-button variant="secondary" [fullWidth]="true">Ver pagos</app-button></a
+        >
+      </section>
+    } @else if (errorMessage(); as error) {
+      <app-card
+        ><div class="history-error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+        </div></app-card
+      >
+    }
+  </main>
+</app-page-container>

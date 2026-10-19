@@ -1,0 +1,111 @@
+.history-detail {
+  display: grid;
+  gap: var(--space-6);
+  padding-block: var(--space-5) calc(var(--space-8) + env(safe-area-inset-bottom));
+}
+.history-detail__back,
+.history-section > a {
+  color: var(--color-primary-700);
+  font-weight: 700;
+  text-decoration: none;
+}
+.history-detail__header {
+  display: grid;
+  gap: var(--space-2);
+}
+.history-detail__header h1,
+.history-detail__header p {
+  margin: 0;
+}
+.history-section {
+  display: grid;
+  gap: var(--space-4);
+}
+.history-section__title {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
+}
+.history-section__title h2,
+.team-card h3 {
+  margin: 0;
+}
+.summary-facts {
+  display: grid;
+  gap: var(--space-3);
+}
+.summary-facts div,
+.expense-list li,
+.obligation-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.summary-facts span,
+.compact-list span {
+  color: var(--color-text-secondary);
+}
+.people-list,
+.compact-list,
+.expense-list,
+.obligation-list {
+  display: grid;
+  gap: var(--space-3);
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+.people-list li {
+  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+}
+.teams-grid,
+.settlements-grid {
+  display: grid;
+  gap: var(--space-4);
+}
+.team-card,
+.dinner-plan {
+  display: grid;
+  gap: var(--space-3);
+}
+.team-card__manager,
+.dinner-plan p {
+  margin: 0;
+}
+.list-label {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.expense-list strong,
+.obligation-list strong {
+  text-align: right;
+  white-space: nowrap;
+}
+.obligation-list__value {
+  align-items: end;
+  display: grid;
+  gap: var(--space-1);
+  justify-items: end;
+}
+.total-outstanding {
+  align-items: center;
+  display: grid;
+  gap: var(--space-2);
+}
+.total-outstanding > strong {
+  font-size: 1.5rem;
+}
+.history-error {
+  display: grid;
+  gap: var(--space-3);
+}
+@media (min-width: 48rem) {
+  .teams-grid,
+  .settlements-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

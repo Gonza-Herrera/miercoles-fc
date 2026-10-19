@@ -1,0 +1,102 @@
+.history-page {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-5) calc(var(--space-8) + env(safe-area-inset-bottom));
+}
+.history-page__back,
+.history-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+.history-page__back {
+  color: var(--color-primary-700);
+  font-weight: 700;
+}
+.history-page__eyebrow {
+  color: var(--color-primary-700);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0 0 var(--space-2);
+  text-transform: uppercase;
+}
+.history-page header p:last-child {
+  margin-bottom: 0;
+}
+.history-list {
+  display: grid;
+  gap: var(--space-4);
+}
+.history-card-link {
+  border-radius: var(--radius-lg);
+  display: block;
+}
+.history-card-link:focus-visible {
+  outline: 3px solid var(--color-primary-500);
+  outline-offset: 3px;
+}
+.history-card {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: var(--space-4);
+  min-height: 9rem;
+}
+.history-card__date {
+  align-content: center;
+  background: var(--color-primary-50);
+  border-radius: var(--radius-md);
+  color: var(--color-primary-700);
+  display: grid;
+  justify-items: center;
+}
+.history-card__date strong {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.history-card__date span {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.history-card__content {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.history-card__heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.history-card__heading h2 {
+  margin: 0;
+}
+.history-card__counts {
+  display: grid;
+  gap: var(--space-2);
+}
+.history-card__action {
+  color: var(--color-primary-700);
+  font-weight: 700;
+}
+.history-skeleton {
+  animation: pulse 1.4s ease-in-out infinite;
+  background: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+  height: 8rem;
+}
+.history-error {
+  display: grid;
+  gap: var(--space-3);
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .history-skeleton {
+    animation: none;
+  }
+}

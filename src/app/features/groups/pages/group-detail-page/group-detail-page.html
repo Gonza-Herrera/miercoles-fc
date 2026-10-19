@@ -30,6 +30,9 @@
       <a [routerLink]="['/groups', currentGroup.id, 'events']">
         <app-button [fullWidth]="true">Ver los miércoles</app-button>
       </a>
+      <a [routerLink]="['/groups', currentGroup.id, 'history']">
+        <app-button variant="secondary" [fullWidth]="true">Ver historial</app-button>
+      </a>
 
       @if (errorMessage(); as error) {
         <p class="feedback feedback--error" role="alert">{{ error }}</p>

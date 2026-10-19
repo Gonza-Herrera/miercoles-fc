@@ -133,6 +133,8 @@ PR22 does the same independently for actual Dinner costs and diners. PR23 reads 
 
 PR24 adds server-derived `events.closed_at`/`closed_by`, a dedicated atomic and idempotent `close_event` command, and a focused `get_event_closure_summary` read model. Closure requires explicit real-attendance records and every applicable immutable settlement, but not completed collection. Closed historical sources remain immutable while ADMIN payment markers may still change; exact Match and Dinner outstanding values remain independent and are summed only for the consolidated display. See [Event Closure & Summary](event-closure-summary.md).
 
+PR25 adds the focused `get_group_event_history` read RPC and a partial `(group_id, starts_at DESC, id DESC)` index for `CLOSED` Events. The RPC enforces active Group membership, uses stable keyset pagination, and calculates football/Dinner actual-attendance counts in separate aggregates to include Guests without row multiplication. Complete detail remains lazy and reuses the existing protected Event read models. See [Event History](history.md).
+
 ## Concurrency and integrity
 
 PostgreSQL, rather than a prior client-side `SELECT`, protects:

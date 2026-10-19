@@ -10,9 +10,9 @@ This repository currently contains the application foundation through independen
 
 ## Current status
 
-**PR24 — Event Closure & Summary**
+**PR25 — History**
 
-PR24 closes eligible Wednesdays atomically, preserves their historical data and presents exact independent Match/Dinner and consolidated financial summaries. Pending collection continues after closure. Milestone 7 begins next with PR25 — History.
+PR25 provides Group-scoped, paginated navigation over completed Wednesdays and composes the existing immutable attendance, teams, Dinner and settlement records with current payment state. PR26 — Realtime & Multi-device is next.
 
 ## Tech stack
 
@@ -161,6 +161,8 @@ Dinner Settlement snapshots exact obligations from PR20 actual diners and expens
 
 Event Closure validates applicable settlements, records server-owned closure metadata, freezes historical sources and exposes a final exact-money summary while collection continues independently. See [Event Closure & Summary](docs/event-closure-summary.md).
 
+History lists only completed Events with actual participation counts, then lazily loads persisted teams/DTs, Dinner data, immutable settlements and current payment state. See [Event History](docs/history.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -187,6 +189,7 @@ Event Closure validates applicable settlements, records server-owned closure met
 - Completed: **PR22 — Dinner Settlement**
 - Completed: **PR23 — Payments**
 - Completed: **PR24 — Event Closure & Summary**
-- Next: **PR25 — History**
+- Completed: **PR25 — History**
+- Next: **PR26 — Realtime & Multi-device**
 
-Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR25 History, PR26 Realtime & Multi-device, and PR27 PWA, Quality & Production Release.
+Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR26 Realtime & Multi-device and PR27 PWA, Quality & Production Release.
