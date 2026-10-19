@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 
+import { offlineAwareFetch } from '../network/connectivity.service';
 import { Database } from './database.types';
 
 export interface SupabasePublicConfig {
@@ -40,6 +41,7 @@ export function createSupabaseClient(
       flowType: 'implicit',
       persistSession: true,
     },
+    global: { fetch: offlineAwareFetch },
   });
 }
 

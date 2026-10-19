@@ -1,6 +1,6 @@
 {
   "name": "miercoles-fc",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -17,26 +17,27 @@
     "supabase:types": "supabase gen types --local --schema public > src/app/core/supabase/database.types.ts",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "quality": "npm run lint && npm run format:check && npm test && npm run build"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
   "dependencies": {
-    "@angular/common": "^22.1.0",
-    "@angular/compiler": "^22.1.0",
-    "@angular/core": "^22.1.0",
-    "@angular/forms": "22.1.7",
-    "@angular/platform-browser": "^22.1.0",
-    "@angular/router": "^22.1.0",
-    "@angular/service-worker": "22.1.7",
+    "@angular/common": "22.2.3",
+    "@angular/compiler": "22.2.3",
+    "@angular/core": "22.2.3",
+    "@angular/forms": "22.2.3",
+    "@angular/platform-browser": "22.2.3",
+    "@angular/router": "22.2.3",
+    "@angular/service-worker": "22.2.3",
     "@supabase/supabase-js": "2.117.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.1.8",
-    "@angular/cli": "^22.1.8",
-    "@angular/compiler-cli": "^22.1.0",
+    "@angular/build": "22.2.3",
+    "@angular/cli": "22.2.3",
+    "@angular/compiler-cli": "22.2.3",
     "@eslint/js": "^10.0.1",
     "angular-eslint": "22.5.0",
     "eslint": "^10.9.1",
