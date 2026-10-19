@@ -33,6 +33,7 @@ declare
   guest_match_item_id uuid := gen_random_uuid();
   closed_item_id uuid := gen_random_uuid();
   guest_dinner_item_id uuid := gen_random_uuid();
+  summary_expense_id uuid := gen_random_uuid();
   draft_item_id uuid := gen_random_uuid();
   open_item_id uuid := gen_random_uuid();
   in_progress_item_id uuid := gen_random_uuid();
@@ -59,14 +60,14 @@ begin
 
   insert into public.events (
     id, group_id, created_by, starts_at, location, court_price_minor, currency_code,
-    status, team_formation_mode
+    status, team_formation_mode, closed_at, closed_by
   ) values
-    (event_id, test_group_id, admin_profile_id, now(), 'Court', 10001, 'ARS', 'IN_PROGRESS', 'MANAGERS'),
-    (closed_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'CLOSED', 'RANDOM'),
-    (draft_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'DRAFT', 'RANDOM'),
-    (open_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'OPEN', 'RANDOM'),
-    (in_progress_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'IN_PROGRESS', 'RANDOM'),
-    (summary_event_id, test_group_id, admin_profile_id, now(), 'Court', 5000000, 'ARS', 'SETTLEMENT', 'RANDOM');
+    (event_id, test_group_id, admin_profile_id, now(), 'Court', 10001, 'ARS', 'IN_PROGRESS', 'MANAGERS', null, null),
+    (closed_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'CLOSED', 'RANDOM', now(), admin_profile_id),
+    (draft_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'DRAFT', 'RANDOM', null, null),
+    (open_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'OPEN', 'RANDOM', null, null),
+    (in_progress_event_id, test_group_id, admin_profile_id, now(), 'Court', 1000, 'ARS', 'IN_PROGRESS', 'RANDOM', null, null),
+    (summary_event_id, test_group_id, admin_profile_id, now(), 'Court', 5000000, 'ARS', 'SETTLEMENT', 'RANDOM', null, null);
   insert into public.event_participants (id, event_id, group_member_id)
   values (member_participant_id, event_id, member_id);
   insert into public.event_participants (
@@ -101,6 +102,12 @@ begin
       'YES', admin_profile_id
     );
   end loop;
+  update public.events
+  set match_attendance_recorded_at = now(), match_attendance_recorded_by = admin_profile_id,
+    dinner_attendance_recorded_at = now(), dinner_attendance_recorded_by = admin_profile_id
+  where id = summary_event_id;
+  insert into public.dinner_expenses (id, event_id, description, amount_minor, created_by)
+  values (summary_expense_id, summary_event_id, 'Summary dinner', 10000000, admin_profile_id);
 
   insert into public.match_settlements (
     id, event_id, court_amount_minor, currency_code, actual_player_count,
@@ -183,7 +190,7 @@ begin
     select item.id
     from public.match_settlement_items as item
     where item.match_settlement_id = summary_match_settlement_id
-      and item.allocation_order < 7
+      and item.allocation_order not in (4, 8)
     order by item.allocation_order
   loop
     perform private.set_obligation_payment_status(
@@ -204,7 +211,7 @@ begin
   view := private.get_event_payments(summary_event_id);
   if view #>> '{match,summary,paidCount}' <> '7'
     or view #>> '{match,summary,pendingCount}' <> '2'
-    or view #>> '{match,summary,outstandingAmountMinor}' <> '1111110'
+    or view #>> '{match,summary,outstandingAmountMinor}' <> '1111111'
     or view #>> '{match,summary,totalAmountMinor}' <> '5000000'
     or (
       (view #>> '{match,summary,collectedAmountMinor}')::bigint
@@ -219,6 +226,39 @@ begin
       + (view #>> '{dinner,summary,outstandingAmountMinor}')::bigint
     ) <> 10000000
   then raise exception 'PAYMENTS_EXACT_SUMMARY_INVALID'; end if;
+
+  view := private.close_event(summary_event_id);
+  if view #>> '{event,status}' <> 'CLOSED'
+    or view #>> '{match,actualCount}' <> '9'
+    or view #>> '{dinner,actualCount}' <> '11'
+    or view #>> '{match,outstandingAmountMinor}' <> '1111111'
+    or view #>> '{dinner,outstandingAmountMinor}' <> '2727272'
+    or view #>> '{financial,outstandingAmountMinor}' <> '3838383'
+    or (view #>> '{financial,collectionComplete}')::boolean
+  then raise exception 'EVENT_CLOSURE_SUMMARY_INVALID'; end if;
+  if (select closed_at is null or closed_by <> admin_profile_id from public.events where id = summary_event_id)
+  then raise exception 'EVENT_CLOSURE_AUDIT_INVALID'; end if;
+  view := private.close_event(summary_event_id);
+  if view #>> '{event,status}' <> 'CLOSED' then raise exception 'EVENT_CLOSURE_NOT_IDEMPOTENT'; end if;
+  caught := false;
+  begin
+    perform private.update_dinner_expense(
+      summary_event_id, summary_expense_id, 'Changed', 10000001,
+      (select updated_at from public.dinner_expenses where id = summary_expense_id)
+    );
+  exception when others then
+    caught := sqlerrm = 'DINNER_REALITY_EVENT_CLOSED';
+  end;
+  if not caught then raise exception 'EVENT_CLOSED_EXPENSE_MUTATED'; end if;
+
+  select item.* into lifecycle_item
+  from public.match_settlement_items as item
+  where item.match_settlement_id = summary_match_settlement_id
+    and item.allocation_order = 4;
+  view := private.set_obligation_payment_status('COURT', lifecycle_item.id, 'PAID', null);
+  if view #>> '{eventStatus}' <> 'CLOSED'
+    or view #>> '{match,summary,outstandingAmountMinor}' <> '555555'
+  then raise exception 'EVENT_CLOSED_PAYMENT_UPDATE_INVALID'; end if;
 
   perform private.set_obligation_payment_status('COURT', match_item_id, 'PAID', null);
   select paid_at, updated_at into first_paid_at, first_updated_at from public.payments
@@ -271,10 +311,10 @@ begin
   if not caught then raise exception 'PAYMENTS_MEMBER_MUTATED'; end if;
   update public.group_members set role = 'ADMIN' where id = admin_member_id;
 
-  caught := false;
-  begin perform private.set_obligation_payment_status('COURT', closed_item_id, 'PAID', null);
-  exception when others then caught := sqlerrm = 'PAYMENTS_EVENT_CLOSED'; end;
-  if not caught then raise exception 'PAYMENTS_CLOSED_MUTATED'; end if;
+  perform private.set_obligation_payment_status('COURT', closed_item_id, 'PAID', null);
+  if not exists (select 1 from public.payments where match_settlement_item_id = closed_item_id)
+    or (select status from public.events where id = closed_event_id) <> 'CLOSED'::public.event_status
+  then raise exception 'PAYMENTS_CLOSED_UPDATE_INVALID'; end if;
 
   for lifecycle_item in
     select * from (values

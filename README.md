@@ -10,9 +10,9 @@ This repository currently contains the application foundation through independen
 
 ## Current status
 
-**PR23 — Payments**
+**PR24 — Event Closure & Summary**
 
-PR23 tracks `PENDING`/`PAID` independently for each immutable Match or Dinner obligation. ADMINs confirm and correct receipts atomically; members have read-only visibility. PR24 — Event Closure & Summary is next.
+PR24 closes eligible Wednesdays atomically, preserves their historical data and presents exact independent Match/Dinner and consolidated financial summaries. Pending collection continues after closure. Milestone 7 begins next with PR25 — History.
 
 ## Tech stack
 
@@ -159,6 +159,8 @@ Match Settlement divides the event-specific court price only among actual PR13 p
 
 Dinner Settlement snapshots exact obligations from PR20 actual diners and expenses. Payments then reference those immutable Match/Dinner items without recalculating either allocation. See [Dinner Settlement](docs/dinner-settlement.md) and [Payments](docs/payments.md).
 
+Event Closure validates applicable settlements, records server-owned closure metadata, freezes historical sources and exposes a final exact-money summary while collection continues independently. See [Event Closure & Summary](docs/event-closure-summary.md).
+
 ## Roadmap
 
 - Completed: **PR01 — Angular Project Foundation**
@@ -183,7 +185,8 @@ Dinner Settlement snapshots exact obligations from PR20 actual diners and expens
 - Completed: **PR20 — Dinner Attendance & Expenses**
 - Completed: **PR21 — Match Settlement**
 - Completed: **PR22 — Dinner Settlement**
-- Current: **PR23 — Payments**
-- Next: **PR24 — Event Closure & Summary**
+- Completed: **PR23 — Payments**
+- Completed: **PR24 — Event Closure & Summary**
+- Next: **PR25 — History**
 
-PR21 and PR22 establish immutable financial obligations. PR23 records whether each independent obligation was received. PR24 will close and summarize the event.
+Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR25 History, PR26 Realtime & Multi-device, and PR27 PWA, Quality & Production Release.

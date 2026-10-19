@@ -10,7 +10,7 @@ Todo evento pertenece a un grupo mediante `group_id` y conserva un UUID estable 
 DRAFT → OPEN → IN_PROGRESS → SETTLEMENT → CLOSED
 ```
 
-Sólo se permite avanzar un paso. Un trigger de PostgreSQL impide saltos, retrocesos y cualquier mutación funcional después de `CLOSED`. En `DRAFT` y `OPEN` se editan fecha, hora, lugar y precio; en `IN_PROGRESS` y `SETTLEMENT`, sólo el precio; en `CLOSED`, nada. PR21 bloquea además el precio en cuanto se finaliza la liquidación de cancha, preservando el snapshot financiero.
+Sólo se permite avanzar un paso. Un trigger de PostgreSQL impide saltos, retrocesos y cualquier mutación funcional después de `CLOSED`. En `DRAFT` y `OPEN` se editan fecha, hora, lugar y precio; en `IN_PROGRESS` y `SETTLEMENT`, sólo el precio; en `CLOSED`, nada salvo el estado de cobro de obligaciones existentes. PR21 bloquea además el precio en cuanto se finaliza la liquidación de cancha, preservando el snapshot financiero. PR24 reserva `SETTLEMENT → CLOSED` para `close_event`, que valida asistencia y liquidaciones aplicables, y registra `closed_at`/`closed_by` atómicamente. Ver [Event Closure & Summary](event-closure-summary.md).
 
 ## Seguridad y concurrencia
 

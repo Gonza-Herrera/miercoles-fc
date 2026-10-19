@@ -80,6 +80,8 @@ type EventSummaryRow = Omit<
   | 'dinner_attendance_recorded_by'
   | 'match_attendance_recorded_at'
   | 'match_attendance_recorded_by'
+  | 'closed_at'
+  | 'closed_by'
 >;
 
 export function mapEvent(row: EventSummaryRow): WeeklyEvent {

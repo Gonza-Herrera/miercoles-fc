@@ -23,7 +23,7 @@ PostgreSQL derives `paid_at` with its clock and `recorded_by` from `auth.uid()`.
 
 ## Authorization and lifecycle
 
-Active linked group members can read the payment view. Only a group `ADMIN` may mutate payment status, and only while the Event is `SETTLEMENT`. `MEMBER`, event DT, purchase owner, participant, unrelated ADMIN and unauthenticated callers cannot mutate. A `CLOSED` Event is read-only; PR23 does not implement closure.
+Active linked group members can read the payment view. Only a group `ADMIN` may mutate payment status while the Event is `SETTLEMENT` or `CLOSED`. This PR24 refinement lets collection continue after the Wednesday finishes without reopening it or changing an obligation. `MEMBER`, event DT, purchase owner, participant, unrelated ADMIN and unauthenticated callers cannot mutate.
 
 Direct browser writes to `payments` remain revoked. Public RPC wrappers run as `SECURITY INVOKER`; only their internal helpers use `SECURITY DEFINER`, with an empty search path, fully qualified relations, explicit caller/group checks and restricted execute grants. RLS remains enabled for table reads.
 
@@ -44,8 +44,8 @@ All values are PostgreSQL `bigint` minor units. The calculation never multiplies
 
 The mutation locks the Event, obligation and current marker in a stable order. Database uniqueness prevents concurrent duplicate markers. Same-target retries are idempotent. A paid-to-pending correction must include the current row's `updated_at`; a mismatch raises `PAYMENTS_CONFLICT`, after which Angular reloads the authoritative view.
 
-## UI and PR24
+## UI and Event closure
 
 `/payments` preserves settlement finalization when either source is not final. Once final, it shows separate Match and Dinner cards, pending rows before paid rows, exact collected/outstanding summaries, signed member avatars, guest/current-user context, an explicit “Todos pagaron” state and confirmation dialogs. ADMIN controls disappear for read-only members and closed events.
 
-PR24 can determine closure readiness from the two independent summaries without changing payment history. No payment gateway, transfer proof, reconciliation, reminder, Realtime subscription or Event Closure is part of PR23.
+PR24 determines closure readiness from the two independent summaries without changing payment history. The closed Event summary continues linking to this payment view, with ADMIN correction controls and read-only MEMBER visibility. No payment gateway, transfer proof, reconciliation, reminder or Realtime subscription is introduced.

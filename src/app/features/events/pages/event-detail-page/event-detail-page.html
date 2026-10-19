@@ -88,15 +88,6 @@
       }
 
       <app-guest-participant-manager [eventId]="currentEvent.id" [isAdmin]="canManageGuests()" />
-
-      <app-confirm-dialog
-        [open]="confirmClose()"
-        title="¿Cerrar este miércoles?"
-        description="Después de cerrarlo no se podrán editar sus datos ni sus invitados. El historial seguirá disponible."
-        confirmLabel="Cerrar miércoles"
-        (cancelled)="confirmClose.set(false)"
-        (confirmed)="transition()"
-      />
     } @else if (errorMessage(); as error) {
       <app-card>
         <div class="feedback feedback--error" role="alert">

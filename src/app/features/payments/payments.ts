@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { PageContainer } from '../../shared/layout';
 import { Avatar, Badge, Button, Card, ConfirmDialog, EmptyState } from '../../shared/ui';
@@ -47,6 +48,7 @@ export class Payments implements OnInit {
   private readonly dinnerSettlements = inject(DinnerSettlementService);
   private readonly matchSettlements = inject(MatchSettlementService);
   private readonly payments = inject(PaymentService);
+  private readonly route = inject(ActivatedRoute, { optional: true });
 
   protected readonly event = signal<WeeklyEvent | null>(null);
   protected readonly matchView = signal<MatchSettlementView | null>(null);
@@ -82,7 +84,13 @@ export class Payments implements OnInit {
         this.paymentsView.set(null);
         return;
       }
-      const event = await this.events.current(groupId);
+      const requestedEventId = this.route?.snapshot.queryParamMap.get('eventId');
+      const event = requestedEventId
+        ? await this.events.get(requestedEventId)
+        : await this.events.current(groupId);
+      if (event && event.groupId !== groupId) {
+        throw new Error('Requested event does not belong to the selected group.');
+      }
       this.event.set(event);
       if (!event) {
         this.matchView.set(null);
