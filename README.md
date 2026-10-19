@@ -6,13 +6,13 @@ A mobile-first PWA for organizing weekly football matches, teams, dinner expense
 
 Miércoles FC will help groups of friends coordinate their weekly match and the meal that follows it. The product roadmap includes group and event management, attendance, team organization, shared expenses, and payment tracking.
 
-This repository currently contains the application foundation through independent Match and Dinner settlement plus payment tracking.
+This repository contains the complete `1.0.0` release candidate, including the weekly workflow and production/PWA hardening. A production deployment is not implied.
 
 ## Current status
 
-**PR26 — Realtime & Multi-device**
+**PR27 — PWA, Quality & Production Release**
 
-PR26 synchronizes Event, attendance, teams, draft, Dinner, settlements, payments, closure and History across devices through scoped Supabase Realtime invalidation and authoritative refetches. PR27 — PWA, Quality & Production Release is next.
+PR27 prepares version `1.0.0` with install/update/offline-shell behavior, shared connectivity handling, Netlify configuration, CI quality gates, release documentation, and an explicit production smoke plan. It does not itself deploy, tag, or mutate production.
 
 ## Tech stack
 
@@ -103,6 +103,7 @@ npm run supabase:types # Regenerate the shared TypeScript database contract
 npm run lint          # Run Angular and TypeScript linting
 npm run format        # Format supported project files
 npm run format:check  # Check formatting without changing files
+npm run quality       # Run lint, formatting, tests, and production build
 ```
 
 ## Testing
@@ -117,9 +118,9 @@ The test suite covers the application host, routing, the showcase, and reusable 
 
 ## Progressive Web App
 
-Miércoles FC is installable from supported browsers as a standalone PWA. Production builds use Angular's official Service Worker to cache the static application shell. This foundation does not make future business data or workflows available offline.
+Miércoles FC is installable from supported browsers as a standalone PWA. Production builds cache only the static application shell. Business data remains online-only; offline network operations fail safely and are never queued. Installation is non-blocking and service-worker updates require explicit user action.
 
-For local verification, run `npm run build` followed by `npm run serve:pwa`, open `http://localhost:4200` in a private browser window, and inspect the Manifest, Service Worker, and Cache Storage panels. See [PWA documentation](docs/pwa.md) for the complete installability and offline-shell checklist.
+For local verification, run `npm run build` followed by `npm run serve:pwa`, open `http://localhost:4200` in a private browser window, and inspect the Manifest, Service Worker, and Cache Storage panels. See [PWA documentation](docs/pwa.md), the [QA checklist](docs/qa-checklist.md), and the [production release runbook](docs/production-release.md).
 
 ## Supabase and database
 
@@ -190,6 +191,6 @@ History lists only completed Events with actual participation counts, then lazil
 - Completed: **PR23 — Payments**
 - Completed: **PR24 — Event Closure & Summary**
 - Completed: **PR26 — Realtime & Multi-device**
-- Next: **PR27 — PWA, Quality & Production Release**
+- Completed: **PR27 — PWA, Quality & Production Release**
 
-Milestone 6 — Liquidaciones y pagos is complete. Milestone 7 — Final Product continues with PR27 PWA, Quality & Production Release.
+Milestone 7 — Final Product is implemented as a release candidate. Production release remains subject to the documented manual gates and explicit approval.

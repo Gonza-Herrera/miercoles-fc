@@ -1,6 +1,14 @@
 @if (auth.isInitializing()) {
   <app-auth-loading />
 } @else {
+  @if (!connectivity.online()) {
+    <div class="app-notice app-notice--offline" role="status" aria-live="polite">
+      <span
+        ><strong>Estás sin conexión.</strong> Podés consultar la pantalla cargada, pero no guardar
+        cambios.</span
+      >
+    </div>
+  }
   @if (realtime?.status() === 'CONNECTING' || realtime?.status() === 'RECONNECTING') {
     <div class="realtime-status" role="status" aria-live="polite">Actualizando información…</div>
   } @else if (
@@ -11,4 +19,50 @@
     </div>
   }
   <router-outlet />
+
+  @if (update.available()) {
+    <aside class="pwa-card" aria-labelledby="update-title">
+      <div>
+        <strong id="update-title">Hay una nueva versión</strong>
+        <p>Cerrá cualquier edición en curso y actualizá cuando estés listo.</p>
+        @if (update.error()) {
+          <p role="alert">No pudimos actualizar. Volvé a intentarlo.</p>
+        }
+      </div>
+      <div class="pwa-card__actions">
+        <button type="button" class="pwa-action pwa-action--quiet" (click)="update.dismiss()">
+          Más tarde
+        </button>
+        <button
+          type="button"
+          class="pwa-action"
+          [disabled]="update.applying()"
+          (click)="update.apply()"
+        >
+          {{ update.applying() ? 'Actualizando…' : 'Actualizar' }}
+        </button>
+      </div>
+    </aside>
+  } @else if (install.canInstall() || install.showIosHelp()) {
+    <aside class="pwa-card" aria-labelledby="install-title">
+      <div>
+        <strong id="install-title">Instalá Miércoles FC</strong>
+        <p>
+          @if (install.showIosHelp()) {
+            En Safari, tocá Compartir y luego “Agregar a inicio”.
+          } @else {
+            Abrí la app más rápido y usala como una aplicación independiente.
+          }
+        </p>
+      </div>
+      <div class="pwa-card__actions">
+        <button type="button" class="pwa-action pwa-action--quiet" (click)="install.dismiss()">
+          Ahora no
+        </button>
+        @if (install.canInstall()) {
+          <button type="button" class="pwa-action" (click)="install.install()">Instalar</button>
+        }
+      </div>
+    </aside>
+  }
 }
