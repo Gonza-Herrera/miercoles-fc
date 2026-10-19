@@ -21,3 +21,5 @@ All values remain integer minor units. For each activity, `collected + outstandi
 ## Security and PR25 compatibility
 
 Functions derive identity from `auth.uid()`, use an empty search path, schema-qualified relations, explicit EXECUTE grants, active membership checks and ADMIN checks for writes. RLS continues to protect table reads and unrelated users cannot access the summary. `closed_at`, `closed_by` and the stable summary RPC provide the historical anchor PR25 can list later; PR24 does not implement history browsing or filters.
+
+PR25 now uses that anchor for Group-scoped historical navigation. It reuses this summary dynamically, so post-closure payment changes update collected/outstanding values without modifying closure metadata or immutable activity data. See [Event History](history.md).

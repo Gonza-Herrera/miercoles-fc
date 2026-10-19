@@ -1,0 +1,73 @@
+<app-page-container>
+  <main class="history-page">
+    <a class="history-page__back" [routerLink]="['/groups', groupId]">← Volver al grupo</a>
+    <header>
+      <p class="history-page__eyebrow">Historial</p>
+      <h1 class="ds-page-title">Los miércoles que compartimos.</h1>
+      @if (group(); as currentGroup) {
+        <p class="ds-body">{{ currentGroup.name }}</p>
+      }
+    </header>
+    @if (loading()) {
+      <div class="history-list" role="status" aria-live="polite" aria-label="Cargando historial">
+        @for (item of [1, 2, 3]; track item) {
+          <app-card><div class="history-skeleton"></div></app-card>
+        }
+      </div>
+    } @else if (errorMessage(); as error) {
+      <app-card
+        ><div class="history-error" role="alert">
+          <p>{{ error }}</p>
+          <app-button variant="secondary" (click)="load()">Reintentar</app-button>
+        </div></app-card
+      >
+    } @else if (!items().length) {
+      <app-card
+        ><app-empty-state
+          title="No hay miércoles anteriores todavía."
+          description="Cuando finalices tu primer miércoles, vas a poder consultarlo acá."
+      /></app-card>
+    } @else {
+      <section class="history-list" aria-label="Miércoles finalizados">
+        @for (item of items(); track item.eventId) {
+          <a
+            class="history-card-link"
+            [routerLink]="['/groups', groupId, 'history', item.eventId]"
+            [attr.aria-label]="
+              'Ver resumen del miércoles ' + date(item).day + ' de ' + date(item).month
+            "
+          >
+            <app-card variant="elevated">
+              <article class="history-card">
+                <div class="history-card__date" aria-hidden="true">
+                  <strong>{{ date(item).day }}</strong
+                  ><span>{{ date(item).month }}</span>
+                </div>
+                <div class="history-card__content">
+                  <div class="history-card__heading">
+                    <h2 class="ds-card-title">Miércoles</h2>
+                    <app-badge variant="success">Finalizado</app-badge>
+                  </div>
+                  <div class="history-card__counts">
+                    <span>⚽ {{ item.actualPlayerCount }} jugadores</span
+                    ><span>🍽️ {{ item.actualDinerCount }} personas</span>
+                  </div>
+                  <span class="history-card__action">Ver resumen →</span>
+                </div>
+              </article>
+            </app-card>
+          </a>
+        }
+      </section>
+      @if (hasMore()) {
+        <app-button
+          variant="secondary"
+          [fullWidth]="true"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+          >{{ loadingMore() ? 'Cargando…' : 'Cargar más' }}</app-button
+        >
+      }
+    }
+  </main>
+</app-page-container>

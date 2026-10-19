@@ -12,6 +12,20 @@ export const GROUP_ROUTES: Routes = [
       import('./pages/group-form-page/group-form-page').then(({ GroupFormPage }) => GroupFormPage),
   },
   {
+    path: ':groupId/history',
+    loadComponent: () =>
+      import('../history/pages/history-page/history-page').then(({ HistoryPage }) => HistoryPage),
+    title: 'Historial · Miércoles FC',
+  },
+  {
+    path: ':groupId/history/:eventId',
+    loadComponent: () =>
+      import('../history/pages/history-detail-page/history-detail-page').then(
+        ({ HistoryDetailPage }) => HistoryDetailPage,
+      ),
+    title: 'Miércoles finalizado · Miércoles FC',
+  },
+  {
     path: ':groupId',
     loadComponent: () =>
       import('./pages/group-detail-page/group-detail-page').then(

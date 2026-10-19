@@ -1162,6 +1162,15 @@ export type Database = {
           team_name: string;
         }[];
       };
+      get_group_event_history: {
+        Args: {
+          p_before_event_id?: string;
+          p_before_starts_at?: string;
+          p_group_id: string;
+          p_limit?: number;
+        };
+        Returns: Json;
+      };
       get_group_invitation_preview: {
         Args: { p_raw_token: string };
         Returns: {
