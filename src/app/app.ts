@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { AuthLoading } from './core/auth/auth-loading/auth-loading';
 import { AuthService } from './core/auth/auth.service';
+import { RealtimeService } from './core/realtime/realtime.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -12,4 +13,5 @@ import { AuthService } from './core/auth/auth.service';
 })
 export class App {
   protected readonly auth = inject(AuthService);
+  protected readonly realtime = inject(RealtimeService, { optional: true });
 }

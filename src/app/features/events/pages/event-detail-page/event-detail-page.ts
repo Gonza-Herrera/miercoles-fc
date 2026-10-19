@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Button, Card } from '../../../../shared/ui';
 import { AttendanceManager } from '../../../attendance';
 import { GroupContextService } from '../../../groups/group-context.service';
@@ -44,11 +46,13 @@ import { EventService } from '../../event.service';
 })
 export class EventDetailPage implements OnInit {
   private readonly eventContext = inject(EventContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly events = inject(EventService);
   private readonly groupContext = inject(GroupContextService);
   private readonly groups = inject(GroupService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly realtime = inject(RealtimeService, { optional: true });
 
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly event = signal<WeeklyEvent | null>(null);
@@ -79,10 +83,12 @@ export class EventDetailPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId, () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       const event = await this.events.get(this.eventId);
@@ -98,7 +104,7 @@ export class EventDetailPage implements OnInit {
           : 'No pudimos cargar el evento.',
       );
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

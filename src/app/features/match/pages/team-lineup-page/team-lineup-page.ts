@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Avatar, Button, Card, ConfirmDialog } from '../../../../shared/ui';
 import { FootballPitch } from '../../lineup/football-pitch/football-pitch';
 import {
@@ -33,6 +35,8 @@ interface SwapSelection {
 })
 export class TeamLineupPage implements OnInit {
   private readonly lineupService = inject(TeamLineupService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
   private readonly route = inject(ActivatedRoute);
   private touchStartX: number | null = null;
 
@@ -56,10 +60,12 @@ export class TeamLineupPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId, () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       const state = await this.lineupService.get(this.eventId);
@@ -70,7 +76,7 @@ export class TeamLineupPage implements OnInit {
     } catch {
       this.errorMessage.set('No pudimos cargar los equipos.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

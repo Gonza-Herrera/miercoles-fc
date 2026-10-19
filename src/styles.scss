@@ -1,1 +1,20 @@
 @use 'styles/index';
+
+.realtime-status {
+  position: fixed;
+  z-index: 1000;
+  inset-block-start: env(safe-area-inset-top, 0);
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0 0 0.75rem 0.75rem;
+  background: #fff;
+  color: #5f6472;
+  box-shadow: 0 0.15rem 0.5rem rgb(0 0 0 / 12%);
+  font-size: 0.75rem;
+}
+
+.realtime-status--offline {
+  background: #fff3cd;
+  color: #684f00;
+}

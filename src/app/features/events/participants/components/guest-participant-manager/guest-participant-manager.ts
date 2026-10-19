@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 
 import { Button, Card, ConfirmDialog, EmptyState } from '../../../../../shared/ui';
+import { RealtimeService } from '../../../../../core/realtime/realtime.service';
 import { GuestParticipantService } from '../../data-access/guest-participant.service';
 import {
   GuestOperationError,
@@ -28,6 +30,8 @@ import { ParticipantRow } from '../participant-row/participant-row';
 })
 export class GuestParticipantManager implements OnInit {
   private readonly guests = inject(GuestParticipantService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
 
   readonly eventId = input.required<string>();
   readonly isAdmin = input(false);
@@ -46,6 +50,8 @@ export class GuestParticipantManager implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId(), () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
   protected presentation(guest: GuestParticipant): ParticipantPresentation {
@@ -118,15 +124,15 @@ export class GuestParticipantManager implements OnInit {
     }
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       this.guestList.set(await this.guests.list(this.eventId()));
     } catch {
       this.errorMessage.set('No pudimos cargar los invitados.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

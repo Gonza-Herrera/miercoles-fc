@@ -49,3 +49,5 @@ The mutation locks the Event, obligation and current marker in a stable order. D
 `/payments` preserves settlement finalization when either source is not final. Once final, it shows separate Match and Dinner cards, pending rows before paid rows, exact collected/outstanding summaries, signed member avatars, guest/current-user context, an explicit “Todos pagaron” state and confirmation dialogs. ADMIN controls disappear for read-only members and closed events.
 
 PR24 determines closure readiness from the two independent summaries without changing payment history. The closed Event summary continues linking to this payment view, with ADMIN correction controls and read-only MEMBER visibility. No payment gateway, transfer proof, reconciliation, reminder or Realtime subscription is introduced.
+
+PR26 publishes the RLS-protected `payments` and settlement tables to Supabase Realtime. Payment notifications invalidate and refetch the canonical Event payment read model, including for `CLOSED` Events and History detail. Match and Dinner remain separate, and no payment payload is treated as authoritative client state.

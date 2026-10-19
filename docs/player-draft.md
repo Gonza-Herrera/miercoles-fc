@@ -67,6 +67,11 @@ change. The screen exposes connection state, disables picks while disconnected,
 uses a confirmation dialog, and remains read-only for spectators. There is no
 offline mutation queue.
 
+PR26 moves that subscription into the shared Event-scoped Realtime coordinator.
+Draft, roster, Manager and team notifications are coalesced and always refetch
+`get_event_player_draft`; reconnect and foreground restoration also refetch. The
+existing locked/versioned RPC remains the sole concurrency authority.
+
 RLS permits draft-row reads only to active linked members who can access the Event.
 The RPCs derive the caller from `auth.uid()`; ADMIN authorizes start only and does
 not authorize an out-of-turn pick. Realtime payloads are merely reload signals and

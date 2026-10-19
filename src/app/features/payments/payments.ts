@@ -1,7 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { PageContainer } from '../../shared/layout';
+import { RealtimeService } from '../../core/realtime/realtime.service';
 import { Avatar, Badge, Button, Card, ConfirmDialog, EmptyState } from '../../shared/ui';
 import { WeeklyEvent, eventDateLabel, formatMoneyMinor } from '../events/event.models';
 import { EventService } from '../events/event.service';
@@ -43,12 +51,15 @@ interface PaymentConfirmation {
 })
 export class Payments implements OnInit {
   private readonly context = inject(GroupContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
   private readonly dinnerSettlements = inject(DinnerSettlementService);
   private readonly matchSettlements = inject(MatchSettlementService);
   private readonly payments = inject(PaymentService);
   private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly realtime = inject(RealtimeService, { optional: true });
+  private unwatch: (() => void) | null = null;
 
   protected readonly event = signal<WeeklyEvent | null>(null);
   protected readonly matchView = signal<MatchSettlementView | null>(null);
@@ -68,8 +79,8 @@ export class Payments implements OnInit {
     await this.load();
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       const summaries = await this.groups.list();
@@ -106,10 +117,14 @@ export class Payments implements OnInit {
       this.matchView.set(matchView);
       this.dinnerView.set(dinnerView);
       this.paymentsView.set(paymentsView);
+      if (!this.unwatch) {
+        this.unwatch = this.realtime?.watchEvent(event.id, () => void this.load(false)) ?? null;
+        this.destroyRef.onDestroy(() => this.unwatch?.());
+      }
     } catch {
       this.errorMessage.set('No pudimos cargar las liquidaciones.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

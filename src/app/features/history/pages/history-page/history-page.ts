@@ -1,7 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Badge, Button, Card, EmptyState } from '../../../../shared/ui';
 import { GroupContextService } from '../../../groups/group-context.service';
 import { GroupDetail } from '../../../groups/group.models';
@@ -18,9 +26,11 @@ import { HistoryService } from '../../history.service';
 })
 export class HistoryPage implements OnInit {
   private readonly context = inject(GroupContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly groups = inject(GroupService);
   private readonly history = inject(HistoryService);
   private readonly route = inject(ActivatedRoute);
+  private readonly realtime = inject(RealtimeService, { optional: true });
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly group = signal<GroupDetail | null>(null);
   protected readonly groupId = this.route.snapshot.paramMap.get('groupId')!;
@@ -32,10 +42,12 @@ export class HistoryPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchGroup(this.groupId, () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     this.items.set([]);
     this.cursor.set(null);
@@ -50,7 +62,7 @@ export class HistoryPage implements OnInit {
     } catch {
       this.errorMessage.set('No pudimos cargar el historial.');
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

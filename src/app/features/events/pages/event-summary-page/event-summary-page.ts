@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Badge, Button, Card, ConfirmDialog } from '../../../../shared/ui';
 import {
   ClosureBlocker,
@@ -27,6 +29,8 @@ import { formatMoneyMinor } from '../../event.models';
 })
 export class EventSummaryPage implements OnInit {
   private readonly closure = inject(EventClosureService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
   private readonly route = inject(ActivatedRoute);
   protected readonly closing = signal(false);
   protected readonly confirmClose = signal(false);
@@ -38,17 +42,19 @@ export class EventSummaryPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.load();
+    const unwatch = this.realtime?.watchEvent(this.eventId, () => void this.load(false));
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
-  protected async load(): Promise<void> {
-    this.loading.set(true);
+  protected async load(showLoading = true): Promise<void> {
+    if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
       this.summary.set(await this.closure.get(this.eventId));
     } catch (error) {
       this.errorMessage.set(this.errorFor(error));
     } finally {
-      this.loading.set(false);
+      if (showLoading) this.loading.set(false);
     }
   }
 

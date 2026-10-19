@@ -206,6 +206,8 @@ PR20 grants the same group members focused read access through `get_dinner_reali
 
 PR21 allows active group members to read court previews and finalized obligations. Only an active ADMIN may finalize in `SETTLEMENT` through `finalize_match_settlement`; direct settlement writes are revoked. Event locking plus a unique event constraint makes the operation concurrent-safe and idempotent. Finalization locks financially relevant price and actual-player changes. See [Match Settlement documentation](match-settlement.md).
 
+PR26 adds the Event-owned, RLS-protected operational and financial tables to the `supabase_realtime` publication. Postgres Changes delivery uses the same active Group/Event read authorization as ordinary queries; it does not grant writes or replace RPC validation. See [Realtime & Multi-device](realtime-multi-device.md).
+
 ## Browser configuration
 
 Copy the example file and replace only the public values:

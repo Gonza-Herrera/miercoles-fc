@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnDestroy,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
+import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Avatar, Badge, Button, Card, ConfirmDialog } from '../../../../shared/ui';
 import {
   DraftPlayer,
@@ -27,10 +28,12 @@ import { PlayerDraftOperationError, PlayerDraftService } from '../../draft/playe
   styleUrl: './player-draft-page.scss',
   templateUrl: './player-draft-page.html',
 })
-export class PlayerDraftPage implements OnInit, OnDestroy {
+export class PlayerDraftPage implements OnInit {
   private readonly draftService = inject(PlayerDraftService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly realtime = inject(RealtimeService, { optional: true });
   private readonly route = inject(ActivatedRoute);
-  private unsubscribe: (() => void) | null = null;
+  private readonly fallbackRealtimeStatus = signal<DraftRealtimeStatus>('CONNECTING');
   private reloading = false;
 
   protected readonly eventId = this.route.snapshot.paramMap.get('eventId')!;
@@ -40,7 +43,9 @@ export class PlayerDraftPage implements OnInit, OnDestroy {
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly feedback = signal<string | null>(null);
   protected readonly selectedPlayer = signal<DraftPlayer | null>(null);
-  protected readonly realtimeStatus = signal<DraftRealtimeStatus>('CONNECTING');
+  protected readonly realtimeStatus = computed(
+    () => this.realtime?.status() ?? this.fallbackRealtimeStatus(),
+  );
   protected readonly currentTeam = computed(() => {
     const draft = this.draft();
     return draft ? currentDraftTeam(draft) : null;
@@ -48,15 +53,14 @@ export class PlayerDraftPage implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     await this.load(true);
-    this.unsubscribe = this.draftService.subscribe(
-      this.eventId,
-      () => void this.reloadFromRealtime(),
-      (status) => this.realtimeStatus.set(status),
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe?.();
+    const unwatch = this.realtime
+      ? this.realtime.watchEvent(this.eventId, () => void this.reloadFromRealtime())
+      : this.draftService.subscribe(
+          this.eventId,
+          () => void this.reloadFromRealtime(),
+          (status) => this.fallbackRealtimeStatus.set(status),
+        );
+    if (unwatch) this.destroyRef.onDestroy(unwatch);
   }
 
   protected remaining(team: PlayerDraftState['teams'][number]): number {
