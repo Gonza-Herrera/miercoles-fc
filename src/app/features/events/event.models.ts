@@ -109,6 +109,7 @@ export function eventDateLabel(startsAt: string): string {
   const value = new Intl.DateTimeFormat('es-AR', {
     day: 'numeric',
     month: 'long',
+    timeZone: 'America/Argentina/Buenos_Aires',
     weekday: 'long',
   }).format(new Date(startsAt));
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -119,6 +120,7 @@ export function eventTime(startsAt: string): string {
     hour: '2-digit',
     hourCycle: 'h23',
     minute: '2-digit',
+    timeZone: 'America/Argentina/Buenos_Aires',
   }).format(new Date(startsAt));
 }
 
