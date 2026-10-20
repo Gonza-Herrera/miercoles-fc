@@ -2,10 +2,10 @@
   @for (item of navigationItems; track item.route) {
     <a
       class="bottom-navigation__item"
-      [routerLink]="item.route"
-      routerLinkActive="bottom-navigation__item--active"
-      [routerLinkActiveOptions]="{ exact: item.exact }"
-      ariaCurrentWhenActive="page"
+      [class.bottom-navigation__item--active]="context.section() === item.section"
+      [routerLink]="context.destination(item.route).route"
+      [queryParams]="context.destination(item.route).queryParams"
+      [attr.aria-current]="context.section() === item.section ? 'page' : null"
     >
       <span class="bottom-navigation__icon" aria-hidden="true">
         @switch (item.icon) {

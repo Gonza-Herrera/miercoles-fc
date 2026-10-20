@@ -37,7 +37,11 @@
       }
     </p>
 
-    <a routerLink="/dinner" aria-label="Ver cena y confirmaciones">
+    <a
+      routerLink="/dinner"
+      [queryParams]="{ eventId: eventId() }"
+      aria-label="Ver cena y confirmaciones"
+    >
       <app-button variant="secondary" [fullWidth]="true">Ver cena</app-button>
     </a>
   </article>

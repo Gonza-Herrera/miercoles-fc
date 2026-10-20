@@ -1,6 +1,6 @@
 <app-page-container>
   <main class="lineup-page">
-    <a class="lineup-page__back" [routerLink]="['/events', eventId]">← Volver al miércoles</a>
+    <a class="lineup-page__back" [routerLink]="backRoute">← Volver</a>
 
     @if (loading()) {
       <section class="lineup-loading" role="status" aria-live="polite">

@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
+import { safeInternalReturnUrl } from '../../../../core/navigation/navigation-context.service';
 import { PageContainer } from '../../../../shared/layout';
 import { RealtimeService } from '../../../../core/realtime/realtime.service';
 import { Avatar, Button, Card, ConfirmDialog } from '../../../../shared/ui';
@@ -41,6 +42,9 @@ export class TeamLineupPage implements OnInit {
   private touchStartX: number | null = null;
 
   protected readonly eventId = this.route.snapshot.paramMap.get('eventId')!;
+  protected readonly backRoute =
+    safeInternalReturnUrl(this.route.snapshot.queryParamMap?.get('returnTo') ?? null) ??
+    `/events/${this.eventId}`;
   protected readonly state = signal<TeamLineupState | null>(null);
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal<string | null>(null);

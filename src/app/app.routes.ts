@@ -31,6 +31,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
+        data: { navigationSection: 'HOME' },
         loadChildren: () =>
           import('./features/home/home.routes').then(({ HOME_ROUTES }) => HOME_ROUTES),
       },
@@ -46,11 +47,13 @@ export const routes: Routes = [
       },
       {
         path: 'match',
+        data: { navigationSection: 'MATCH' },
         loadChildren: () =>
           import('./features/match/match.routes').then(({ MATCH_ROUTES }) => MATCH_ROUTES),
       },
       {
         path: 'dinner',
+        data: { navigationSection: 'DINNER' },
         loadChildren: () =>
           import('./features/dinner/dinner.routes').then(({ DINNER_ROUTES }) => DINNER_ROUTES),
       },
@@ -63,6 +66,7 @@ export const routes: Routes = [
       },
       {
         path: 'payments',
+        data: { navigationSection: 'PAYMENTS' },
         loadChildren: () =>
           import('./features/payments/payments.routes').then(
             ({ PAYMENTS_ROUTES }) => PAYMENTS_ROUTES,

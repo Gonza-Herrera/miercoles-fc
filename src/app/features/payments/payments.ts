@@ -60,6 +60,8 @@ export class Payments implements OnInit {
   private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly realtime = inject(RealtimeService, { optional: true });
   private unwatch: (() => void) | null = null;
+  private watchedEventId: string | null = null;
+  private request = 0;
 
   protected readonly event = signal<WeeklyEvent | null>(null);
   protected readonly matchView = signal<MatchSettlementView | null>(null);
@@ -76,32 +78,36 @@ export class Payments implements OnInit {
   protected readonly formatMoney = formatMoneyMinor;
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    const changes = this.route?.queryParamMap;
+    if (!changes?.subscribe) {
+      await this.load();
+      return;
+    }
+    const subscription = changes.subscribe(() => void this.load());
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   protected async load(showLoading = true): Promise<void> {
+    const request = ++this.request;
     if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
-      const summaries = await this.groups.list();
-      const groupId =
-        this.context.current()?.id ??
-        summaries.find((group) => group.id === this.context.selectedGroupId())?.id ??
-        summaries[0]?.id;
-      if (!groupId) {
-        this.event.set(null);
-        this.matchView.set(null);
-        this.dinnerView.set(null);
-        this.paymentsView.set(null);
-        return;
-      }
       const requestedEventId = this.route?.snapshot.queryParamMap.get('eventId');
-      const event = requestedEventId
-        ? await this.events.get(requestedEventId)
-        : await this.events.current(groupId);
-      if (event && event.groupId !== groupId) {
-        throw new Error('Requested event does not belong to the selected group.');
+      let event: WeeklyEvent | null;
+      let requestedGroup: Awaited<ReturnType<GroupService['get']>> | null = null;
+      if (requestedEventId) {
+        event = await this.events.get(requestedEventId);
+        requestedGroup = await this.groups.get(event.groupId);
+      } else {
+        const summaries = await this.groups.list();
+        const groupId =
+          this.context.current()?.id ??
+          summaries.find((group) => group.id === this.context.selectedGroupId())?.id ??
+          summaries[0]?.id;
+        event = groupId ? await this.events.current(groupId) : null;
       }
+      if (request !== this.request) return;
+      if (requestedGroup) this.context.set(requestedGroup);
       this.event.set(event);
       if (!event) {
         this.matchView.set(null);
@@ -114,18 +120,33 @@ export class Payments implements OnInit {
         this.dinnerSettlements.get(event.id),
         this.payments.get(event.id),
       ]);
+      if (request !== this.request) return;
       this.matchView.set(matchView);
       this.dinnerView.set(dinnerView);
       this.paymentsView.set(paymentsView);
-      if (!this.unwatch) {
-        this.unwatch = this.realtime?.watchEvent(event.id, () => void this.load(false)) ?? null;
-        this.destroyRef.onDestroy(() => this.unwatch?.());
-      }
+      this.watch(event.id);
     } catch {
-      this.errorMessage.set('No pudimos cargar las liquidaciones.');
+      if (request === this.request) {
+        this.event.set(null);
+        this.matchView.set(null);
+        this.dinnerView.set(null);
+        this.paymentsView.set(null);
+        this.errorMessage.set('No pudimos cargar las liquidaciones del miércoles solicitado.');
+      }
     } finally {
-      if (showLoading) this.loading.set(false);
+      if (showLoading && request === this.request) this.loading.set(false);
     }
+  }
+
+  private watch(eventId: string): void {
+    if (this.watchedEventId === eventId) return;
+    this.unwatch?.();
+    this.watchedEventId = eventId;
+    this.unwatch = this.realtime?.watchEvent(eventId, () => void this.load(false)) ?? null;
+  }
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.unwatch?.());
   }
 
   protected requestFinalize(kind: 'DINNER' | 'MATCH'): void {

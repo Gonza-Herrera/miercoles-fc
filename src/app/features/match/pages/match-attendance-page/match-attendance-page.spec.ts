@@ -92,7 +92,7 @@ describe('MatchAttendancePage', () => {
         { attended: false, groupMemberId: 'm-3', participantId: 'p-3' },
         { attended: true, groupMemberId: 'm-2', participantId: 'p-2' },
       ]);
-      expect(navigateMock).toHaveBeenCalledWith(['/events', 'event-id'], {
+      expect(navigateMock).toHaveBeenCalledWith(['/events', 'event-id', 'teams'], {
         state: {
           eventFeedback: 'Se guardó la lista de presentes (2 jugadores).',
         },

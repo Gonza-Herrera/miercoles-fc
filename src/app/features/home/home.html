@@ -36,11 +36,13 @@
           [currencyCode]="currentDashboard.event.currencyCode"
           [dataAvailable]="!attendanceError()"
           [estimatedPerPlayerMinor]="currentDashboard.estimatedCourtPerPlayerMinor"
+          [eventId]="currentDashboard.event.id"
           [eventStatus]="currentDashboard.event.status"
         />
         <app-dinner-summary-card
           [confirmedCount]="currentDashboard.dinnerConfirmedCount"
           [dataAvailable]="!attendanceError()"
+          [eventId]="currentDashboard.event.id"
           [eventStatus]="currentDashboard.event.status"
           [menu]="dinnerMenu()"
         />

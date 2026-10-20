@@ -1,6 +1,14 @@
 <a class="skip-link" href="#main-content">Saltar al contenido</a>
 <div class="app-shell">
   <app-header />
+  @if (navigation.eventId(); as eventId) {
+    <aside class="event-context-notice" aria-label="Contexto de navegación">
+      <span>Estás viendo un miércoles seleccionado.</span>
+      <a [routerLink]="navigation.returnUrl() ?? '/'">
+        {{ navigation.returnUrl() ? 'Volver al historial' : 'Ir al miércoles actual' }}
+      </a>
+    </aside>
+  }
   <main id="main-content" class="app-shell__content" tabindex="-1">
     <router-outlet />
   </main>

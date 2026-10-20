@@ -15,5 +15,6 @@ export class DinnerSummaryCard {
   readonly confirmedCount = input.required<number>();
   readonly dataAvailable = input(true);
   readonly eventStatus = input.required<EventStatus>();
+  readonly eventId = input.required<string>();
   readonly menu = input<string | null>(null);
 }

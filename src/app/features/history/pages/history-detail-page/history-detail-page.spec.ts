@@ -25,7 +25,13 @@ describe('HistoryDetailPage', () => {
     expect(fixture.nativeElement.textContent).toContain('Leña');
     expect(fixture.nativeElement.textContent).toContain('Pagó');
     expect(fixture.nativeElement.textContent).toContain('Hay pagos pendientes');
-    expect(fixture.nativeElement.querySelector('a[href="/payments?eventId=event-1"]')).toBeTruthy();
+    const paymentsLink = Array.from(
+      fixture.nativeElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>,
+    ).find((link) => link.textContent?.includes('Ver pagos'));
+    const paymentsUrl = new URL(paymentsLink?.href ?? '', 'http://localhost');
+    expect(paymentsUrl.pathname).toBe('/payments');
+    expect(paymentsUrl.searchParams.get('eventId')).toBe('event-1');
+    expect(paymentsUrl.searchParams.get('returnTo')).toBe('/groups/group-1/history/event-1');
   });
 });
 

@@ -8,18 +8,26 @@ import { BottomNavigation } from './bottom-navigation';
 class TestPage {}
 
 describe('BottomNavigation', () => {
-  it('renders accessible links and marks the active destination', async () => {
+  beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BottomNavigation],
       providers: [
         provideRouter([
-          { path: '', component: TestPage },
-          { path: 'match', component: TestPage },
-          { path: 'dinner', component: TestPage },
-          { path: 'payments', component: TestPage },
+          { path: '', component: TestPage, data: { navigationSection: 'HOME' } },
+          { path: 'match', component: TestPage, data: { navigationSection: 'MATCH' } },
+          { path: 'dinner', component: TestPage, data: { navigationSection: 'DINNER' } },
+          { path: 'payments', component: TestPage, data: { navigationSection: 'PAYMENTS' } },
+          {
+            path: 'events/:eventId/lineup',
+            component: TestPage,
+            data: { navigationSection: 'MATCH' },
+          },
         ]),
       ],
     }).compileComponents();
+  });
+
+  it('renders accessible links and marks the active destination', async () => {
     const fixture = TestBed.createComponent(BottomNavigation);
     await TestBed.inject(Router).navigateByUrl('/match');
     fixture.detectChanges();
@@ -43,5 +51,25 @@ describe('BottomNavigation', () => {
       '/payments',
     ]);
     expect(element.querySelector('[aria-current="page"]')?.textContent).toContain('Partido');
+  });
+
+  it('keeps an event selected and marks Match inside an Event route', async () => {
+    const fixture = TestBed.createComponent(BottomNavigation);
+    await TestBed.inject(Router).navigateByUrl('/events/event-7/lineup');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const links = Array.from(
+      fixture.nativeElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>,
+    );
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/?eventId=event-7',
+      '/match?eventId=event-7',
+      '/dinner?eventId=event-7',
+      '/payments?eventId=event-7',
+    ]);
+    expect(fixture.nativeElement.querySelector('[aria-current="page"]')?.textContent).toContain(
+      'Partido',
+    );
   });
 });

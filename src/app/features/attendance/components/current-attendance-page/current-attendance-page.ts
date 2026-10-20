@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { PageContainer } from '../../../../shared/layout';
 import { Button, Card, EmptyState } from '../../../../shared/ui';
@@ -19,8 +28,11 @@ import { AttendanceManager } from '../attendance-manager/attendance-manager';
 })
 export class CurrentAttendancePage implements OnInit {
   private readonly context = inject(GroupContextService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private request = 0;
 
   readonly activity = input.required<AttendanceActivity>();
   protected readonly currentEvent = signal<WeeklyEvent | null>(null);
@@ -28,23 +40,43 @@ export class CurrentAttendancePage implements OnInit {
   protected readonly loading = signal(true);
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    const changes = this.route?.queryParamMap;
+    if (!changes?.subscribe) {
+      await this.load();
+      return;
+    }
+    const subscription = changes.subscribe(() => void this.load());
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   protected async load(): Promise<void> {
+    const request = ++this.request;
     this.loading.set(true);
     this.errorMessage.set(null);
     try {
+      const requestedEventId = this.route?.snapshot.queryParamMap.get('eventId');
+      if (requestedEventId) {
+        const event = await this.events.get(requestedEventId);
+        const group = await this.groups.get(event.groupId);
+        if (request !== this.request) return;
+        this.context.set(group);
+        this.currentEvent.set(event);
+        return;
+      }
       const groups = await this.groups.list();
       const groupId =
         this.context.current()?.id ??
         groups.find((group) => group.id === this.context.selectedGroupId())?.id ??
         groups[0]?.id;
-      this.currentEvent.set(groupId ? await this.events.current(groupId) : null);
+      const event = groupId ? await this.events.current(groupId) : null;
+      if (request === this.request) this.currentEvent.set(event);
     } catch {
-      this.errorMessage.set('No pudimos cargar el miércoles actual.');
+      if (request === this.request) {
+        this.currentEvent.set(null);
+        this.errorMessage.set('No pudimos cargar el miércoles solicitado.');
+      }
     } finally {
-      this.loading.set(false);
+      if (request === this.request) this.loading.set(false);
     }
   }
 }

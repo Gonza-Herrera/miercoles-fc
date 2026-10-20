@@ -7,6 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { PageContainer } from '../../shared/layout';
 import { RealtimeService } from '../../core/realtime/realtime.service';
@@ -41,7 +42,10 @@ export class Dinner implements OnInit {
   private readonly groups = inject(GroupService);
   private readonly planning = inject(DinnerPlanningService);
   private readonly realtime = inject(RealtimeService, { optional: true });
+  private readonly route = inject(ActivatedRoute, { optional: true });
   private unwatch: (() => void) | null = null;
+  private watchedEventId: string | null = null;
+  private request = 0;
 
   protected readonly currentEvent = signal<WeeklyEvent | null>(null);
   protected readonly group = signal<GroupDetail | null>(null);
@@ -58,13 +62,33 @@ export class Dinner implements OnInit {
   );
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    const changes = this.route?.queryParamMap;
+    if (!changes?.subscribe) {
+      await this.load();
+      return;
+    }
+    const subscription = changes.subscribe(() => void this.load());
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   protected async load(showLoading = true): Promise<void> {
+    const request = ++this.request;
     if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     try {
+      const requestedEventId = this.route?.snapshot.queryParamMap.get('eventId');
+      if (requestedEventId) {
+        const event = await this.events.get(requestedEventId);
+        const group = await this.groups.get(event.groupId);
+        const view = await this.planning.get(event.id);
+        if (request !== this.request) return;
+        this.context.set(group);
+        this.group.set(group);
+        this.currentEvent.set(event);
+        this.view.set(view);
+        this.watch(event.id);
+        return;
+      }
       const summaries = await this.groups.list();
       const groupId =
         this.context.current()?.id ??
@@ -80,18 +104,36 @@ export class Dinner implements OnInit {
         this.groups.get(groupId),
         this.events.current(groupId),
       ]);
+      if (request !== this.request) return;
+      const view = event ? await this.planning.get(event.id) : null;
+      if (request !== this.request) return;
       this.group.set(group);
+      this.context.set(group);
       this.currentEvent.set(event);
-      this.view.set(event ? await this.planning.get(event.id) : null);
-      if (event && !this.unwatch) {
-        this.unwatch = this.realtime?.watchEvent(event.id, () => void this.load(false)) ?? null;
-        this.destroyRef.onDestroy(() => this.unwatch?.());
-      }
+      this.view.set(view);
+      this.watch(event?.id ?? null);
     } catch {
-      this.errorMessage.set('No pudimos cargar la planificación de la cena.');
+      if (request === this.request) {
+        this.currentEvent.set(null);
+        this.view.set(null);
+        this.errorMessage.set('No pudimos cargar la planificación de la cena.');
+      }
     } finally {
-      if (showLoading) this.loading.set(false);
+      if (showLoading && request === this.request) this.loading.set(false);
     }
+  }
+
+  private watch(eventId: string | null): void {
+    if (this.watchedEventId === eventId) return;
+    this.unwatch?.();
+    this.watchedEventId = eventId;
+    this.unwatch = eventId
+      ? (this.realtime?.watchEvent(eventId, () => void this.load(false)) ?? null)
+      : null;
+  }
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.unwatch?.());
   }
 
   protected startEditing(): void {
