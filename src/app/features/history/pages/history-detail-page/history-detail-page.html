@@ -97,7 +97,9 @@
               </app-card>
             }
           </div>
-          <a [routerLink]="['/events', eventId, 'lineup']"
+          <a
+            [routerLink]="['/events', eventId, 'lineup']"
+            [queryParams]="{ returnTo: '/groups/' + groupId + '/history/' + eventId }"
             ><app-button variant="secondary" [fullWidth]="true"
               >Ver formación en cancha</app-button
             ></a
@@ -273,7 +275,12 @@
             >
           </div></app-card
         >
-        <a [routerLink]="['/payments']" [queryParams]="{ eventId: eventId }"
+        <a
+          [routerLink]="['/payments']"
+          [queryParams]="{
+            eventId: eventId,
+            returnTo: '/groups/' + groupId + '/history/' + eventId,
+          }"
           ><app-button variant="secondary" [fullWidth]="true">Ver pagos</app-button></a
         >
       </section>

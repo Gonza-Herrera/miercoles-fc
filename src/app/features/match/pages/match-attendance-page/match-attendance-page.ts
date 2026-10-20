@@ -164,7 +164,7 @@ export class MatchAttendancePage implements OnInit {
 
     try {
       await this.attendanceService.recordMatchAttendance(currentEvent.id, payload);
-      await this.router.navigate(['/events', currentEvent.id], {
+      await this.router.navigate(['/events', currentEvent.id, 'teams'], {
         state: {
           eventFeedback: `Se guardó la lista de presentes (${this.presentCount()} jugadores).`,
         },

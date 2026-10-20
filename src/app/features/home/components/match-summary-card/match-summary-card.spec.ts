@@ -40,6 +40,7 @@ describe('MatchSummaryCard', () => {
     const fixture = TestBed.createComponent(MatchSummaryCard);
     fixture.componentRef.setInput('confirmedCount', count);
     fixture.componentRef.setInput('courtPriceMinor', 5_000_000);
+    fixture.componentRef.setInput('eventId', 'event-1');
     fixture.componentRef.setInput('eventStatus', status);
     fixture.componentRef.setInput('estimatedPerPlayerMinor', estimate);
     fixture.detectChanges();

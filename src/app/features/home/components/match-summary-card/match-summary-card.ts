@@ -18,6 +18,7 @@ export class MatchSummaryCard {
   readonly dataAvailable = input(true);
   readonly estimatedPerPlayerMinor = input<number | null>(null);
   readonly eventStatus = input.required<EventStatus>();
+  readonly eventId = input.required<string>();
 
   protected readonly courtPrice = computed(() =>
     formatMoneyMinor(this.courtPriceMinor(), this.currencyCode()),

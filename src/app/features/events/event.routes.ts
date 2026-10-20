@@ -8,6 +8,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/match-attendance',
+    data: { navigationSection: 'MATCH' },
     loadComponent: () =>
       import('../match/pages/match-attendance-page/match-attendance-page').then(
         ({ MatchAttendancePage }) => MatchAttendancePage,
@@ -16,6 +17,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/team-generation',
+    data: { navigationSection: 'MATCH' },
     loadComponent: () =>
       import('../match/pages/team-generation-page/team-generation-page').then(
         ({ TeamGenerationPage }) => TeamGenerationPage,
@@ -24,6 +26,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/teams',
+    data: { navigationSection: 'MATCH' },
     loadComponent: () =>
       import('../match/pages/team-generation-page/team-generation-page').then(
         ({ TeamGenerationPage }) => TeamGenerationPage,
@@ -32,6 +35,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/draft',
+    data: { navigationSection: 'MATCH' },
     loadComponent: () =>
       import('../match/pages/player-draft-page/player-draft-page').then(
         ({ PlayerDraftPage }) => PlayerDraftPage,
@@ -40,6 +44,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/lineup',
+    data: { navigationSection: 'MATCH' },
     loadComponent: () =>
       import('../match/pages/team-lineup-page/team-lineup-page').then(
         ({ TeamLineupPage }) => TeamLineupPage,
@@ -48,6 +53,7 @@ export const EVENT_ROUTES: Routes = [
   },
   {
     path: ':eventId/summary',
+    data: { navigationSection: 'PAYMENTS' },
     loadComponent: () =>
       import('./pages/event-summary-page/event-summary-page').then(
         ({ EventSummaryPage }) => EventSummaryPage,

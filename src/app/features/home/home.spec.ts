@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
 import { AttendanceService } from '../attendance/attendance.service';
@@ -14,6 +14,7 @@ describe('Home', () => {
   const attendance = vi.fn();
   const current = vi.fn();
   const getGroup = vi.fn();
+  const getEvent = vi.fn();
   const getDinnerPlanning = vi.fn();
   const listGroups = vi.fn();
 
@@ -27,6 +28,7 @@ describe('Home', () => {
         attendee('Martín', 'YES', 'YES', true),
       ]);
     current.mockReset().mockResolvedValue(event('OPEN'));
+    getEvent.mockReset().mockResolvedValue(event('CLOSED'));
     getDinnerPlanning.mockReset().mockResolvedValue({ plan: null });
     getGroup.mockReset().mockResolvedValue(group('ADMIN'));
     listGroups
@@ -38,7 +40,7 @@ describe('Home', () => {
         provideRouter([]),
         { provide: AttendanceService, useValue: { listForDashboard: attendance } },
         { provide: DinnerPlanningService, useValue: { get: getDinnerPlanning } },
-        { provide: EventService, useValue: { current } },
+        { provide: EventService, useValue: { current, get: getEvent } },
         { provide: GroupService, useValue: { get: getGroup, list: listGroups } },
       ],
     });
@@ -59,8 +61,8 @@ describe('Home', () => {
     expect(text.match(/3 confirmados/g)).toHaveLength(2);
     expect(text).toContain('50.000');
     expect(text).toContain('Estimado por jugador');
-    expect(links).toContain('/match');
-    expect(links).toContain('/dinner');
+    expect(links).toContain('/match?eventId=event-id');
+    expect(links).toContain('/dinner?eventId=event-id');
     expect(text).toContain('Menú por definir');
     expect(text).not.toContain('Asado');
   });
@@ -107,6 +109,17 @@ describe('Home', () => {
 
     expect(fixture.nativeElement.textContent).toContain('No hay un miércoles programado.');
     expect(fixture.nativeElement.textContent).toContain('Crear próximo miércoles');
+  });
+
+  it('uses an explicit event from the URL instead of silently selecting the current one', async () => {
+    TestBed.overrideProvider(ActivatedRoute, {
+      useValue: { snapshot: { queryParamMap: convertToParamMap({ eventId: 'event-id' }) } },
+    });
+    const fixture = await createFixture();
+
+    expect(getEvent).toHaveBeenCalledWith('event-id');
+    expect(current).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Cerrado');
   });
 
   async function createFixture() {

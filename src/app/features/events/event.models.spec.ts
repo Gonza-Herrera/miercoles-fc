@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   WeeklyEvent,
+  eventDateLabel,
+  eventTime,
   localDateTimeToIso,
   parseCourtPriceToMinor,
   selectCurrentEvent,
@@ -20,6 +22,13 @@ describe('event models', () => {
     expect(iso).toBeTruthy();
     expect(new Date(iso!).getFullYear()).toBe(2026);
     expect(localDateTimeToIso('2026-02-31', '21:30')).toBeNull();
+  });
+
+  it('formats event dates and times in the event timezone', () => {
+    const startsAt = '2026-09-30T21:00:00-03:00';
+
+    expect(eventDateLabel(startsAt)).toBe('Miércoles, 30 de septiembre');
+    expect(eventTime(startsAt)).toBe('21:00');
   });
 
   it('prioritizes an in-progress event over future events and settlement', () => {

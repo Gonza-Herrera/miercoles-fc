@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
+import { NavigationContextService } from '../../../core/navigation/navigation-context.service';
 import { AppHeader } from '../app-header/app-header';
 import { BottomNavigation } from '../bottom-navigation/bottom-navigation';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AppHeader, BottomNavigation, RouterOutlet],
+  imports: [AppHeader, BottomNavigation, RouterLink, RouterOutlet],
   selector: 'app-shell',
   styleUrl: './app-shell.scss',
   templateUrl: './app-shell.html',
 })
-export class AppShell {}
+export class AppShell {
+  protected readonly navigation = inject(NavigationContextService);
+}

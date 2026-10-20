@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { PageContainer } from '../../shared/layout';
 import { RealtimeService } from '../../core/realtime/realtime.service';
@@ -51,6 +51,8 @@ export class Home implements OnInit {
   private readonly events = inject(EventService);
   private readonly groups = inject(GroupService);
   private readonly realtime = inject(RealtimeService, { optional: true });
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private request = 0;
   private unwatchEvent: (() => void) | null = null;
   private unwatchGroup: (() => void) | null = null;
   private watchedEventId: string | null = null;
@@ -70,16 +72,36 @@ export class Home implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    await this.load();
+    const changes = this.route?.queryParamMap;
+    if (!changes?.subscribe) {
+      await this.load();
+      return;
+    }
+    const subscription = changes.subscribe(() => void this.load());
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   protected async load(showLoading = true): Promise<void> {
+    const request = ++this.request;
     if (showLoading) this.loading.set(true);
     this.errorMessage.set(null);
     this.attendanceError.set(false);
     this.attendanceRecords.set([]);
     this.dinnerMenu.set(null);
     try {
+      const requestedEventId = this.route?.snapshot.queryParamMap.get('eventId');
+      if (requestedEventId) {
+        const event = await this.events.get(requestedEventId);
+        const group = await this.groups.get(event.groupId);
+        if (request !== this.request) return;
+        this.group.set(group);
+        this.currentEvent.set(event);
+        this.context.set(group);
+        this.watch(group.id, event.id);
+        this.eventContext.set(event);
+        await this.loadDashboardDetails(event, request);
+        return;
+      }
       const summaries = await this.groups.list();
       const selectedId =
         this.context.current()?.id ??
@@ -95,31 +117,39 @@ export class Home implements OnInit {
         this.groups.get(selectedId),
         this.events.current(selectedId),
       ]);
+      if (request !== this.request) return;
       this.group.set(group);
       this.currentEvent.set(event);
       this.context.set(group);
       this.watch(group.id, event?.id ?? null);
       if (event) {
         this.eventContext.set(event);
-        try {
-          this.attendanceRecords.set(await this.attendance.listForDashboard(event.id));
-        } catch {
-          this.attendanceError.set(true);
-        }
-        try {
-          const dinner = await this.dinnerPlanning.get(event.id);
-          this.dinnerMenu.set(dinner.plan?.menu ?? null);
-        } catch {
-          this.dinnerMenu.set(null);
-        }
+        await this.loadDashboardDetails(event, request);
       } else {
         this.eventContext.clear();
       }
     } catch {
-      this.errorMessage.set('No pudimos cargar tu próximo miércoles.');
-      this.eventContext.clear();
+      if (request === this.request) {
+        this.errorMessage.set('No pudimos cargar el miércoles solicitado.');
+        this.eventContext.clear();
+      }
     } finally {
-      if (showLoading) this.loading.set(false);
+      if (showLoading && request === this.request) this.loading.set(false);
+    }
+  }
+
+  private async loadDashboardDetails(event: WeeklyEvent, request: number): Promise<void> {
+    try {
+      const attendance = await this.attendance.listForDashboard(event.id);
+      if (request === this.request) this.attendanceRecords.set(attendance);
+    } catch {
+      if (request === this.request) this.attendanceError.set(true);
+    }
+    try {
+      const dinner = await this.dinnerPlanning.get(event.id);
+      if (request === this.request) this.dinnerMenu.set(dinner.plan?.menu ?? null);
+    } catch {
+      if (request === this.request) this.dinnerMenu.set(null);
     }
   }
 
